@@ -4,7 +4,7 @@ const recentItems = [
   {
     id: "AA001",
     name: "Antique Vase",
-    image: "https://unsplash.com/photos/white-ceramic-vase-on-brown-wooden-table-WUrXahlyjBo",
+    image: "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     barcode: "123456789001",
     status: "new",
     time: "Just now"
@@ -12,7 +12,7 @@ const recentItems = [
   {
     id: "BB002",
     name: "Electric Guitar",
-    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+    image: "https://static.bax-shop.es/image/product/363423/2395005/fd5680e0/1599749840Fazley%20FTL218XW%20Exotic%20Wood%20elektrische%20gitaar_1.jpg",
     barcode: "123456789002",
     status: "pending",
     time: "8 minutes ago"
@@ -32,54 +32,66 @@ const inventory = [
     id: "AA001",
     name: "Antique Vase",
     quantity: 1,
-    zone: "Zone A",
+    zone: "Unit 32",
     status: "new",
     category: "Antiques",
-    location: "Zone A",
+    location: "M1-B2-L2",
     last_updated: "2025-09-24"
   },
   {
     id: "BB002",
     name: "Electric Guitar",
     quantity: 3,
-    zone: "Zone B",
+    zone: "Unit 32",
     status: "pending",
     category: "Instruments",
-    location: "Zone B",
+    location: "R1-B7-L3",
     last_updated: "2025-09-23"
   },
   {
     id: "CC003",
     name: "Collectible Toy Car",
     quantity: 12,
-    zone: "Zone A",
+    zone: "In Transit",
     status: "new",
     category: "Toys",
-    location: "Zone A",
+    location: "Van",
     last_updated: "2025-09-24"
   }
 ];
 
 const zones = [
   {
-    name: "Zone A",
+    name: "Unit 32",
     racks: ["Rack 1", "Rack 2"],
     capacity: 75, // percent
     full: false
   },
   {
-    name: "Zone B",
+    name: "Unit 30",
     racks: ["Rack 3"],
     capacity: 110,
     full: true
+  }
+  {
+    name: "In Transit",
+    locaton: ["Van"],
+    capacity: 75, // percent
+    full: false
+  },
+  {
+    name: "On Site",
+    Location: ["Company A"],
+    capacity: N/A,
+    full: false
   }
 ];
 
 // Analytics mock
 const kpis = [
-  { title: "Total Items", value: 16 },
-  { title: "Turnover Rate", value: "2.1x/mo" },
-  { title: "Scan Frequency", value: "52/wk" }
+  { title: "Total Items at JPS", value: 16 },
+  { title: "Total Auctions This Week", value: "2.1x/mo" },
+  { title: "Total Sold Last Week", value: "£2,800" }
 ];
 
 // ------------------ Utilities ------------------
