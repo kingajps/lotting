@@ -4,7 +4,7 @@ const recentItems = [
   {
     id: "AA001",
     name: "Antique Vase",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+    image: "https://unsplash.com/photos/white-ceramic-vase-on-brown-wooden-table-WUrXahlyjBo",
     barcode: "123456789001",
     status: "new",
     time: "Just now"
