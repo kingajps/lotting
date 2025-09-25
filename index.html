@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1200, initial-scale=1.0" />
+  <title>Auction Warehouse Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <h1>Auction Warehouse Dashboard</h1>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" data-tab="recent">Recent Items</button>
+    <button class="tab-btn" data-tab="barcode">Barcode Scanning</button>
+    <button class="tab-btn" data-tab="inventory">Inventory Tracking</button>
+    <button class="tab-btn" data-tab="storage">Storage Management</button>
+    <button class="tab-btn" data-tab="analytics">Analytics</button>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <!-- Recent Items -->
+    <section id="tab-recent" class="tab-section active">
+      <h2>Recent Items</h2>
+      <div class="card-grid" id="recent-items"></div>
+    </section>
+    <!-- Barcode Scanning -->
+    <section id="tab-barcode" class="tab-section">
+      <h2>Barcode Scanning</h2>
+      <div class="barcode-panel">
+        <input type="text" id="barcode-input" placeholder="Enter or scan barcode..." />
+        <button id="barcode-scan-btn">Scan</button>
+      </div>
+      <div class="barcode-result" id="barcode-result"></div>
+    </section>
+    <!-- Inventory Tracking -->
+    <section id="tab-inventory" class="tab-section">
+      <h2>Inventory Tracking</h2>
+      <div class="filter-bar">
+        <select id="filter-category"><option>All Categories</option></select>
+        <select id="filter-status"><option>All Status</option></select>
+        <select id="filter-location"><option>All Locations</option></select>
+      </div>
+      <table class="inventory-table" id="inventory-table">
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Zone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <!-- Storage Management -->
+    <section id="tab-storage" class="tab-section">
+      <h2>Storage Management</h2>
+      <div class="zone-grid" id="zone-cards"></div>
+    </section>
+    <!-- Analytics -->
+    <section id="tab-analytics" class="tab-section">
+      <h2>Analytics</h2>
+      <div class="kpi-cards" id="kpi-cards"></div>
+      <div class="charts-section" id="charts-section"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
