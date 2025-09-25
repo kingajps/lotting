@@ -11,18 +11,76 @@
     <h1>Auction Warehouse Dashboard</h1>
   </header>
   <nav class="nav-tabs">
-    <button class="tab-btn active" data-tab="recent">Recent Items</button>
-    <button class="tab-btn" data-tab="barcode">Barcode Scanning</button>
-    <button class="tab-btn" data-tab="inventory">Inventory Tracking</button>
+    <button class="tab-btn active" data-tab="inventory">Inventory Tracking</button>
     <button class="tab-btn" data-tab="storage">Storage Management</button>
     <button class="tab-btn" data-tab="cases">Cases</button>
     <button class="tab-btn" data-tab="analytics">Analytics</button>
   </nav>
   <main class="main-container">
-    <!-- Recent Items Tab -->
-    <section id="tab-recent" class="tab-section active">
-      <h2>Recent Items</h2>
-      <div id="recent-items" class="card-grid"></div>
+    <!-- Inventory Tracking Tab -->
+    <section id="tab-inventory" class="tab-section active">
+      <div class="inventory-container">
+        <div class="inventory-header-row">
+          <div>
+            <h2 class="inventory-title">Inventory Manager</h2>
+            <p class="inventory-subtitle">Manage and track all items in your warehouse</p>
+          </div>
+          <button class="inventory-add-btn">
+            <span style="font-size:1.2em;">&#43;</span>
+            Add New Item
+          </button>
+        </div>
+        <!-- Search and Filters -->
+        <div class="inventory-filters-box">
+          <div class="inventory-filters-grid">
+            <div class="inventory-search-wrap">
+              <input type="text" class="inventory-search" placeholder="Search items, barcodes, brands..." />
+            </div>
+            <select class="inventory-category">
+              <option value="">All Categories</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Appliances">Appliances</option>
+              <option value="Jewellery">Jewellery</option>
+              <option value="Art">Art</option>
+              <option value="Collectibles">Collectibles</option>
+              <option value="Tools">Tools</option>
+            </select>
+            <select class="inventory-status">
+              <option value="">All Statuses</option>
+              <option value="Received">Received</option>
+              <option value="Catalogued">Catalogued</option>
+              <option value="Photographed">Photographed</option>
+              <option value="Listed">Listed</option>
+              <option value="Sold">Sold</option>
+              <option value="Awaiting Lotting">Awaiting Lotting</option>
+            </select>
+            <select class="inventory-case">
+              <option value="">All Cases</option>
+              <option value="CASE-2024-001">CASE-2024-001 - Estate Sale - Johnson Family</option>
+              <option value="CASE-2024-002">CASE-2024-002 - Business Liquidation - Tech Startup</option>
+            </select>
+          </div>
+          <div class="inventory-filters-row">
+            <span class="inventory-count">Showing X of Y items</span>
+            <div class="inventory-sort-wrap">
+              <span>Sort by:</span>
+              <select class="inventory-sort">
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="category-asc">Category (A-Z)</option>
+                <option value="category-desc">Category (Z-A)</option>
+                <option value="value-desc">Value (High-Low)</option>
+                <option value="value-asc">Value (Low-High)</option>
+                <option value="date-desc">Date (Newest)</option>
+                <option value="date-asc">Date (Oldest)</option>
+                <option value="status-asc">Status (A-Z)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="inventory-grid"></div>
+      </div>
     </section>
 
     <!-- Barcode Scanning Tab -->
@@ -35,72 +93,6 @@
       <div id="barcode-result" class="barcode-result"></div>
     </section>
 
-<!-- Replace your Inventory Tracking tab section with this block -->
-<section id="tab-inventory" class="tab-section">
-  <div class="inventory-container">
-    <div class="inventory-header-row">
-      <div>
-        <h2 class="inventory-title">Inventory Manager</h2>
-        <p class="inventory-subtitle">Manage and track all items in your warehouse</p>
-      </div>
-      <button class="inventory-add-btn">
-        <span style="font-size:1.2em;">&#43;</span>
-        Add New Item
-      </button>
-    </div>
-    <!-- Search and Filters -->
-    <div class="inventory-filters-box">
-      <div class="inventory-filters-grid">
-        <div class="inventory-search-wrap">
-          <input type="text" class="inventory-search" placeholder="Search items, barcodes, brands..." />
-        </div>
-        <select class="inventory-category">
-          <option value="">All Categories</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Furniture">Furniture</option>
-          <option value="Appliances">Appliances</option>
-          <option value="Jewellery">Jewellery</option>
-          <option value="Art">Art</option>
-          <option value="Collectibles">Collectibles</option>
-          <option value="Tools">Tools</option>
-        </select>
-        <select class="inventory-status">
-          <option value="">All Statuses</option>
-          <option value="Received">Received</option>
-          <option value="Catalogued">Catalogued</option>
-          <option value="Photographed">Photographed</option>
-          <option value="Listed">Listed</option>
-          <option value="Sold">Sold</option>
-          <option value="Awaiting Lotting">Awaiting Lotting</option>
-        </select>
-        <select class="inventory-case">
-          <option value="">All Cases</option>
-          <option value="CASE-2024-001">CASE-2024-001 - Estate Sale - Johnson Family</option>
-          <option value="CASE-2024-002">CASE-2024-002 - Business Liquidation - Tech Startup</option>
-        </select>
-      </div>
-      <div class="inventory-filters-row">
-        <span class="inventory-count">Showing X of Y items</span>
-        <div class="inventory-sort-wrap">
-          <span>Sort by:</span>
-          <select class="inventory-sort">
-            <option value="name-asc">Name (A-Z)</option>
-            <option value="name-desc">Name (Z-A)</option>
-            <option value="category-asc">Category (A-Z)</option>
-            <option value="category-desc">Category (Z-A)</option>
-            <option value="value-desc">Value (High-Low)</option>
-            <option value="value-asc">Value (Low-High)</option>
-            <option value="date-desc">Date (Newest)</option>
-            <option value="date-asc">Date (Oldest)</option>
-            <option value="status-asc">Status (A-Z)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="inventory-grid"></div>
-  </div>
-</section>
-
     <!-- Storage Management Tab -->
     <section id="tab-storage" class="tab-section">
       <h2>Storage Management</h2>
@@ -111,7 +103,6 @@
     <section id="tab-cases" class="tab-section">
       <div class="cases-container">
         <div class="cases-max-width">
-          <!-- Header -->
           <div class="cases-header">
             <div>
               <h1 class="cases-title">Case Manager</h1>
@@ -122,37 +113,28 @@
               <span>New Case</span>
             </button>
           </div>
-          <!-- Search and Filters -->
           <div class="cases-search-container">
-  <div class="cases-search-grid">
-    <div class="cases-search-input-container">
-      <span class="cases-search-icon">&#128269;</span>
-      <input
-        type="text"
-        placeholder="Search cases, clients, case numbers..."
-        class="cases-search-input"
-      />
-    </div>
-    <div>
-      <select class="cases-filter-select">
-        <option value="">All Statuses</option>
-        <option value="Active">Active</option>
-        <option value="Processing">Processing</option>
-        <option value="Ready">Ready</option>
-        <option value="Completed">Completed</option>
-        <option value="Cancelled">Cancelled</option>
-      </select>
-    </div>
-    <div class="cases-results-info">
-      <span class="cases-results-count">
-        Showing X of Y cases
-      </span>
-    </div>
-  </div>
-</div>
-          <!-- Cases Grid (dynamic by JS) -->
+            <div class="cases-search-grid">
+              <div class="cases-search-input-container">
+                <span class="cases-search-icon">&#128269;</span>
+                <input type="text" placeholder="Search cases, clients, case numbers..." class="cases-search-input" />
+              </div>
+              <div>
+                <select class="cases-filter-select">
+                  <option value="">All Statuses</option>
+                  <option value="Active">Active</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Ready">Ready</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="cases-results-info">
+                <span class="cases-results-count">Showing X of Y cases</span>
+              </div>
+            </div>
+          </div>
           <div class="cases-grid"></div>
-          <!-- Empty State (shown by JS) -->
           <div class="cases-empty" style="display:none;"></div>
         </div>
       </div>
