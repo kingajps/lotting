@@ -1,5 +1,44 @@
-// ------------------ Simulated Data ------------------
+// ---- Dashboard KPIs and Charts ----
+function renderDashboardKPIs() {
+  const kpiBox = document.getElementById("dashboard-kpis");
+  if (!kpiBox) return;
+  kpiBox.innerHTML = `
+    <div class="kpi-card"><div class="kpi-title">Total Items</div><div class="kpi-value">500</div></div>
+    <div class="kpi-card"><div class="kpi-title">Items Sold</div><div class="kpi-value">120</div></div>
+    <div class="kpi-card"><div class="kpi-title">Active Cases</div><div class="kpi-value">8</div></div>
+    <div class="kpi-card"><div class="kpi-title">Storage Utilization</div><div class="kpi-value">68%</div></div>
+  `;
+}
+function renderDashboardCharts() {
+  const charts = document.getElementById("dashboard-charts");
+  if (!charts) return;
+  charts.innerHTML = `
+    <div class="chart-card"><div class="chart-title">Items per Category</div>
+      <svg width="220" height="120">
+        <rect x="20" y="40" width="30" height="60" fill="#1a73e8"/>
+        <rect x="70" y="70" width="30" height="30" fill="#43a047"/>
+        <rect x="120" y="20" width="30" height="80" fill="#fbc02d"/>
+        <text x="20" y="115" font-size="12">Antiques</text>
+        <text x="70" y="115" font-size="12">Instruments</text>
+        <text x="120" y="115" font-size="12">Toys</text>
+      </svg>
+    </div>
+    <div class="chart-card"><div class="chart-title">Scans Over Time</div>
+      <svg width="220" height="120">
+        <polyline points="10,100 40,80 70,95 100,60 130,20 160,40 190,30" fill="none" stroke="#1a73e8" stroke-width="3"/>
+        <circle cx="10" cy="100" r="3" fill="#1a73e8"/>
+        <circle cx="40" cy="80" r="3" fill="#1a73e8"/>
+        <circle cx="70" cy="95" r="3" fill="#1a73e8"/>
+        <circle cx="100" cy="60" r="3" fill="#1a73e8"/>
+        <circle cx="130" cy="20" r="3" fill="#1a73e8"/>
+        <circle cx="160" cy="40" r="3" fill="#1a73e8"/>
+        <circle cx="190" cy="30" r="3" fill="#1a73e8"/>
+      </svg>
+    </div>
+  `;
+}
 
+// ---- Recent Items (for dashboard) ----
 const recentItems = [
   {
     id: "AA001",
@@ -23,7 +62,36 @@ const recentItems = [
     time: "25 minutes ago"
   }
 ];
+function statusText(status) {
+  switch (status) {
+    case "new": return "New";
+    case "pending": return "Pending";
+    case "alert": return "Alert";
+    default: return "Unknown";
+  }
+}
+function renderRecentItems() {
+  const grid = document.getElementById("recent-items");
+  if (!grid) return;
+  grid.innerHTML = "";
+  recentItems.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "item-card";
+    card.innerHTML = `
+      <div class="item-info">
+        <div class="item-name">${item.name}</div>
+        <div class="item-meta">
+          <span>Barcode: ${item.barcode}</span>
+          <span class="status-badge ${item.status}">${statusText(item.status)}</span>
+        </div>
+        <div class="item-time">${item.time}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
 
+// ---- Barcode Scanner Tab ----
 const inventory = [
   {
     id: "AA001",
@@ -57,80 +125,9 @@ const inventory = [
   }
   // Add more items as needed
 ];
-
-// ---------- UPDATED ZONES DATA STRUCTURE ----------
-const zones = [
-  {
-    name: "Unit 32",
-    details: [
-      "3 Mezzanines (5 bays each, 4 levels per bay)",
-      "3 Racks (6 bays each, 3 levels per bay)",
-      "6 Floor Storage Areas"
-    ],
-    capacity: 80,
-    full: false
-  },
-  {
-    name: "Unit 30",
-    details: [
-      "3 Racks (6 bays each, 3 levels per bay)",
-      "6 Floor Storage Areas"
-    ],
-    capacity: 65,
-    full: false
-  },
-  {
-    name: "On Site",
-    details: [
-      "Unlimited and unspecified storage"
-    ],
-    capacity: 100,
-    full: false
-  },
-  {
-    name: "In Transit",
-    details: [
-      "Van"
-    ],
-    capacity: 30,
-    full: false
-  }
-];
-
-// ------------------ Utilities ------------------
-function statusText(status) {
-  switch (status) {
-    case "new": return "New";
-    case "pending": return "Pending";
-    case "alert": return "Alert";
-    default: return "Unknown";
-  }
-}
-
-// ------------------ Recent Items ------------------
-function renderRecentItems() {
-  const grid = document.getElementById("recent-items");
-  grid.innerHTML = "";
-  recentItems.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "item-card";
-    card.innerHTML = `
-      <div class="item-info">
-        <div class="item-name">${item.name}</div>
-        <div class="item-meta">
-          <span>Barcode: ${item.barcode}</span>
-          <span class="status-badge ${item.status}">${statusText(item.status)}</span>
-        </div>
-        <div class="item-time">${item.time}</div>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-// ------------------ Barcode Scanning ------------------
 function renderBarcodeResult(item) {
   const result = document.getElementById("barcode-result");
+  if (!result) return;
   if (!item) {
     result.className = "barcode-result";
     result.innerHTML = "<span style='color:#e53935;font-weight:600'>No item found for this barcode.</span>";
@@ -143,21 +140,22 @@ function renderBarcodeResult(item) {
     <span class="status-badge ${item.status}">${statusText(item.status)}</span>
   `;
 }
-
 function setupBarcodeScan() {
   const btn = document.getElementById("barcode-scan-btn");
   const input = document.getElementById("barcode-input");
-  btn.onclick = () => {
-    const code = input.value.trim();
-    const found = inventory.find(i => i.id === code || i.barcode === code);
-    renderBarcodeResult(found);
-  };
-  input.onkeypress = (e) => {
-    if (e.key === "Enter") btn.click();
-  };
+  if (btn && input) {
+    btn.onclick = () => {
+      const code = input.value.trim();
+      const found = inventory.find(i => i.id === code || i.barcode === code);
+      renderBarcodeResult(found);
+    };
+    input.onkeypress = (e) => {
+      if (e.key === "Enter") btn.click();
+    };
+  }
 }
 
-// ---- Inventory Data ----
+// ---- Inventory Tab ----
 const inventoryItems = [
   {
     id: "123456789012",
@@ -196,10 +194,9 @@ const inventoryItems = [
     date: "2024-08-07"
   }
 ];
-
-// ---- Inventory Grid Rendering ----
 function renderInventoryGrid(items) {
   const grid = document.querySelector(".inventory-grid");
+  if (!grid) return;
   grid.innerHTML = items.length ? items.map(item => `
     <div class="inventory-card">
       <div class="inventory-image">
@@ -244,8 +241,6 @@ function renderInventoryGrid(items) {
     </div>
   `;
 }
-
-// ---- Filter, Search, and Sorting Logic ----
 function filterSortInventory() {
   const search = document.querySelector(".inventory-search").value.trim().toLowerCase();
   const category = document.querySelector(".inventory-category").value;
@@ -283,7 +278,6 @@ function filterSortInventory() {
 
   renderInventoryGrid(filtered);
 }
-
 function setupInventoryTab() {
   [
     ".inventory-search",
@@ -297,9 +291,47 @@ function setupInventoryTab() {
   filterSortInventory();
 }
 
-// ------------------ Storage Management ------------------
+// ---- Storage Map Tab ----
+const zones = [
+  {
+    name: "Unit 32",
+    details: [
+      "3 Mezzanines (5 bays each, 4 levels per bay)",
+      "3 Racks (6 bays each, 3 levels per bay)",
+      "6 Floor Storage Areas"
+    ],
+    capacity: 80,
+    full: false
+  },
+  {
+    name: "Unit 30",
+    details: [
+      "3 Racks (6 bays each, 3 levels per bay)",
+      "6 Floor Storage Areas"
+    ],
+    capacity: 65,
+    full: false
+  },
+  {
+    name: "On Site",
+    details: [
+      "Unlimited and unspecified storage"
+    ],
+    capacity: 100,
+    full: false
+  },
+  {
+    name: "In Transit",
+    details: [
+      "Van"
+    ],
+    capacity: 30,
+    full: false
+  }
+];
 function renderZoneCards() {
   const grid = document.getElementById("zone-cards");
+  if (!grid) return;
   grid.innerHTML = "";
   zones.forEach(zone => {
     const card = document.createElement("div");
@@ -314,119 +346,11 @@ function renderZoneCards() {
       </div>
       ${zone.full ? '<span class="zone-alert">Overfilled</span>' : ''}
     `;
-    card.onclick = () => showZoneInventory(zone.name);
     grid.appendChild(card);
   });
 }
 
-function showZoneInventory(zoneName) {
-  let overlay = document.getElementById("zone-inventory-overlay");
-  if (!overlay) {
-    overlay = document.createElement("div");
-    overlay.id = "zone-inventory-overlay";
-    overlay.className = "zone-inventory-overlay";
-    document.body.appendChild(overlay);
-  }
-  const items = inventory.filter(item => item.zone === zoneName);
-  overlay.innerHTML = `
-    <div class="zone-inventory-modal">
-      <h3>Items in ${zoneName}</h3>
-      <button class="close-zone-inventory" onclick="document.getElementById('zone-inventory-overlay').remove()">Close</button>
-      <ul>
-        ${items.length === 0 ? "<li>No items in this zone.</li>" : items.map(item => `
-          <li>
-            <strong>${item.name}</strong> <br/>
-            Location: ${item.location ? item.location : "N/A"}
-          </li>
-        `).join("")}
-      </ul>
-    </div>
-  `;
-}
-
-// ------------------ Analytics ------------------
-const kpis = [
-  { title: "Total Items", value: 16 },
-  { title: "Turnover Rate", value: "2.1x/mo" },
-  { title: "Scan Frequency", value: "52/wk" }
-];
-
-function renderKPIs() {
-  const kpiBox = document.getElementById("kpi-cards");
-  kpiBox.innerHTML = "";
-  kpis.forEach(kpi => {
-    const card = document.createElement("div");
-    card.className = "kpi-card";
-    card.innerHTML = `
-      <div class="kpi-title">${kpi.title}</div>
-      <div class="kpi-value">${kpi.value}</div>
-    `;
-    kpiBox.appendChild(card);
-  });
-}
-
-// Mock chart rendering with SVG
-function makeChartCard(title, svg) {
-  const div = document.createElement("div");
-  div.className = "chart-card";
-  div.innerHTML = `<div class="chart-title">${title}</div>${svg}`;
-  return div;
-}
-
-function renderCharts() {
-  const charts = document.getElementById("charts-section");
-  charts.innerHTML = "";
-
-  charts.appendChild(makeChartCard("Items per Category", `
-    <svg width="220" height="120">
-      <rect x="20" y="40" width="30" height="60" fill="#1a73e8"/>
-      <rect x="70" y="70" width="30" height="30" fill="#43a047"/>
-      <rect x="120" y="20" width="30" height="80" fill="#fbc02d"/>
-      <text x="20" y="115" font-size="12">Antiques</text>
-      <text x="70" y="115" font-size="12">Instruments</text>
-      <text x="120" y="115" font-size="12">Toys</text>
-    </svg>
-  `));
-
-  charts.appendChild(makeChartCard("Scans Over Time", `
-    <svg width="220" height="120">
-      <polyline points="10,100 40,80 70,95 100,60 130,20 160,40 190,30"
-        fill="none" stroke="#1a73e8" stroke-width="3"/>
-      <circle cx="10" cy="100" r="3" fill="#1a73e8"/>
-      <circle cx="40" cy="80" r="3" fill="#1a73e8"/>
-      <circle cx="70" cy="95" r="3" fill="#1a73e8"/>
-      <circle cx="100" cy="60" r="3" fill="#1a73e8"/>
-      <circle cx="130" cy="20" r="3" fill="#1a73e8"/>
-      <circle cx="160" cy="40" r="3" fill="#1a73e8"/>
-      <circle cx="190" cy="30" r="3" fill="#1a73e8"/>
-    </svg>
-  `));
-
-  charts.appendChild(makeChartCard("Status Distribution", `
-    <svg width="120" height="120" viewBox="0 0 32 32">
-      <circle r="16" cx="16" cy="16" fill="#f5f7fa"/>
-      <path d="M16 16 L16 0 A16 16 0 0 1 31.2 12.7 Z" fill="#1a73e8"/>
-      <path d="M16 16 L31.2 12.7 A16 16 0 0 1 16 32 Z" fill="#43a047"/>
-      <path d="M16 16 L16 32 A16 16 0 0 1 16 0 Z" fill="#fbc02d"/>
-    </svg>
-  `));
-}
-
-// ------------------ Tab Navigation ------------------
-function setupTabs() {
-  const tabs = document.querySelectorAll(".tab-btn");
-  const sections = document.querySelectorAll(".tab-section");
-  tabs.forEach(tab => {
-    tab.onclick = () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      sections.forEach(s => s.classList.remove("active"));
-      tab.classList.add("active");
-      document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
-    };
-  });
-}
-
-// ------------------ Cases Tab ------------------
+// ---- Cases Tab ----
 const cases = [
   {
     id: "CASE-2024-001",
@@ -463,7 +387,6 @@ const cases = [
   }
   // Add more cases as needed
 ];
-
 function renderCasesTab() {
   const casesGrid = document.querySelector("#tab-cases .cases-grid");
   const countLabel = document.querySelector(".cases-results-count");
@@ -523,25 +446,39 @@ function renderCasesTab() {
 
   countLabel.textContent = `Showing ${filtered.length} of ${cases.length} cases`;
 }
-
 function setupCasesTab() {
   const searchInput = document.querySelector(".cases-search-input");
   const statusSelect = document.querySelector(".cases-filter-select");
-
-  searchInput.addEventListener("input", renderCasesTab);
-  statusSelect.addEventListener("change", renderCasesTab);
-
+  if (searchInput && statusSelect) {
+    searchInput.addEventListener("input", renderCasesTab);
+    statusSelect.addEventListener("change", renderCasesTab);
+  }
   renderCasesTab();
 }
 
-// ------------------ Window Onload ------------------
-window.onload = function() {
-  setupTabs();
-  renderRecentItems();
-  setupBarcodeScan();
-  setupInventoryTab();
-  renderZoneCards();
-  renderKPIs();
-  renderCharts();
-  setupCasesTab();
-};
+// ---- Analytics Tab ----
+function renderKPIs() {
+  const kpiBox = document.getElementById("kpi-cards");
+  if (!kpiBox) return;
+  kpiBox.innerHTML = `
+    <div class="item-card">Total Items: 500</div>
+    <div class="item-card">Items Sold: 120</div>
+    <div class="item-card">Active Cases: 8</div>
+    <div class="item-card">Storage Utilization: 68%</div>
+  `;
+}
+function renderCharts() {
+  const charts = document.getElementById("charts-section");
+  if (!charts) return;
+  charts.innerHTML = `
+    <div class="item-card">[Chart Placeholder]</div>
+    <div class="item-card">[Chart Placeholder]</div>
+  `;
+}
+
+// ---- Tab Switching Logic ----
+function setupTabs() {
+  const tabs = document.querySelectorAll(".tab-btn");
+  const sections = document.querySelectorAll(".tab-section");
+  tabs.forEach(btn => {
+    btn.addEventListener("click
