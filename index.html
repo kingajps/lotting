@@ -14,12 +14,13 @@
 
   <!-- Navigation Tabs -->
   <nav class="nav-tabs">
-    <button class="tab-btn active" data-tab="recent">Recent Items</button>
-    <button class="tab-btn" data-tab="barcode">Barcode Scanning</button>
-    <button class="tab-btn" data-tab="inventory">Inventory Tracking</button>
-    <button class="tab-btn" data-tab="storage">Storage Management</button>
-    <button class="tab-btn" data-tab="analytics">Analytics</button>
-  </nav>
+  <button class="tab-btn active" data-tab="recent">Recent Items</button>
+  <button class="tab-btn" data-tab="barcode">Barcode Scanning</button>
+  <button class="tab-btn" data-tab="inventory">Inventory Tracking</button>
+  <button class="tab-btn" data-tab="storage">Storage Management</button>
+  <button class="tab-btn" data-tab="analytics">Analytics</button>
+  <button class="tab-btn" data-tab="cases">Cases</button>
+</nav>
 
   <!-- Main Container -->
   <main class="main-container">
@@ -69,6 +70,103 @@
       <div class="kpi-cards" id="kpi-cards"></div>
       <div class="charts-section" id="charts-section"></div>
     </section>
+
+      <!-- Cases Tab Section -->
+  <section id="tab-cases" class="tab-section">
+    <div class="cases-container">
+      <div class="cases-max-width">
+        <!-- Header -->
+        <div class="cases-header">
+          <div>
+            <h1 class="cases-title">Case Manager</h1>
+            <p class="cases-subtitle">Manage client cases and consignments</p>
+          </div>
+          <button class="cases-add-button">
+            <span style="font-size:1.2em;">&#43;</span>
+            <span>New Case</span>
+          </button>
+        </div>
+        <!-- Search and Filters -->
+        <div class="cases-search-container">
+          <div class="cases-search-grid">
+            <div class="cases-search-input-container">
+              <span class="cases-search-icon">&#128269;</span>
+              <input
+                type="text"
+                placeholder="Search cases, clients, case numbers..."
+                class="cases-search-input"
+              />
+            </div>
+            <div>
+              <select class="cases-filter-select">
+                <option value="">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Processing">Processing</option>
+                <option value="Ready">Ready</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="cases-results-info">
+            <span class="cases-results-count">
+              Showing X of Y cases
+            </span>
+          </div>
+        </div>
+        <!-- Cases Grid -->
+        <div class="cases-grid">
+          <!-- Single Case Card Example -->
+          <div class="case-card">
+            <div class="case-card-header">
+              <div class="case-header-top">
+                <h3 class="case-title">Estate Sale - Johnson Family</h3>
+                <span class="status-badge status-processing">
+                  Processing
+                </span>
+              </div>
+              <span class="case-number">CASE-2024-001</span>
+            </div>
+            <div class="case-card-body">
+              <div>
+                <div><strong>Client:</strong> Johnson Family Estate</div>
+                <div><strong>Received:</strong> 15/01/2024</div>
+                <div><strong>Items:</strong> 25</div>
+                <div><strong>Est. Value:</strong> £12,500</div>
+              </div>
+              <div style="margin:12px 0;">
+                <p>
+                  Complete household contents including furniture, electronics, and collectibles from a 50-year family home in Surrey
+                </p>
+              </div>
+              <!-- Progress Bar -->
+              <div style="margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;font-size:0.97em;">
+                  <span>Progress</span>
+                  <span>50%</span>
+                </div>
+                <div style="background:#e5e7eb;border-radius:999px;height:8px;width:100%;margin-top:4px;">
+                  <div style="background:#2563eb;border-radius:999px;height:8px;width:50%;"></div>
+                </div>
+              </div>
+              <!-- Actions -->
+              <div style="display:flex;gap:8px;">
+                <button style="flex:1;background:#2563eb;color:#fff;padding:8px 0;border-radius:8px;font-size:0.97em;border:none;cursor:pointer;">View</button>
+                <button style="flex:1;background:#f3f4f6;color:#222;padding:8px 0;border-radius:8px;font-size:0.97em;border:none;cursor:pointer;">Edit</button>
+                <button style="flex:1;background:#fee2e2;color:#dc2626;padding:8px 0;border-radius:8px;font-size:0.97em;border:none;cursor:pointer;">Delete</button>
+              </div>
+            </div>
+          </div>
+          <!-- End Single Case Card Example -->
+        </div>
+        <!-- Empty State Example -->
+        <div class="cases-empty" style="display: none;">
+          <h3>No cases found</h3>
+          <p>Try adjusting your search filters or create a new case.</p>
+        </div>
+      </div>
+    </div>
+  </section>
   </main>
 
   <script src="script.js"></script>
