@@ -61,48 +61,70 @@ const inventory = [
 ];
 
 const zones = [
-  {
-    name: "Unit 32",
-    locations: {
-      mezzanines: {
-        count: 3,
-        baysPerMezzanine: 5,
-        levelsPerBay: 4
-      },
-      racks: {
-        count: 3,
-        baysPerRack: 6,
-        levelsPerBay: 3
-      },
-      floorStorageAreas: 6
+  <script>
+  const zones = [
+    {
+      name: "Unit 32",
+      locations: {
+        mezzanines: {
+          count: 3,
+          baysPerMezzanine: 5,
+          levelsPerBay: 4
+        },
+        racks: {
+          count: 3,
+          baysPerRack: 6,
+          levelsPerBay: 3
+        },
+        floorStorageAreas: 6
+      }
+    },
+    {
+      name: "Unit 30",
+      locations: {
+        racks: {
+          count: 3,
+          baysPerRack: 6,
+          levelsPerBay: 3
+        },
+        floorStorageAreas: 6
+      }
+    },
+    {
+      name: "On Site",
+      locations: {
+        type: "Unspecified",
+        description: "Unlimited and unspecified storage"
+      }
+    },
+    {
+      name: "In Transit",
+      locations: {
+        type: "Vehicle",
+        description: "Van"
+      }
     }
-  },
-  {
-    name: "Unit 30",
-    locations: {
-      racks: {
-        count: 3,
-        baysPerRack: 6,
-        levelsPerBay: 3
-      },
-      floorStorageAreas: 6
-    }
-  },
-  {
-    name: "On Site",
-    locations: {
-      type: "Unspecified",
-      description: "Unlimited and unspecified storage"
-    }
-  },
-  {
-    name: "In Transit",
-    locations: {
-      type: "Vehicle",
-      description: "Van"
-    }
-  }
-];
+  ];
+
+  const zoneGrid = document.querySelector('.zone-grid');
+
+  zones.forEach(zone => {
+    const card = document.createElement('div');
+    card.className = 'zone-card';
+    card.innerHTML = `
+      <div class="zone-name">${zone.name}</div>
+      <div class="rack-list">
+        ${zone.locations.description || Object.entries(zone.locations).map(([key, val]) => {
+          if (typeof val === 'object') {
+            return `${key}: ${val.count} × ${val.baysPerRack || val.baysPerMezzanine} bays × ${val.levelsPerBay} levels`;
+          } else {
+            return `${key}: ${val}`;
+          }
+        }).join('<br>')}
+      </div>
+    `;
+    zoneGrid.appendChild(card);
+  });
 
 // Analytics mock
 const kpis = [
