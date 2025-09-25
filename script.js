@@ -4,7 +4,6 @@ const recentItems = [
   {
     id: "AA001",
     name: "Antique Vase",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789001",
     status: "new",
     time: "Just now"
@@ -12,7 +11,6 @@ const recentItems = [
   {
     id: "BB002",
     name: "Electric Guitar",
-    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789002",
     status: "pending",
     time: "8 minutes ago"
@@ -20,7 +18,6 @@ const recentItems = [
   {
     id: "CC003",
     name: "Collectible Toy Car",
-    image: "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789003",
     status: "new",
     time: "25 minutes ago"
@@ -141,7 +138,6 @@ function renderBarcodeResult(item) {
   }
   result.className = "barcode-result active";
   result.innerHTML = `
-    <img src="${item.image}" alt="${item.name}" />
     <div style="font-weight:600;font-size:1.1em;margin-bottom:4px">${item.name}</div>
     <div style="color:#888;margin-bottom:4px">Location: ${item.zone || item.location || "N/A"}</div>
     <span class="status-badge ${item.status}">${statusText(item.status)}</span>
@@ -161,6 +157,7 @@ function setupBarcodeScan() {
   };
 }
 
+// ---- Inventory Data ----
 const inventoryItems = [
   {
     id: "123456789012",
@@ -197,9 +194,108 @@ const inventoryItems = [
     location: "U32-COL-B3",
     case: "CASE-2024-001",
     date: "2024-08-07"
-  },
-  // ...add more items as needed
+  }
 ];
+
+// ---- Inventory Grid Rendering ----
+function renderInventoryGrid(items) {
+  const grid = document.querySelector(".inventory-grid");
+  grid.innerHTML = items.length ? items.map(item => `
+    <div class="inventory-card">
+      <div class="inventory-image">
+        <svg class="inventory-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+      </div>
+      <div class="inventory-details">
+        <div class="inventory-header">
+          <h3>${item.name}</h3>
+          <div class="inventory-brand">${item.brand}</div>
+          <div class="inventory-id">${item.id}</div>
+        </div>
+        <div class="inventory-status-row">
+          <span class="inventory-status status-${item.status.toLowerCase().replace(/ /g,'-')}">${item.status}</span>
+          <span class="inventory-condition">${item.condition}</span>
+        </div>
+        <div class="inventory-value-category">
+          <div>Value: <span>£${item.value}</span></div>
+          <div>Category: <span>${item.category}</span></div>
+        </div>
+        <div class="inventory-location-case">
+          <div><span class="inventory-location">${item.location}</span></div>
+          <div><span class="inventory-case">${item.case}</span></div>
+        </div>
+        <div class="inventory-actions">
+          <button class="inventory-btn view-btn">View</button>
+          <button class="inventory-btn edit-btn">Edit</button>
+          <button class="inventory-btn delete-btn">Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join("") : `
+    <div class="inventory-empty">
+      <svg class="inventory-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      <h3>No items found</h3>
+      <p>Try adjusting your search filters or add new items to inventory.</p>
+    </div>
+  `;
+}
+
+// ---- Filter, Search, and Sorting Logic ----
+function filterSortInventory() {
+  const search = document.querySelector(".inventory-search").value.trim().toLowerCase();
+  const category = document.querySelector(".inventory-category").value;
+  const status = document.querySelector(".inventory-status").value;
+  const caseId = document.querySelector(".inventory-case").value;
+  const sort = document.querySelector(".inventory-sort").value;
+
+  let filtered = inventoryItems.filter(i => {
+    let matchesSearch = i.name.toLowerCase().includes(search) ||
+      i.brand.toLowerCase().includes(search) ||
+      i.id.toLowerCase().includes(search);
+    let matchesCategory = !category || i.category === category;
+    let matchesStatus = !status || i.status === status;
+    let matchesCase = !caseId || i.case === caseId;
+    return matchesSearch && matchesCategory && matchesStatus && matchesCase;
+  });
+
+  filtered.sort((a, b) => {
+    switch (sort) {
+      case "name-asc": return a.name.localeCompare(b.name);
+      case "name-desc": return b.name.localeCompare(a.name);
+      case "category-asc": return a.category.localeCompare(b.category);
+      case "category-desc": return b.category.localeCompare(a.category);
+      case "value-asc": return a.value - b.value;
+      case "value-desc": return b.value - a.value;
+      case "date-asc": return new Date(a.date) - new Date(b.date);
+      case "date-desc": return new Date(b.date) - new Date(a.date);
+      case "status-asc": return a.status.localeCompare(b.status);
+      default: return 0;
+    }
+  });
+
+  document.querySelector(".inventory-count").textContent =
+    `Showing ${filtered.length} of ${inventoryItems.length} items`;
+
+  renderInventoryGrid(filtered);
+}
+
+function setupInventoryTab() {
+  [
+    ".inventory-search",
+    ".inventory-category",
+    ".inventory-status",
+    ".inventory-case",
+    ".inventory-sort"
+  ].forEach(sel =>
+    document.querySelector(sel).addEventListener("input", filterSortInventory)
+  );
+  filterSortInventory();
+}
 
 // ------------------ Storage Management ------------------
 function renderZoneCards() {
@@ -330,6 +426,7 @@ function setupTabs() {
   });
 }
 
+// ------------------ Cases Tab ------------------
 const cases = [
   {
     id: "CASE-2024-001",
@@ -427,7 +524,6 @@ function renderCasesTab() {
   countLabel.textContent = `Showing ${filtered.length} of ${cases.length} cases`;
 }
 
-// Setup event listeners for search/filter
 function setupCasesTab() {
   const searchInput = document.querySelector(".cases-search-input");
   const statusSelect = document.querySelector(".cases-filter-select");
@@ -438,17 +534,14 @@ function setupCasesTab() {
   renderCasesTab();
 }
 
-// Call this from window.onload after tab switching logic
+// ------------------ Window Onload ------------------
 window.onload = function() {
-  // ...your existing setup code...
   setupTabs();
   renderRecentItems();
   setupBarcodeScan();
-  fillFilters();
-  renderInventoryTable();
-  setupInventoryFilters();
+  setupInventoryTab();
   renderZoneCards();
   renderKPIs();
   renderCharts();
-  setupCasesTab(); // <--- Add this line
+  setupCasesTab();
 };
