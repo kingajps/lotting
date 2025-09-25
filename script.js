@@ -28,6 +28,7 @@ const recentItems = [
 ];
 
 const inventory = [
+  const inventory = [
   {
     id: "AA001",
     name: "Antique Vase",
@@ -35,7 +36,7 @@ const inventory = [
     zone: "Unit 32",
     status: "new",
     category: "Antiques",
-    location: "Unit 32",
+    location: "Mezzanine 1, Bay 2, Level 3",
     last_updated: "2025-09-24"
   },
   {
@@ -45,7 +46,7 @@ const inventory = [
     zone: "Unit 30",
     status: "pending",
     category: "Instruments",
-    location: "Unit 30",
+    location: "Rack 2, Bay 4, Level 2",
     last_updated: "2025-09-23"
   },
   {
@@ -55,12 +56,12 @@ const inventory = [
     zone: "Unit 32",
     status: "new",
     category: "Toys",
-    location: "Unit 32",
+    location: "Floor Storage Area 1",
     last_updated: "2025-09-24"
   }
 ];
 
-// UPDATED ZONES DATA STRUCTURE
+// ---------- UPDATED ZONES DATA STRUCTURE ----------
 const zones = [
   {
     name: "Unit 32",
@@ -240,8 +241,35 @@ function renderZoneCards() {
       </div>
       ${zone.full ? '<span class="zone-alert">Overfilled</span>' : ''}
     `;
+    card.onclick = () => showZoneInventory(zone.name); // <-- zone click handler
     grid.appendChild(card);
   });
+}
+
+// Function to show inventory items in a zone
+function showZoneInventory(zoneName) {
+  let overlay = document.getElementById("zone-inventory-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "zone-inventory-overlay";
+    overlay.className = "zone-inventory-overlay";
+    document.body.appendChild(overlay);
+  }
+  const items = inventory.filter(item => item.zone === zoneName);
+  overlay.innerHTML = `
+    <div class="zone-inventory-modal">
+      <h3>Items in ${zoneName}</h3>
+      <button class="close-zone-inventory" onclick="document.getElementById('zone-inventory-overlay').remove()">Close</button>
+      <ul>
+        ${items.length === 0 ? "<li>No items in this zone.</li>" : items.map(item => `
+          <li>
+            <strong>${item.name}</strong> <br/>
+            Location: ${item.location ? item.location : "N/A"}
+          </li>
+        `).join("")}
+      </ul>
+    </div>
+  `;
 }
 
 // ------------------ Analytics ------------------
