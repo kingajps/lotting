@@ -343,19 +343,6 @@ function setupTabs() {
   });
 }
 
-// ------------------ Main Init ------------------
-window.onload = function() {
-  setupTabs();
-  renderRecentItems();
-  setupBarcodeScan();
-  fillFilters();
-  renderInventoryTable();
-  setupInventoryFilters();
-  renderZoneCards();
-  renderKPIs();
-  renderCharts();
-};
-
 const cases = [
   {
     id: "CASE-2024-001",
