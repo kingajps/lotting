@@ -27,6 +27,40 @@ const recentItems = [
   }
 ];
 
+const inventory = [
+  {
+    id: "AA001",
+    name: "Antique Vase",
+    quantity: 1,
+    zone: "Unit 32",
+    status: "new",
+    category: "Antiques",
+    location: "Mezzanine 1, Bay 2, Level 3",
+    last_updated: "2025-09-24"
+  },
+  {
+    id: "BB002",
+    name: "Electric Guitar",
+    quantity: 3,
+    zone: "Unit 30",
+    status: "pending",
+    category: "Instruments",
+    location: "Rack 2, Bay 4, Level 2",
+    last_updated: "2025-09-23"
+  },
+  {
+    id: "CC003",
+    name: "Collectible Toy Car",
+    quantity: 12,
+    zone: "Unit 32",
+    status: "new",
+    category: "Toys",
+    location: "Floor Storage Area 1",
+    last_updated: "2025-09-24"
+  }
+  // Add more items as needed
+];
+
 // ---------- UPDATED ZONES DATA STRUCTURE ----------
 const zones = [
   {
