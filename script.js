@@ -1,48 +1,10 @@
-// ---- Dashboard KPIs and Charts ----
-function renderDashboardKPIs() {
-  const kpiBox = document.getElementById("dashboard-kpis");
-  if (!kpiBox) return;
-  kpiBox.innerHTML = `
-    <div class="kpi-card"><div class="kpi-title">Total Items</div><div class="kpi-value">500</div></div>
-    <div class="kpi-card"><div class="kpi-title">Items Sold</div><div class="kpi-value">120</div></div>
-    <div class="kpi-card"><div class="kpi-title">Active Cases</div><div class="kpi-value">8</div></div>
-    <div class="kpi-card"><div class="kpi-title">Storage Utilization</div><div class="kpi-value">68%</div></div>
-  `;
-}
-function renderDashboardCharts() {
-  const charts = document.getElementById("dashboard-charts");
-  if (!charts) return;
-  charts.innerHTML = `
-    <div class="chart-card"><div class="chart-title">Items per Category</div>
-      <svg width="220" height="120">
-        <rect x="20" y="40" width="30" height="60" fill="#1a73e8"/>
-        <rect x="70" y="70" width="30" height="30" fill="#43a047"/>
-        <rect x="120" y="20" width="30" height="80" fill="#fbc02d"/>
-        <text x="20" y="115" font-size="12">Antiques</text>
-        <text x="70" y="115" font-size="12">Instruments</text>
-        <text x="120" y="115" font-size="12">Toys</text>
-      </svg>
-    </div>
-    <div class="chart-card"><div class="chart-title">Scans Over Time</div>
-      <svg width="220" height="120">
-        <polyline points="10,100 40,80 70,95 100,60 130,20 160,40 190,30" fill="none" stroke="#1a73e8" stroke-width="3"/>
-        <circle cx="10" cy="100" r="3" fill="#1a73e8"/>
-        <circle cx="40" cy="80" r="3" fill="#1a73e8"/>
-        <circle cx="70" cy="95" r="3" fill="#1a73e8"/>
-        <circle cx="100" cy="60" r="3" fill="#1a73e8"/>
-        <circle cx="130" cy="20" r="3" fill="#1a73e8"/>
-        <circle cx="160" cy="40" r="3" fill="#1a73e8"/>
-        <circle cx="190" cy="30" r="3" fill="#1a73e8"/>
-      </svg>
-    </div>
-  `;
-}
+// ------------------ Simulated Data ------------------
 
-// ---- Recent Items (for dashboard) ----
 const recentItems = [
   {
     id: "AA001",
     name: "Antique Vase",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789001",
     status: "new",
     time: "Just now"
@@ -50,6 +12,7 @@ const recentItems = [
   {
     id: "BB002",
     name: "Electric Guitar",
+    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789002",
     status: "pending",
     time: "8 minutes ago"
@@ -57,41 +20,13 @@ const recentItems = [
   {
     id: "CC003",
     name: "Collectible Toy Car",
+    image: "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789003",
     status: "new",
     time: "25 minutes ago"
   }
 ];
-function statusText(status) {
-  switch (status) {
-    case "new": return "New";
-    case "pending": return "Pending";
-    case "alert": return "Alert";
-    default: return "Unknown";
-  }
-}
-function renderRecentItems() {
-  const grid = document.getElementById("recent-items");
-  if (!grid) return;
-  grid.innerHTML = "";
-  recentItems.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "item-card";
-    card.innerHTML = `
-      <div class="item-info">
-        <div class="item-name">${item.name}</div>
-        <div class="item-meta">
-          <span>Barcode: ${item.barcode}</span>
-          <span class="status-badge ${item.status}">${statusText(item.status)}</span>
-        </div>
-        <div class="item-time">${item.time}</div>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-}
 
-// ---- Barcode Scanner Tab ----
 const inventory = [
   {
     id: "AA001",
@@ -125,173 +60,8 @@ const inventory = [
   }
   // Add more items as needed
 ];
-function renderBarcodeResult(item) {
-  const result = document.getElementById("barcode-result");
-  if (!result) return;
-  if (!item) {
-    result.className = "barcode-result";
-    result.innerHTML = "<span style='color:#e53935;font-weight:600'>No item found for this barcode.</span>";
-    return;
-  }
-  result.className = "barcode-result active";
-  result.innerHTML = `
-    <div style="font-weight:600;font-size:1.1em;margin-bottom:4px">${item.name}</div>
-    <div style="color:#888;margin-bottom:4px">Location: ${item.zone || item.location || "N/A"}</div>
-    <span class="status-badge ${item.status}">${statusText(item.status)}</span>
-  `;
-}
-function setupBarcodeScan() {
-  const btn = document.getElementById("barcode-scan-btn");
-  const input = document.getElementById("barcode-input");
-  if (btn && input) {
-    btn.onclick = () => {
-      const code = input.value.trim();
-      const found = inventory.find(i => i.id === code || i.barcode === code);
-      renderBarcodeResult(found);
-    };
-    input.onkeypress = (e) => {
-      if (e.key === "Enter") btn.click();
-    };
-  }
-}
 
-// ---- Inventory Tab ----
-const inventoryItems = [
-  {
-    id: "123456789012",
-    name: "Oak Dining Table",
-    brand: "Heritage Furniture Classic Oak",
-    status: "Catalogued",
-    condition: "Good",
-    value: 420,
-    category: "Furniture",
-    location: "U32-FURN-B1",
-    case: "CASE-2024-001",
-    date: "2024-08-01"
-  },
-  {
-    id: "234567890123",
-    name: "Electric Guitar",
-    brand: "Fender",
-    status: "Received",
-    condition: "Excellent",
-    value: 1100,
-    category: "Electronics",
-    location: "U32-ELEC-A2",
-    case: "CASE-2024-002",
-    date: "2024-08-04"
-  },
-  {
-    id: "345678901234",
-    name: "Antique Vase",
-    brand: "Ming Dynasty",
-    status: "Listed",
-    condition: "Fair",
-    value: 2500,
-    category: "Collectibles",
-    location: "U32-COL-B3",
-    case: "CASE-2024-001",
-    date: "2024-08-07"
-  }
-];
-function renderInventoryGrid(items) {
-  const grid = document.querySelector(".inventory-grid");
-  if (!grid) return;
-  grid.innerHTML = items.length ? items.map(item => `
-    <div class="inventory-card">
-      <div class="inventory-image">
-        <svg class="inventory-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      </div>
-      <div class="inventory-details">
-        <div class="inventory-header">
-          <h3>${item.name}</h3>
-          <div class="inventory-brand">${item.brand}</div>
-          <div class="inventory-id">${item.id}</div>
-        </div>
-        <div class="inventory-status-row">
-          <span class="inventory-status status-${item.status.toLowerCase().replace(/ /g,'-')}">${item.status}</span>
-          <span class="inventory-condition">${item.condition}</span>
-        </div>
-        <div class="inventory-value-category">
-          <div>Value: <span>£${item.value}</span></div>
-          <div>Category: <span>${item.category}</span></div>
-        </div>
-        <div class="inventory-location-case">
-          <div><span class="inventory-location">${item.location}</span></div>
-          <div><span class="inventory-case">${item.case}</span></div>
-        </div>
-        <div class="inventory-actions">
-          <button class="inventory-btn view-btn">View</button>
-          <button class="inventory-btn edit-btn">Edit</button>
-          <button class="inventory-btn delete-btn">Delete</button>
-        </div>
-      </div>
-    </div>
-  `).join("") : `
-    <div class="inventory-empty">
-      <svg class="inventory-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-      </svg>
-      <h3>No items found</h3>
-      <p>Try adjusting your search filters or add new items to inventory.</p>
-    </div>
-  `;
-}
-function filterSortInventory() {
-  const search = document.querySelector(".inventory-search").value.trim().toLowerCase();
-  const category = document.querySelector(".inventory-category").value;
-  const status = document.querySelector(".inventory-status").value;
-  const caseId = document.querySelector(".inventory-case").value;
-  const sort = document.querySelector(".inventory-sort").value;
-
-  let filtered = inventoryItems.filter(i => {
-    let matchesSearch = i.name.toLowerCase().includes(search) ||
-      i.brand.toLowerCase().includes(search) ||
-      i.id.toLowerCase().includes(search);
-    let matchesCategory = !category || i.category === category;
-    let matchesStatus = !status || i.status === status;
-    let matchesCase = !caseId || i.case === caseId;
-    return matchesSearch && matchesCategory && matchesStatus && matchesCase;
-  });
-
-  filtered.sort((a, b) => {
-    switch (sort) {
-      case "name-asc": return a.name.localeCompare(b.name);
-      case "name-desc": return b.name.localeCompare(a.name);
-      case "category-asc": return a.category.localeCompare(b.category);
-      case "category-desc": return b.category.localeCompare(a.category);
-      case "value-asc": return a.value - b.value;
-      case "value-desc": return b.value - a.value;
-      case "date-asc": return new Date(a.date) - new Date(b.date);
-      case "date-desc": return new Date(b.date) - new Date(a.date);
-      case "status-asc": return a.status.localeCompare(b.status);
-      default: return 0;
-    }
-  });
-
-  document.querySelector(".inventory-count").textContent =
-    `Showing ${filtered.length} of ${inventoryItems.length} items`;
-
-  renderInventoryGrid(filtered);
-}
-function setupInventoryTab() {
-  [
-    ".inventory-search",
-    ".inventory-category",
-    ".inventory-status",
-    ".inventory-case",
-    ".inventory-sort"
-  ].forEach(sel =>
-    document.querySelector(sel).addEventListener("input", filterSortInventory)
-  );
-  filterSortInventory();
-}
-
-// ---- Storage Map Tab ----
+// ---------- UPDATED ZONES DATA STRUCTURE ----------
 const zones = [
   {
     name: "Unit 32",
@@ -329,9 +99,123 @@ const zones = [
     full: false
   }
 ];
+
+// ------------------ Utilities ------------------
+function statusText(status) {
+  switch (status) {
+    case "new": return "New";
+    case "pending": return "Pending";
+    case "alert": return "Alert";
+    default: return "Unknown";
+  }
+}
+
+// ------------------ Recent Items ------------------
+function renderRecentItems() {
+  const grid = document.getElementById("recent-items");
+  grid.innerHTML = "";
+  recentItems.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "item-card";
+    card.innerHTML = `
+      <div class="item-info">
+        <div class="item-name">${item.name}</div>
+        <div class="item-meta">
+          <span>Barcode: ${item.barcode}</span>
+          <span class="status-badge ${item.status}">${statusText(item.status)}</span>
+        </div>
+        <div class="item-time">${item.time}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ------------------ Barcode Scanning ------------------
+function renderBarcodeResult(item) {
+  const result = document.getElementById("barcode-result");
+  if (!item) {
+    result.className = "barcode-result";
+    result.innerHTML = "<span style='color:#e53935;font-weight:600'>No item found for this barcode.</span>";
+    return;
+  }
+  result.className = "barcode-result active";
+  result.innerHTML = `
+    <img src="${item.image}" alt="${item.name}" />
+    <div style="font-weight:600;font-size:1.1em;margin-bottom:4px">${item.name}</div>
+    <div style="color:#888;margin-bottom:4px">Location: ${item.zone || item.location || "N/A"}</div>
+    <span class="status-badge ${item.status}">${statusText(item.status)}</span>
+  `;
+}
+
+function setupBarcodeScan() {
+  const btn = document.getElementById("barcode-scan-btn");
+  const input = document.getElementById("barcode-input");
+  btn.onclick = () => {
+    const code = input.value.trim();
+    const found = inventory.find(i => i.id === code || i.barcode === code);
+    renderBarcodeResult(found);
+  };
+  input.onkeypress = (e) => {
+    if (e.key === "Enter") btn.click();
+  };
+}
+
+// ------------------ Inventory Tracking ------------------
+function fillFilters() {
+  const catSel = document.getElementById("filter-category");
+  const statusSel = document.getElementById("filter-status");
+  const locSel = document.getElementById("filter-location");
+
+  let cats = [...new Set(inventory.map(i => i.category))];
+  let stats = [...new Set(inventory.map(i => i.status))];
+  let locs = [...new Set(inventory.map(i => i.location))];
+
+  catSel.innerHTML = `<option value="">All Categories</option>` + cats.map(c => `<option>${c}</option>`).join("");
+  statusSel.innerHTML = `<option value="">All Status</option>` + stats.map(s => `<option>${statusText(s)}</option>`).join("");
+  locSel.innerHTML = `<option value="">All Locations</option>` + locs.map(l => `<option>${l}</option>`).join("");
+}
+
+function renderInventoryTable() {
+  const tbody = document.querySelector("#inventory-table tbody");
+  tbody.innerHTML = "";
+
+  const cat = document.getElementById("filter-category").value;
+  const stat = document.getElementById("filter-status").value;
+  const loc = document.getElementById("filter-location").value;
+
+  let filtered = inventory.filter(i =>
+    (!cat || i.category === cat) &&
+    (!stat || statusText(i.status) === stat) &&
+    (!loc || i.location === loc)
+  );
+
+  filtered.forEach(item => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.name}</td>
+      <td>${item.quantity}</td>
+      <td>${item.zone}</td>
+      <td><span class="status-badge ${item.status}">${statusText(item.status)}</span></td>
+      <td>
+        <button class="table-action-btn" title="Edit">&#9998;</button>
+        <button class="table-action-btn" title="View">&#128065;</button>
+        <button class="table-action-btn" title="Delete">&#10006;</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function setupInventoryFilters() {
+  ["filter-category", "filter-status", "filter-location"].forEach(id => {
+    document.getElementById(id).onchange = renderInventoryTable;
+  });
+}
+
+// ------------------ Storage Management ------------------
 function renderZoneCards() {
   const grid = document.getElementById("zone-cards");
-  if (!grid) return;
   grid.innerHTML = "";
   zones.forEach(zone => {
     const card = document.createElement("div");
@@ -346,11 +230,118 @@ function renderZoneCards() {
       </div>
       ${zone.full ? '<span class="zone-alert">Overfilled</span>' : ''}
     `;
+    card.onclick = () => showZoneInventory(zone.name);
     grid.appendChild(card);
   });
 }
 
-// ---- Cases Tab ----
+function showZoneInventory(zoneName) {
+  let overlay = document.getElementById("zone-inventory-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "zone-inventory-overlay";
+    overlay.className = "zone-inventory-overlay";
+    document.body.appendChild(overlay);
+  }
+  const items = inventory.filter(item => item.zone === zoneName);
+  overlay.innerHTML = `
+    <div class="zone-inventory-modal">
+      <h3>Items in ${zoneName}</h3>
+      <button class="close-zone-inventory" onclick="document.getElementById('zone-inventory-overlay').remove()">Close</button>
+      <ul>
+        ${items.length === 0 ? "<li>No items in this zone.</li>" : items.map(item => `
+          <li>
+            <strong>${item.name}</strong> <br/>
+            Location: ${item.location ? item.location : "N/A"}
+          </li>
+        `).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+// ------------------ Analytics ------------------
+const kpis = [
+  { title: "Total Items", value: 16 },
+  { title: "Turnover Rate", value: "2.1x/mo" },
+  { title: "Scan Frequency", value: "52/wk" }
+];
+
+function renderKPIs() {
+  const kpiBox = document.getElementById("kpi-cards");
+  kpiBox.innerHTML = "";
+  kpis.forEach(kpi => {
+    const card = document.createElement("div");
+    card.className = "kpi-card";
+    card.innerHTML = `
+      <div class="kpi-title">${kpi.title}</div>
+      <div class="kpi-value">${kpi.value}</div>
+    `;
+    kpiBox.appendChild(card);
+  });
+}
+
+// Mock chart rendering with SVG
+function makeChartCard(title, svg) {
+  const div = document.createElement("div");
+  div.className = "chart-card";
+  div.innerHTML = `<div class="chart-title">${title}</div>${svg}`;
+  return div;
+}
+
+function renderCharts() {
+  const charts = document.getElementById("charts-section");
+  charts.innerHTML = "";
+
+  charts.appendChild(makeChartCard("Items per Category", `
+    <svg width="220" height="120">
+      <rect x="20" y="40" width="30" height="60" fill="#1a73e8"/>
+      <rect x="70" y="70" width="30" height="30" fill="#43a047"/>
+      <rect x="120" y="20" width="30" height="80" fill="#fbc02d"/>
+      <text x="20" y="115" font-size="12">Antiques</text>
+      <text x="70" y="115" font-size="12">Instruments</text>
+      <text x="120" y="115" font-size="12">Toys</text>
+    </svg>
+  `));
+
+  charts.appendChild(makeChartCard("Scans Over Time", `
+    <svg width="220" height="120">
+      <polyline points="10,100 40,80 70,95 100,60 130,20 160,40 190,30"
+        fill="none" stroke="#1a73e8" stroke-width="3"/>
+      <circle cx="10" cy="100" r="3" fill="#1a73e8"/>
+      <circle cx="40" cy="80" r="3" fill="#1a73e8"/>
+      <circle cx="70" cy="95" r="3" fill="#1a73e8"/>
+      <circle cx="100" cy="60" r="3" fill="#1a73e8"/>
+      <circle cx="130" cy="20" r="3" fill="#1a73e8"/>
+      <circle cx="160" cy="40" r="3" fill="#1a73e8"/>
+      <circle cx="190" cy="30" r="3" fill="#1a73e8"/>
+    </svg>
+  `));
+
+  charts.appendChild(makeChartCard("Status Distribution", `
+    <svg width="120" height="120" viewBox="0 0 32 32">
+      <circle r="16" cx="16" cy="16" fill="#f5f7fa"/>
+      <path d="M16 16 L16 0 A16 16 0 0 1 31.2 12.7 Z" fill="#1a73e8"/>
+      <path d="M16 16 L31.2 12.7 A16 16 0 0 1 16 32 Z" fill="#43a047"/>
+      <path d="M16 16 L16 32 A16 16 0 0 1 16 0 Z" fill="#fbc02d"/>
+    </svg>
+  `));
+}
+
+// ------------------ Tab Navigation ------------------
+function setupTabs() {
+  const tabs = document.querySelectorAll(".tab-btn");
+  const sections = document.querySelectorAll(".tab-section");
+  tabs.forEach(tab => {
+    tab.onclick = () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
+    };
+  });
+}
+
 const cases = [
   {
     id: "CASE-2024-001",
@@ -387,6 +378,7 @@ const cases = [
   }
   // Add more cases as needed
 ];
+
 function renderCasesTab() {
   const casesGrid = document.querySelector("#tab-cases .cases-grid");
   const countLabel = document.querySelector(".cases-results-count");
@@ -446,39 +438,29 @@ function renderCasesTab() {
 
   countLabel.textContent = `Showing ${filtered.length} of ${cases.length} cases`;
 }
+
+// Setup event listeners for search/filter
 function setupCasesTab() {
   const searchInput = document.querySelector(".cases-search-input");
   const statusSelect = document.querySelector(".cases-filter-select");
-  if (searchInput && statusSelect) {
-    searchInput.addEventListener("input", renderCasesTab);
-    statusSelect.addEventListener("change", renderCasesTab);
-  }
+
+  searchInput.addEventListener("input", renderCasesTab);
+  statusSelect.addEventListener("change", renderCasesTab);
+
   renderCasesTab();
 }
 
-// ---- Analytics Tab ----
-function renderKPIs() {
-  const kpiBox = document.getElementById("kpi-cards");
-  if (!kpiBox) return;
-  kpiBox.innerHTML = `
-    <div class="item-card">Total Items: 500</div>
-    <div class="item-card">Items Sold: 120</div>
-    <div class="item-card">Active Cases: 8</div>
-    <div class="item-card">Storage Utilization: 68%</div>
-  `;
-}
-function renderCharts() {
-  const charts = document.getElementById("charts-section");
-  if (!charts) return;
-  charts.innerHTML = `
-    <div class="item-card">[Chart Placeholder]</div>
-    <div class="item-card">[Chart Placeholder]</div>
-  `;
-}
-
-// ---- Tab Switching Logic ----
-function setupTabs() {
-  const tabs = document.querySelectorAll(".tab-btn");
-  const sections = document.querySelectorAll(".tab-section");
-  tabs.forEach(btn => {
-    btn.addEventListener("click
+// Call this from window.onload after tab switching logic
+window.onload = function() {
+  // ...your existing setup code...
+  setupTabs();
+  renderRecentItems();
+  setupBarcodeScan();
+  fillFilters();
+  renderInventoryTable();
+  setupInventoryFilters();
+  renderZoneCards();
+  renderKPIs();
+  renderCharts();
+  setupCasesTab(); // <--- Add this line
+};
