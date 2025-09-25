@@ -62,16 +62,45 @@ const inventory = [
 
 const zones = [
   {
-    name: "Zone A",
-    racks: ["Rack 1", "Rack 2"],
-    capacity: 75, // percent
-    full: false
+    name: "Unit 32",
+    locations: {
+      mezzanines: {
+        count: 3,
+        baysPerMezzanine: 5,
+        levelsPerBay: 4
+      },
+      racks: {
+        count: 3,
+        baysPerRack: 6,
+        levelsPerBay: 3
+      },
+      floorStorageAreas: 6
+    }
   },
   {
-    name: "Zone B",
-    racks: ["Rack 3"],
-    capacity: 110,
-    full: true
+    name: "Unit 30",
+    locations: {
+      racks: {
+        count: 3,
+        baysPerRack: 6,
+        levelsPerBay: 3
+      },
+      floorStorageAreas: 6
+    }
+  },
+  {
+    name: "On Site",
+    locations: {
+      type: "Unspecified",
+      description: "Unlimited and unspecified storage"
+    }
+  },
+  {
+    name: "In Transit",
+    locations: {
+      type: "Vehicle",
+      description: "Van"
+    }
   }
 ];
 
