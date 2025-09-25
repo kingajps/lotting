@@ -118,7 +118,6 @@ function renderRecentItems() {
     const card = document.createElement("div");
     card.className = "item-card";
     card.innerHTML = `
-      <img src="${item.image}" alt="${item.name}" class="item-thumb" />
       <div class="item-info">
         <div class="item-name">${item.name}</div>
         <div class="item-meta">
