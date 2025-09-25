@@ -514,72 +514,95 @@ h2 {
   background-color: #1d4ed8;
 }
 
-/* Search and filters container */
+/* -- CASES SEARCH AND FILTER AREA -- */
+
+/* Container for search and filters */
 .cases-search-container {
-  background-color: white;
+  background-color: #fff;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
   border: 1px solid #e5e7eb;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
+
+/* Responsive grid for search input, status select, and result count */
 .cases-search-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 1rem;
+  align-items: center;
 }
-@media (min-width: 768px) {
+
+@media (max-width: 900px) {
   .cases-search-grid {
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr;
   }
 }
+
+/* Search input container with icon */
 .cases-search-input-container {
   position: relative;
 }
+
 .cases-search-icon {
   position: absolute;
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  height: 1.25rem;
-  width: 1.25rem;
+  font-size: 1.1em;
   color: #9ca3af;
+  pointer-events: none;
 }
+
 .cases-search-input {
   width: 100%;
-  padding-left: 2.5rem;
+  padding-left: 2.2rem;
   padding-right: 1rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
+  background-color: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
 }
+
 .cases-search-input:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: #2563eb;
 }
+
+/* Status select dropdown */
 .cases-filter-select {
   width: 100%;
   padding: 0.5rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background-color: white;
+  font-size: 1rem;
+  background-color: #fff;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
 }
+
 .cases-filter-select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: #2563eb;
 }
+
+/* Result count display */
 .cases-results-info {
-  margin-top: 1rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  height: 100%;
+  font-size: 0.97em;
 }
+
 .cases-results-count {
-  font-size: 0.875rem;
   color: #6b7280;
+  font-size: 0.97em;
 }
 
 /* Cases grid container */
