@@ -32,46 +32,70 @@ const inventory = [
     id: "AA001",
     name: "Antique Vase",
     quantity: 1,
-    zone: "Zone A",
+    zone: "Unit 32",
     status: "new",
     category: "Antiques",
-    location: "Zone A",
+    location: "Unit 32",
     last_updated: "2025-09-24"
   },
   {
     id: "BB002",
     name: "Electric Guitar",
     quantity: 3,
-    zone: "Zone B",
+    zone: "Unit 30",
     status: "pending",
     category: "Instruments",
-    location: "Zone B",
+    location: "Unit 30",
     last_updated: "2025-09-23"
   },
   {
     id: "CC003",
     name: "Collectible Toy Car",
     quantity: 12,
-    zone: "Zone A",
+    zone: "Unit 32",
     status: "new",
     category: "Toys",
-    location: "Zone A",
+    location: "Unit 32",
     last_updated: "2025-09-24"
   }
 ];
 
+// UPDATED ZONES DATA STRUCTURE
 const zones = [
   {
-    name: "Zone A",
-    racks: ["Rack 1", "Rack 2"],
-    capacity: 75, // percent
+    name: "Unit 32",
+    details: [
+      "3 Mezzanines (5 bays each, 4 levels per bay)",
+      "3 Racks (6 bays each, 3 levels per bay)",
+      "6 Floor Storage Areas"
+    ],
+    capacity: 80,
     full: false
   },
   {
-    name: "Zone B",
-    racks: ["Rack 3"],
-    capacity: 110,
-    full: true
+    name: "Unit 30",
+    details: [
+      "3 Racks (6 bays each, 3 levels per bay)",
+      "6 Floor Storage Areas"
+    ],
+    capacity: 65,
+    full: false
+  },
+  {
+    name: "On Site",
+    details: [
+      "Unlimited and unspecified storage"
+    ],
+    capacity: 100,
+    full: false
+  },
+  {
+    name: "In Transit",
+    details: [
+      "Van"
+    ],
+    capacity: 30,
+    full: false
   }
 ];
 
@@ -208,7 +232,9 @@ function renderZoneCards() {
     card.className = "zone-card";
     card.innerHTML = `
       <div class="zone-name">${zone.name}</div>
-      <div class="rack-list">${zone.racks.join(", ")}</div>
+      <ul class="zone-details">
+        ${zone.details.map(detail => `<li>${detail}</li>`).join("")}
+      </ul>
       <div class="capacity-bar">
         <div class="capacity-bar-fill" style="width:${Math.min(zone.capacity,100)}%;background:${zone.capacity>100?'#e53935':'#1a73e8'}"></div>
       </div>
