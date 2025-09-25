@@ -27,40 +27,6 @@ const recentItems = [
   }
 ];
 
-const inventory = [
-  {
-    id: "AA001",
-    name: "Antique Vase",
-    quantity: 1,
-    zone: "Unit 32",
-    status: "new",
-    category: "Antiques",
-    location: "Mezzanine 1, Bay 2, Level 3",
-    last_updated: "2025-09-24"
-  },
-  {
-    id: "BB002",
-    name: "Electric Guitar",
-    quantity: 3,
-    zone: "Unit 30",
-    status: "pending",
-    category: "Instruments",
-    location: "Rack 2, Bay 4, Level 2",
-    last_updated: "2025-09-23"
-  },
-  {
-    id: "CC003",
-    name: "Collectible Toy Car",
-    quantity: 12,
-    zone: "Unit 32",
-    status: "new",
-    category: "Toys",
-    location: "Floor Storage Area 1",
-    last_updated: "2025-09-24"
-  }
-  // Add more items as needed
-];
-
 // ---------- UPDATED ZONES DATA STRUCTURE ----------
 const zones = [
   {
@@ -161,57 +127,45 @@ function setupBarcodeScan() {
   };
 }
 
-// ------------------ Inventory Tracking ------------------
-function fillFilters() {
-  const catSel = document.getElementById("filter-category");
-  const statusSel = document.getElementById("filter-status");
-  const locSel = document.getElementById("filter-location");
-
-  let cats = [...new Set(inventory.map(i => i.category))];
-  let stats = [...new Set(inventory.map(i => i.status))];
-  let locs = [...new Set(inventory.map(i => i.location))];
-
-  catSel.innerHTML = `<option value="">All Categories</option>` + cats.map(c => `<option>${c}</option>`).join("");
-  statusSel.innerHTML = `<option value="">All Status</option>` + stats.map(s => `<option>${statusText(s)}</option>`).join("");
-  locSel.innerHTML = `<option value="">All Locations</option>` + locs.map(l => `<option>${l}</option>`).join("");
-}
-
-function renderInventoryTable() {
-  const tbody = document.querySelector("#inventory-table tbody");
-  tbody.innerHTML = "";
-
-  const cat = document.getElementById("filter-category").value;
-  const stat = document.getElementById("filter-status").value;
-  const loc = document.getElementById("filter-location").value;
-
-  let filtered = inventory.filter(i =>
-    (!cat || i.category === cat) &&
-    (!stat || statusText(i.status) === stat) &&
-    (!loc || i.location === loc)
-  );
-
-  filtered.forEach(item => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${item.name}</td>
-      <td>${item.quantity}</td>
-      <td>${item.zone}</td>
-      <td><span class="status-badge ${item.status}">${statusText(item.status)}</span></td>
-      <td>
-        <button class="table-action-btn" title="Edit">&#9998;</button>
-        <button class="table-action-btn" title="View">&#128065;</button>
-        <button class="table-action-btn" title="Delete">&#10006;</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function setupInventoryFilters() {
-  ["filter-category", "filter-status", "filter-location"].forEach(id => {
-    document.getElementById(id).onchange = renderInventoryTable;
-  });
-}
+const inventoryItems = [
+  {
+    id: "123456789012",
+    name: "Oak Dining Table",
+    brand: "Heritage Furniture Classic Oak",
+    status: "Catalogued",
+    condition: "Good",
+    value: 420,
+    category: "Furniture",
+    location: "U32-FURN-B1",
+    case: "CASE-2024-001",
+    date: "2024-08-01"
+  },
+  {
+    id: "234567890123",
+    name: "Electric Guitar",
+    brand: "Fender",
+    status: "Received",
+    condition: "Excellent",
+    value: 1100,
+    category: "Electronics",
+    location: "U32-ELEC-A2",
+    case: "CASE-2024-002",
+    date: "2024-08-04"
+  },
+  {
+    id: "345678901234",
+    name: "Antique Vase",
+    brand: "Ming Dynasty",
+    status: "Listed",
+    condition: "Fair",
+    value: 2500,
+    category: "Collectibles",
+    location: "U32-COL-B3",
+    case: "CASE-2024-001",
+    date: "2024-08-07"
+  },
+  // ...add more items as needed
+];
 
 // ------------------ Storage Management ------------------
 function renderZoneCards() {
