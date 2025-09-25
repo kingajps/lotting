@@ -35,27 +35,71 @@
       <div id="barcode-result" class="barcode-result"></div>
     </section>
 
-    <!-- Inventory Tracking Tab -->
-    <section id="tab-inventory" class="tab-section">
-      <h2>Inventory Tracking</h2>
-      <div class="inventory-filters">
-        <select id="filter-category"></select>
-        <select id="filter-status"></select>
-        <select id="filter-location"></select>
+<!-- Replace your Inventory Tracking tab section with this block -->
+<section id="tab-inventory" class="tab-section">
+  <div class="inventory-container">
+    <div class="inventory-header-row">
+      <div>
+        <h2 class="inventory-title">Inventory Manager</h2>
+        <p class="inventory-subtitle">Manage and track all items in your warehouse</p>
       </div>
-      <table id="inventory-table" class="inventory-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Quantity</th>
-            <th>Zone</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
+      <button class="inventory-add-btn">
+        <span style="font-size:1.2em;">&#43;</span>
+        Add New Item
+      </button>
+    </div>
+    <!-- Search and Filters -->
+    <div class="inventory-filters-box">
+      <div class="inventory-filters-grid">
+        <div class="inventory-search-wrap">
+          <input type="text" class="inventory-search" placeholder="Search items, barcodes, brands..." />
+        </div>
+        <select class="inventory-category">
+          <option value="">All Categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Appliances">Appliances</option>
+          <option value="Jewellery">Jewellery</option>
+          <option value="Art">Art</option>
+          <option value="Collectibles">Collectibles</option>
+          <option value="Tools">Tools</option>
+        </select>
+        <select class="inventory-status">
+          <option value="">All Statuses</option>
+          <option value="Received">Received</option>
+          <option value="Catalogued">Catalogued</option>
+          <option value="Photographed">Photographed</option>
+          <option value="Listed">Listed</option>
+          <option value="Sold">Sold</option>
+          <option value="Awaiting Lotting">Awaiting Lotting</option>
+        </select>
+        <select class="inventory-case">
+          <option value="">All Cases</option>
+          <option value="CASE-2024-001">CASE-2024-001 - Estate Sale - Johnson Family</option>
+          <option value="CASE-2024-002">CASE-2024-002 - Business Liquidation - Tech Startup</option>
+        </select>
+      </div>
+      <div class="inventory-filters-row">
+        <span class="inventory-count">Showing X of Y items</span>
+        <div class="inventory-sort-wrap">
+          <span>Sort by:</span>
+          <select class="inventory-sort">
+            <option value="name-asc">Name (A-Z)</option>
+            <option value="name-desc">Name (Z-A)</option>
+            <option value="category-asc">Category (A-Z)</option>
+            <option value="category-desc">Category (Z-A)</option>
+            <option value="value-desc">Value (High-Low)</option>
+            <option value="value-asc">Value (Low-High)</option>
+            <option value="date-desc">Date (Newest)</option>
+            <option value="date-asc">Date (Oldest)</option>
+            <option value="status-asc">Status (A-Z)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="inventory-grid"></div>
+  </div>
+</section>
 
     <!-- Storage Management Tab -->
     <section id="tab-storage" class="tab-section">
