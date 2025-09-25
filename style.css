@@ -329,6 +329,17 @@ h2 {
   transform: translateY(-2px) scale(1.01);
 }
 
+.zone-details {
+  padding-left: 20px;
+  margin: 4px 0 8px 0;
+  font-size: 0.96rem;
+  color: #444;
+}
+
+.zone-details li {
+  margin-bottom: 2px;
+}
+
 .zone-name {
   font-weight: 600;
   color: #222;
