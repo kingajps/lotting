@@ -11,14 +11,41 @@
     <h1>Auction Warehouse Dashboard</h1>
   </header>
   <nav class="nav-tabs">
-    <button class="tab-btn active" data-tab="inventory">Inventory Tracking</button>
-    <button class="tab-btn" data-tab="storage">Storage Management</button>
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="barcode">Barcode Scanner</button>
+    <button class="tab-btn" data-tab="inventory">Inventory</button>
+    <button class="tab-btn" data-tab="storage">Storage Map</button>
     <button class="tab-btn" data-tab="cases">Cases</button>
     <button class="tab-btn" data-tab="analytics">Analytics</button>
   </nav>
   <main class="main-container">
-    <!-- Inventory Tracking Tab -->
-    <section id="tab-inventory" class="tab-section active">
+
+    <!-- Dashboard Tab -->
+    <section id="tab-dashboard" class="tab-section active">
+      <h2>Dashboard</h2>
+      <div id="dashboard-content" style="margin-bottom:2rem;">
+        <!-- Add your summary widgets and charts here if desired -->
+        <div class="kpi-cards" id="dashboard-kpis"></div>
+        <div class="charts-section" id="dashboard-charts"></div>
+      </div>
+      <div>
+        <h3>Recent Items</h3>
+        <div id="recent-items" class="card-grid"></div>
+      </div>
+    </section>
+
+    <!-- Barcode Scanner Tab -->
+    <section id="tab-barcode" class="tab-section">
+      <h2>Barcode Scanner</h2>
+      <div class="barcode-panel">
+        <input type="text" id="barcode-input" placeholder="Enter barcode or item ID..." />
+        <button id="barcode-scan-btn">Scan</button>
+      </div>
+      <div id="barcode-result" class="barcode-result"></div>
+    </section>
+
+    <!-- Inventory Tab -->
+    <section id="tab-inventory" class="tab-section">
       <div class="inventory-container">
         <div class="inventory-header-row">
           <div>
@@ -30,7 +57,6 @@
             Add New Item
           </button>
         </div>
-        <!-- Search and Filters -->
         <div class="inventory-filters-box">
           <div class="inventory-filters-grid">
             <div class="inventory-search-wrap">
@@ -83,19 +109,9 @@
       </div>
     </section>
 
-    <!-- Barcode Scanning Tab -->
-    <section id="tab-barcode" class="tab-section">
-      <h2>Barcode Scanning</h2>
-      <div class="barcode-panel">
-        <input type="text" id="barcode-input" placeholder="Enter barcode or item ID..." />
-        <button id="barcode-scan-btn">Scan</button>
-      </div>
-      <div id="barcode-result" class="barcode-result"></div>
-    </section>
-
-    <!-- Storage Management Tab -->
+    <!-- Storage Map Tab -->
     <section id="tab-storage" class="tab-section">
-      <h2>Storage Management</h2>
+      <h2>Storage Map</h2>
       <div id="zone-cards" class="zone-grid"></div>
     </section>
 
