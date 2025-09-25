@@ -28,7 +28,6 @@ const recentItems = [
 ];
 
 const inventory = [
-  const inventory = [
   {
     id: "AA001",
     name: "Antique Vase",
@@ -59,6 +58,7 @@ const inventory = [
     location: "Floor Storage Area 1",
     last_updated: "2025-09-24"
   }
+  // Add more items as needed
 ];
 
 // ---------- UPDATED ZONES DATA STRUCTURE ----------
@@ -100,15 +100,7 @@ const zones = [
   }
 ];
 
-// Analytics mock
-const kpis = [
-  { title: "Total Items", value: 16 },
-  { title: "Turnover Rate", value: "2.1x/mo" },
-  { title: "Scan Frequency", value: "52/wk" }
-];
-
 // ------------------ Utilities ------------------
-
 function statusText(status) {
   switch (status) {
     case "new": return "New";
@@ -172,7 +164,6 @@ function setupBarcodeScan() {
 
 // ------------------ Inventory Tracking ------------------
 function fillFilters() {
-  // Fill filter dropdowns with unique values from inventory
   const catSel = document.getElementById("filter-category");
   const statusSel = document.getElementById("filter-status");
   const locSel = document.getElementById("filter-location");
@@ -190,7 +181,6 @@ function renderInventoryTable() {
   const tbody = document.querySelector("#inventory-table tbody");
   tbody.innerHTML = "";
 
-  // Filters
   const cat = document.getElementById("filter-category").value;
   const stat = document.getElementById("filter-status").value;
   const loc = document.getElementById("filter-location").value;
@@ -241,12 +231,11 @@ function renderZoneCards() {
       </div>
       ${zone.full ? '<span class="zone-alert">Overfilled</span>' : ''}
     `;
-    card.onclick = () => showZoneInventory(zone.name); // <-- zone click handler
+    card.onclick = () => showZoneInventory(zone.name);
     grid.appendChild(card);
   });
 }
 
-// Function to show inventory items in a zone
 function showZoneInventory(zoneName) {
   let overlay = document.getElementById("zone-inventory-overlay");
   if (!overlay) {
@@ -273,6 +262,12 @@ function showZoneInventory(zoneName) {
 }
 
 // ------------------ Analytics ------------------
+const kpis = [
+  { title: "Total Items", value: 16 },
+  { title: "Turnover Rate", value: "2.1x/mo" },
+  { title: "Scan Frequency", value: "52/wk" }
+];
+
 function renderKPIs() {
   const kpiBox = document.getElementById("kpi-cards");
   kpiBox.innerHTML = "";
@@ -288,11 +283,17 @@ function renderKPIs() {
 }
 
 // Mock chart rendering with SVG
+function makeChartCard(title, svg) {
+  const div = document.createElement("div");
+  div.className = "chart-card";
+  div.innerHTML = `<div class="chart-title">${title}</div>${svg}`;
+  return div;
+}
+
 function renderCharts() {
   const charts = document.getElementById("charts-section");
   charts.innerHTML = "";
 
-  // Bar Chart (Items per Category)
   charts.appendChild(makeChartCard("Items per Category", `
     <svg width="220" height="120">
       <rect x="20" y="40" width="30" height="60" fill="#1a73e8"/>
@@ -303,7 +304,7 @@ function renderCharts() {
       <text x="120" y="115" font-size="12">Toys</text>
     </svg>
   `));
-  // Line Chart (Scans over Time)
+
   charts.appendChild(makeChartCard("Scans Over Time", `
     <svg width="220" height="120">
       <polyline points="10,100 40,80 70,95 100,60 130,20 160,40 190,30"
@@ -317,7 +318,7 @@ function renderCharts() {
       <circle cx="190" cy="30" r="3" fill="#1a73e8"/>
     </svg>
   `));
-  // Pie Chart (Status Distribution)
+
   charts.appendChild(makeChartCard("Status Distribution", `
     <svg width="120" height="120" viewBox="0 0 32 32">
       <circle r="16" cx="16" cy="16" fill="#f5f7fa"/>
@@ -326,13 +327,6 @@ function renderCharts() {
       <path d="M16 16 L16 32 A16 16 0 0 1 16 0 Z" fill="#fbc02d"/>
     </svg>
   `));
-}
-
-function makeChartCard(title, svg) {
-  const div = document.createElement("div");
-  div.className = "chart-card";
-  div.innerHTML = `<div class="chart-title">${title}</div>${svg}`;
-  return div;
 }
 
 // ------------------ Tab Navigation ------------------
@@ -350,7 +344,6 @@ function setupTabs() {
 }
 
 // ------------------ Main Init ------------------
-
 window.onload = function() {
   setupTabs();
   renderRecentItems();
