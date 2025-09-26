@@ -31,6 +31,7 @@ const inventory = [
   {
     id: "AA001",
     name: "Antique Vase",
+    barcode: "123456789001",
     quantity: 1,
     zone: "Unit 32",
     status: "new",
@@ -41,6 +42,7 @@ const inventory = [
   {
     id: "BB002",
     name: "Electric Guitar",
+    barcode: "123456789002",
     quantity: 3,
     zone: "Unit 30",
     status: "pending",
@@ -51,6 +53,7 @@ const inventory = [
   {
     id: "CC003",
     name: "Collectible Toy Car",
+    barcode: "123456789003",
     quantity: 12,
     zone: "Unit 32",
     status: "new",
@@ -118,6 +121,7 @@ function renderRecentItems() {
     const card = document.createElement("div");
     card.className = "item-card";
     card.innerHTML = `
+      <img class="item-thumb" src="${item.image}" alt="${item.name}" />
       <div class="item-info">
         <div class="item-name">${item.name}</div>
         <div class="item-meta">
@@ -141,7 +145,7 @@ function renderBarcodeResult(item) {
   }
   result.className = "barcode-result active";
   result.innerHTML = `
-    <img src="${item.image}" alt="${item.name}" />
+    <img src="${item.image || 'https://via.placeholder.com/80?text=No+Image'}" alt="${item.name}" style="max-width:80px;border-radius:8px;margin-bottom:8px;" />
     <div style="font-weight:600;font-size:1.1em;margin-bottom:4px">${item.name}</div>
     <div style="color:#888;margin-bottom:4px">Location: ${item.zone || item.location || "N/A"}</div>
     <span class="status-badge ${item.status}">${statusText(item.status)}</span>
@@ -407,7 +411,7 @@ function renderCasesTab() {
           </div>
           <span class="case-number">${c.id}</span>
         </div>
-        <div class="case-card-body">
+        <div class="case-card-body" style="padding:1.2rem;">
           <div>
             <div><strong>Client:</strong> ${c.client}</div>
             <div><strong>Received:</strong> ${c.received}</div>
@@ -452,7 +456,6 @@ function setupCasesTab() {
 
 // Call this from window.onload after tab switching logic
 window.onload = function() {
-  // ...your existing setup code...
   setupTabs();
   renderRecentItems();
   setupBarcodeScan();
@@ -462,5 +465,5 @@ window.onload = function() {
   renderZoneCards();
   renderKPIs();
   renderCharts();
-  setupCasesTab(); // <--- Add this line
+  setupCasesTab();
 };
