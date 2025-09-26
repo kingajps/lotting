@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inventory | Auction Warehouse</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="inventory.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-row">
+        <span class="logo-icon">
+          <svg width="36" height="36" fill="none" viewBox="0 0 36 36">
+            <rect width="36" height="36" rx="12" fill="#2563eb"/>
+            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
+            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
+          </svg>
+        </span>
+        <div>
+          <h1 class="header-title">Auction Warehouse</h1>
+          <span class="app-subtitle">Management System</span>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs" aria-label="Main navigation">
+    <a class="tab-btn" href="dashboard.html" aria-controls="tab-dashboard" aria-selected="false">Dashboard</a>
+    <a class="tab-btn" href="scan.html" aria-controls="tab-scan" aria-selected="false">Barcode Scanner</a>
+    <a class="tab-btn active" href="inventory.html" aria-controls="tab-inventory" aria-selected="true">Inventory</a>
+    <a class="tab-btn" href="storage.html" aria-controls="tab-storage" aria-selected="false">Storage Map</a>
+    <a class="tab-btn" href="cases.html" aria-controls="tab-cases" aria-selected="false">Cases</a>
+    <a class="tab-btn" href="analytics.html" aria-controls="tab-analytics" aria-selected="false">Analytics</a>
+  </nav>
+  <main class="main-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <span>Auction Warehouse</span> / <span>Inventory</span>
+    </nav>
+    <section id="tab-inventory" class="tab-section active" tabindex="0">
+      <h2 class="inventory-title">Inventory Manager</h2>
+      <p class="inventory-desc">Manage and track all items in your warehouse</p>
+      <div class="inventory-filters-bar">
+        <input type="text" id="inventory-search" class="inventory-search" placeholder="Search items, barcodes, brands..." />
+        <select id="filter-category" class="inventory-filter-select">
+          <option value="">All Categories</option>
+        </select>
+        <select id="filter-status" class="inventory-filter-select">
+          <option value="">All Statuses</option>
+        </select>
+        <select id="filter-case" class="inventory-filter-select">
+          <option value="">All Cases</option>
+        </select>
+        <select id="inventory-sort" class="inventory-filter-select">
+          <option value="name">Sort by: Name (A-Z)</option>
+          <option value="value">Sort by: Value (High-Low)</option>
+          <option value="status">Sort by: Status</option>
+        </select>
+        <button class="primary-btn inventory-add-btn" id="inventory-add-btn">+ Add New Item</button>
+      </div>
+      <div class="inventory-results-info">
+        <span id="inventory-results-count">Showing 0 of 0 items</span>
+      </div>
+      <div class="inventory-card-grid" id="inventory-card-grid">
+        <!-- JS will fill item cards here -->
+      </div>
+    </section>
+  </main>
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <div class="footer-row">
+      <div class="footer-col">
+        <div class="footer-logo">
+          <svg width="32" height="32" fill="none" viewBox="0 0 36 36">
+            <rect width="36" height="36" rx="12" fill="#2563eb"/>
+            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
+            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="footer-title">Auction Warehouse System</div>
+        <div class="footer-desc">Complete inventory management solution</div>
+        <div class="footer-meta">© 2024 JPS Surveyors Auction Warehouse &middot; Built with React &amp; TypeScript</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Features</div>
+        <ul class="footer-list">
+          <li>Barcode Scanning</li>
+          <li>Inventory Management</li>
+          <li>Storage Mapping</li>
+          <li>Case Tracking</li>
+          <li>Analytics Dashboard</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Core Functions</div>
+        <ul class="footer-list">
+          <li>Item cataloguing</li>
+          <li>Warehouse organization</li>
+          <li>Client case management</li>
+          <li>Performance analytics</li>
+          <li>Mobile-friendly interface</li>
+          <li>Real-time updates</li>
+          <li>Comprehensive reporting</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+  <script src="inventory.js"></script>
+</body>
+</html>
