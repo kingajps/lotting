@@ -2,48 +2,52 @@
 
 const inventory = [
   {
-    id: "ITEM-001",
-    name: "Oak Dining Table",
-    price: 420,
-    condition: "Good",
-    category: "Furniture",
-    status: "Catalogued",
-    zone: "U32-ELEC-A1",
-    recent: true,
-    soldWeek: false
-  },
-  {
-    id: "ITEM-002",
-    name: "Oak Dining Chairs (Set of 6)",
-    price: 230,
-    condition: "Good",
-    category: "Furniture",
-    status: "Catalogued",
-    zone: "U32-FURN-B1",
-    recent: true,
-    soldWeek: false
-  },
-  {
     id: "ITEM-003",
     name: "Dell Laptop",
-    price: 320,
+    subtitle: "Dell Inspiron 15 3000",
+    barcode: "987654321998",
     condition: "Like New",
     category: "Electronics",
     status: "Photographed",
     zone: "U32-ELEC-A1",
-    recent: true,
-    soldWeek: false
+    case: "CASE-2024-002",
+    price: 320
   },
   {
     id: "ITEM-004",
     name: "iPad Air",
-    price: 160,
+    subtitle: "Apple iPad Air (4th generation)",
+    barcode: "456789123456",
     condition: "Good",
     category: "Electronics",
     status: "Listed",
-    zone: "U30-ANT-C1",
-    recent: true,
-    soldWeek: false
+    zone: "U32-ELEC-A1",
+    case: "CASE-2024-002",
+    price: 160
+  },
+  {
+    id: "ITEM-002",
+    name: "Oak Dining Chairs (Set of 6)",
+    subtitle: "Heritage Furniture Classic Oak",
+    barcode: "123456789012",
+    condition: "Good",
+    category: "Furniture",
+    status: "Catalogued",
+    zone: "U32-FURN-B1",
+    case: "CASE-2024-001",
+    price: 230
+  },
+  {
+    id: "ITEM-001",
+    name: "Oak Dining Table",
+    subtitle: "Heritage Furniture Classic Oak",
+    barcode: "123456789012",
+    condition: "Good",
+    category: "Furniture",
+    status: "Catalogued",
+    zone: "U32-FURN-B1",
+    case: "CASE-2024-001",
+    price: 420
   }
 ];
 
@@ -76,10 +80,17 @@ const cases = [
     date: "15/02/2024",
     time: "10:00",
     estimate: "£32,000"
+  },
+  {
+    id: "CASE-2024-002",
+    title: "March Tech Auction",
+    lots: 40,
+    date: "01/03/2024",
+    time: "15:00",
+    estimate: "£14,000"
   }
 ];
 
-// Status types for the status distribution
 const statusTypes = [
   { key: "Received", label: "Received" },
   { key: "Catalogued", label: "Catalogued" },
@@ -88,6 +99,25 @@ const statusTypes = [
   { key: "Sold", label: "Sold" },
   { key: "Awaiting Lotting", label: "Awaiting Lotting" }
 ];
+
+// ------------------ Tab Navigation and Breadcrumb ------------------
+function setupTabs() {
+  const tabs = document.querySelectorAll(".tab-btn");
+  const sections = document.querySelectorAll(".tab-section");
+  const breadcrumb = document.getElementById("breadcrumb");
+  tabs.forEach(tab => {
+    tab.onclick = () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
+      // Breadcrumb logic
+      breadcrumb.innerHTML = `<span>Auction Warehouse</span> / <span>${
+        tab.textContent.trim()
+      }</span>`;
+    };
+  });
+}
 
 // ------------------ Dashboard Tab Functions ------------------
 function renderDashboardKPIs() {
@@ -224,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function() {
   if (lookupBtn) {
     lookupBtn.onclick = () => {
       const code = document.getElementById("barcode-manual-input").value.trim();
-      const found = inventory.find(i => i.id === code);
+      const found = inventory.find(i => i.id === code || i.barcode === code);
       if (found) {
         alert(
           `Found Item:\n` +
@@ -233,7 +263,8 @@ document.addEventListener("DOMContentLoaded", function() {
           `Condition: ${found.condition}\n` +
           `Category: ${found.category}\n` +
           `Status: ${found.status}\n` +
-          `Zone: ${found.zone}`
+          `Zone: ${found.zone}\n` +
+          `Case: ${found.case}`
         );
       } else {
         alert("No item found for this barcode.");
@@ -249,54 +280,94 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // ------------------ Inventory Tab ------------------
-function fillFilters() {
+function fillInventoryFilters() {
+  // Fill select options
   const catSel = document.getElementById("filter-category");
   const statusSel = document.getElementById("filter-status");
-  const locSel = document.getElementById("filter-location");
-
+  const caseSel = document.getElementById("filter-case");
+  // Categories
   let cats = [...new Set(inventory.map(i => i.category))];
-  let stats = [...new Set(inventory.map(i => i.status))];
-  let locs = [...new Set(inventory.map(i => i.zone))];
-
   catSel.innerHTML = `<option value="">All Categories</option>` + cats.map(c => `<option>${c}</option>`).join("");
-  statusSel.innerHTML = `<option value="">All Status</option>` + stats.map(s => `<option>${s}</option>`).join("");
-  locSel.innerHTML = `<option value="">All Zones</option>` + locs.map(l => `<option>${l}</option>`).join("");
+  // Statuses
+  let stats = [...new Set(inventory.map(i => i.status))];
+  statusSel.innerHTML = `<option value="">All Statuses</option>` + stats.map(s => `<option>${s}</option>`).join("");
+  // Cases
+  let casesList = [...new Set(inventory.map(i => i.case))];
+  caseSel.innerHTML = `<option value="">All Cases</option>` + casesList.map(c => `<option>${c}</option>`).join("");
 }
 
-function renderInventoryTable() {
-  const tbody = document.querySelector("#inventory-table tbody");
-  tbody.innerHTML = "";
-
-  const cat = document.getElementById("filter-category").value;
-  const stat = document.getElementById("filter-status").value;
-  const loc = document.getElementById("filter-location").value;
-
+function renderInventoryCards() {
+  const searchVal = document.getElementById("inventory-search").value.toLowerCase();
+  const catVal = document.getElementById("filter-category").value;
+  const statusVal = document.getElementById("filter-status").value;
+  const caseVal = document.getElementById("filter-case").value;
+  const sortVal = document.getElementById("inventory-sort").value;
   let filtered = inventory.filter(i =>
-    (!cat || i.category === cat) &&
-    (!stat || i.status === stat) &&
-    (!loc || i.zone === loc)
+    (!catVal || i.category === catVal) &&
+    (!statusVal || i.status === statusVal) &&
+    (!caseVal || i.case === caseVal) &&
+    (
+      !searchVal ||
+      i.name.toLowerCase().includes(searchVal) ||
+      i.subtitle.toLowerCase().includes(searchVal) ||
+      i.barcode.toLowerCase().includes(searchVal)
+    )
   );
 
+  // Sort logic
+  if (sortVal === "name") {
+    filtered.sort((a,b) => a.name.localeCompare(b.name));
+  } else if (sortVal === "value") {
+    filtered.sort((a,b) => b.price - a.price);
+  } else if (sortVal === "status") {
+    filtered.sort((a,b) => a.status.localeCompare(b.status));
+  }
+
+  document.getElementById("inventory-results-count").textContent =
+    `Showing ${filtered.length} of ${inventory.length} items`;
+
+  const grid = document.getElementById("inventory-card-grid");
+  grid.innerHTML = "";
   filtered.forEach(item => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${item.name}</td>
-      <td>${item.quantity ? item.quantity : 1}</td>
-      <td>${item.zone}</td>
-      <td><span class="status-badge status-${item.status.toLowerCase()}">${item.status}</span></td>
-      <td>
-        <button class="table-action-btn" title="Edit">&#9998;</button>
-        <button class="table-action-btn" title="View">&#128065;</button>
-        <button class="table-action-btn" title="Delete">&#10006;</button>
-      </td>
+    const div = document.createElement("div");
+    div.className = "inventory-card";
+    div.innerHTML = `
+      <div class="card-icon">
+        <svg width="28" height="28" fill="none"><rect width="28" height="28" rx="7" fill="#e3f0fb"/><path d="M14 8l6 3.5v5c0 .59-.33 1.13-.83 1.37l-4.67 2.12-4.67-2.12A1.34 1.34 0 0 1 8 16.5v-5L14 8Z" fill="#2563eb"/><path d="M14 8v9.5" stroke="#2563eb" stroke-width="2"/></svg>
+      </div>
+      <div class="card-title">${item.name}</div>
+      <div class="card-subtitle">${item.subtitle}</div>
+      <div class="card-barcode">${item.barcode}</div>
+      <div>
+        <span class="card-status-badge card-status-${item.status.toLowerCase()}">${item.status}</span>
+        <span class="card-status-badge card-status-good">${item.condition}</span>
+      </div>
+      <div class="card-meta-group">
+        <span class="card-meta-label">Value:</span>
+        <span class="card-meta-value">£${item.price}</span>
+        <span class="card-meta-label">Category:</span>
+        <span class="card-meta-value">${item.category}</span>
+      </div>
+      <div class="card-zone">📦 ${item.zone}</div>
+      <div class="card-case">📝 ${item.case}</div>
+      <div class="inventory-card-actions">
+        <button class="view-btn">View</button>
+        <button class="edit-btn">✏️</button>
+        <button class="delete-btn">🗑️</button>
+      </div>
     `;
-    tbody.appendChild(tr);
+    grid.appendChild(div);
   });
 }
 
-function setupInventoryFilters() {
-  ["filter-category", "filter-status", "filter-location"].forEach(id => {
-    document.getElementById(id).onchange = renderInventoryTable;
+function setupInventoryTabEvents() {
+  document.getElementById("inventory-search").addEventListener("input", renderInventoryCards);
+  document.getElementById("filter-category").addEventListener("change", renderInventoryCards);
+  document.getElementById("filter-status").addEventListener("change", renderInventoryCards);
+  document.getElementById("filter-case").addEventListener("change", renderInventoryCards);
+  document.getElementById("inventory-sort").addEventListener("change", renderInventoryCards);
+  document.getElementById("inventory-add-btn").addEventListener("click", () => {
+    alert("Add New Item functionality to be implemented!");
   });
 }
 
@@ -341,7 +412,7 @@ function showZoneInventory(zoneName) {
         ${items.length === 0 ? "<li>No items in this zone.</li>" : items.map(item => `
           <li>
             <strong>${item.name}</strong> <br/>
-            Price: £${item.price} | Condition: ${item.condition}<br/>
+            Value: £${item.price} | Condition: ${item.condition}<br/>
             Status: ${item.status}
           </li>
         `).join("")}
@@ -355,32 +426,21 @@ function renderCasesTab() {
   // For brevity, cases tab logic can be filled out as needed
 }
 
-// ------------------ Tab Navigation ------------------
-function setupTabs() {
-  const tabs = document.querySelectorAll(".tab-btn");
-  const sections = document.querySelectorAll(".tab-section");
-  tabs.forEach(tab => {
-    tab.onclick = () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      sections.forEach(s => s.classList.remove("active"));
-      tab.classList.add("active");
-      document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
-    };
-  });
-}
-
 // ------------------ Initial Load ------------------
 window.onload = function() {
   setupTabs();
+  // Dashboard
   renderDashboardKPIs();
   renderDashboardRecentItems();
   renderDashboardUpcomingAuctions();
   renderDashboardStorageStatus();
   renderDashboardStatusDistribution();
   setupDashboardActions();
-  fillFilters();
-  renderInventoryTable();
-  setupInventoryFilters();
+  // Inventory
+  fillInventoryFilters();
+  renderInventoryCards();
+  setupInventoryTabEvents();
+  // Storage
   renderZoneCards();
-  // renderCasesTab(); // Add if cases logic is needed
+  // Cases/Analytics tabs can be enhanced as needed
 };
