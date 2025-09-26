@@ -12,7 +12,11 @@
     <div class="header-content">
       <div class="logo-row">
         <span class="logo-icon">
-          <!-- SVG omitted for brevity, copy from your original -->
+          <svg width="36" height="36" fill="none" viewBox="0 0 36 36">
+            <rect width="36" height="36" rx="12" fill="#2563eb"/>
+            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
+            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
+          </svg>
         </span>
         <div>
           <h1 class="header-title">Auction Warehouse</h1>
@@ -21,26 +25,72 @@
       </div>
     </div>
   </header>
-  <!-- Navigation Tabs (optional: can be included or swapped for a sidebar/menu) -->
+  <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
-    <button class="tab-btn active">Dashboard</button>
-    <a class="tab-btn" href="scan.html">Barcode Scanner</a>
-    <a class="tab-btn" href="inventory.html">Inventory</a>
-    <a class="tab-btn" href="storage.html">Storage Map</a>
-    <a class="tab-btn" href="cases.html">Cases</a>
-    <a class="tab-btn" href="analytics.html">Analytics</a>
+    <a class="tab-btn active" href="dashboard.html" aria-controls="tab-dashboard" aria-selected="true">Dashboard</a>
+    <a class="tab-btn" href="scan.html" aria-controls="tab-scan" aria-selected="false">Barcode Scanner</a>
+    <a class="tab-btn" href="inventory.html" aria-controls="tab-inventory" aria-selected="false">Inventory</a>
+    <a class="tab-btn" href="storage.html" aria-controls="tab-storage" aria-selected="false">Storage Map</a>
+    <a class="tab-btn" href="cases.html" aria-controls="tab-cases" aria-selected="false">Cases</a>
+    <a class="tab-btn" href="analytics.html" aria-controls="tab-analytics" aria-selected="false">Analytics</a>
   </nav>
   <main class="main-container">
-    <nav class="breadcrumb">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" id="breadcrumb">
       <span>Auction Warehouse</span> / <span>Dashboard</span>
     </nav>
-    <section id="dashboard-main" tabindex="0">
+    <!-- Dashboard Tab Content -->
+    <section id="tab-dashboard" class="tab-section active" tabindex="0">
       <h2 class="dashboard-title">Auction Warehouse Dashboard</h2>
       <p class="dashboard-desc">Overview of your warehouse operations and inventory status</p>
-      <!-- KPI Cards -->
       <div class="dashboard-kpi-row">
-        <!-- Copy your KPI cards here, unchanged -->
-        <!-- ... -->
+        <div class="dashboard-kpi-card">
+          <div class="dashboard-kpi-label">Total Items</div>
+          <div class="dashboard-kpi-icon">
+            <svg width="28" height="28" fill="none">
+              <rect width="28" height="28" rx="7" fill="#e3f0fb"/>
+              <path d="M14 8l6 3.5v5c0 .59-.33 1.13-.83 1.37l-4.67 2.12-4.67-2.12A1.34 1.34 0 0 1 8 16.5v-5L14 8Z" fill="#2563eb"/>
+              <path d="M14 8v9.5" stroke="#2563eb" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="dashboard-kpi-value" id="dashboard-total-items">0</div>
+          <div class="dashboard-kpi-trend"><span id="dashboard-total-items-trend">+0 this week</span></div>
+        </div>
+        <div class="dashboard-kpi-card">
+          <div class="dashboard-kpi-label">Storage Utilisation</div>
+          <div class="dashboard-kpi-icon">
+            <svg width="28" height="28" fill="none">
+              <rect width="28" height="28" rx="7" fill="#e3f0fb"/>
+              <path d="M14 8v12M8 14h12" stroke="#43a047" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="dashboard-kpi-value" id="dashboard-storage-util">0%</div>
+          <div class="dashboard-kpi-bar"><div id="dashboard-storage-bar"></div></div>
+        </div>
+        <div class="dashboard-kpi-card">
+          <div class="dashboard-kpi-label">Active Cases</div>
+          <div class="dashboard-kpi-icon">
+            <svg width="28" height="28" fill="none">
+              <rect width="28" height="28" rx="7" fill="#f3e8ff"/>
+              <path d="M14 18a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" fill="#7c3aed"/>
+              <path d="M14 14v4" stroke="#7c3aed" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="dashboard-kpi-value" id="dashboard-active-cases">0</div>
+          <div class="dashboard-kpi-trend"><span id="dashboard-active-cases-trend">Processing inventory</span></div>
+        </div>
+        <div class="dashboard-kpi-card">
+          <div class="dashboard-kpi-label">Items Sold</div>
+          <div class="dashboard-kpi-icon">
+            <svg width="28" height="28" fill="none">
+              <rect width="28" height="28" rx="7" fill="#feecd6"/>
+              <path d="M9 15l5-5 5 5" stroke="#fbc02d" stroke-width="2"/>
+              <path d="M14 14v5" stroke="#fbc02d" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="dashboard-kpi-value" id="dashboard-items-sold">0</div>
+          <div class="dashboard-kpi-trend"><span id="dashboard-items-sold-trend">This month</span></div>
+        </div>
       </div>
       <div class="dashboard-main-row">
         <div class="dashboard-main-col">
@@ -79,7 +129,42 @@
   </main>
   <!-- Footer -->
   <footer class="dashboard-footer">
-    <!-- Copy your footer code here -->
+    <div class="footer-row">
+      <div class="footer-col">
+        <div class="footer-logo">
+          <svg width="32" height="32" fill="none" viewBox="0 0 36 36">
+            <rect width="36" height="36" rx="12" fill="#2563eb"/>
+            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
+            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="footer-title">Auction Warehouse System</div>
+        <div class="footer-desc">Complete inventory management solution</div>
+        <div class="footer-meta">© 2024 JPS Surveyors Auction Warehouse &middot; Built with React &amp; TypeScript</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Features</div>
+        <ul class="footer-list">
+          <li>Barcode Scanning</li>
+          <li>Inventory Management</li>
+          <li>Storage Mapping</li>
+          <li>Case Tracking</li>
+          <li>Analytics Dashboard</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Core Functions</div>
+        <ul class="footer-list">
+          <li>Item cataloguing</li>
+          <li>Warehouse organization</li>
+          <li>Client case management</li>
+          <li>Performance analytics</li>
+          <li>Mobile-friendly interface</li>
+          <li>Real-time updates</li>
+          <li>Comprehensive reporting</li>
+        </ul>
+      </div>
+    </div>
   </footer>
   <script src="dashboard.js"></script>
 </body>
