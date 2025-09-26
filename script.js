@@ -4,7 +4,6 @@ const recentItems = [
   {
     id: "AA001",
     name: "Antique Vase",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789001",
     status: "new",
     time: "Just now"
@@ -12,7 +11,6 @@ const recentItems = [
   {
     id: "BB002",
     name: "Electric Guitar",
-    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789002",
     status: "pending",
     time: "8 minutes ago"
@@ -20,7 +18,6 @@ const recentItems = [
   {
     id: "CC003",
     name: "Collectible Toy Car",
-    image: "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?auto=format&fit=crop&w=400&q=80",
     barcode: "123456789003",
     status: "new",
     time: "25 minutes ago"
@@ -121,7 +118,6 @@ function renderRecentItems() {
     const card = document.createElement("div");
     card.className = "item-card";
     card.innerHTML = `
-      <img class="item-thumb" src="${item.image}" alt="${item.name}" />
       <div class="item-info">
         <div class="item-name">${item.name}</div>
         <div class="item-meta">
