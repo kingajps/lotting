@@ -21,7 +21,7 @@ body {
   min-height: 100vh;
 }
 
-h1, h2 {
+h1, h2, h3 {
   font-weight: 600;
   color: #222;
 }
@@ -29,6 +29,11 @@ h1, h2 {
 h2 {
   margin-top: 0;
   font-size: 1.4rem;
+}
+
+h3 {
+  margin-top: 2rem;
+  font-size: 1.15rem;
 }
 
 .app-subtitle {
@@ -137,59 +142,168 @@ h2 {
   gap: 24px;
 }
 
-/* Lot/Item Card */
-.item-card, .lot-card {
+/* KPI Cards (Dashboard) */
+.kpi-cards {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.kpi-card {
   background: var(--color-card);
   border-radius: var(--radius);
   box-shadow: 0 2px 10px var(--color-shadow);
-  padding: 18px 18px 14px;
-  transition: box-shadow var(--transition), transform var(--transition);
+  padding: 22px 34px;
+  min-width: 180px;
+  min-height: 90px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  position: relative;
-}
-.item-card:hover, .lot-card:hover {
-  box-shadow: 0 6px 24px var(--color-shadow);
-  transform: translateY(-2px) scale(1.01);
-}
-.item-info, .lot-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.item-name, .lot-name {
-  font-weight: 600;
-  color: #222;
-  font-size: 1.1rem;
-  margin-bottom: 2px;
-}
-.item-meta, .lot-meta {
-  font-size: 0.97rem;
-  color: var(--color-gray);
-  display: flex;
+  align-items: flex-start;
   gap: 10px;
-  align-items: center;
 }
-.status-badge {
+
+.kpi-title {
+  color: var(--color-gray);
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-blue);
+}
+
+/* Dashboard Quick Actions */
+.dashboard-actions {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 24px;
+  margin-top: 8px;
+}
+
+/* Dashboard Sections */
+.dashboard-section {
+  margin-bottom: 2.2rem;
+}
+
+.dashboard-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.dashboard-list-item {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px var(--color-shadow);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dashboard-list-item .item-name {
+  font-weight: 600;
+  font-size: 1.08em;
+  margin-bottom: 4px;
+}
+.dashboard-list-item .item-meta {
+  color: #555;
+  font-size: 0.97em;
+}
+
+.dashboard-list-item .item-status {
   display: inline-block;
-  font-size: 0.93rem;
+  font-size: 0.91em;
   font-weight: 600;
   padding: 2px 10px;
   border-radius: 10px;
   margin-left: 8px;
 }
-.status-badge.new {
-  background: var(--color-status-new);
-  color: #fff;
+.dashboard-list-item .status-new { background: var(--color-status-new); color: #fff; }
+.dashboard-list-item .status-pending { background: var(--color-status-pending); color: #fff; }
+.dashboard-list-item .status-sold { background: var(--color-status-blue); color: #fff; }
+.dashboard-list-item .status-unsold { background: var(--color-status-alert); color: #fff; }
+.dashboard-list-item .status-catalogued { background: #e0e3e8; color: #333; }
+.dashboard-list-item .status-listed { background: #e3f0fb; color: var(--color-blue); }
+.dashboard-list-item .status-awlotting { background: #f3e8ff; color: #7c3aed; }
+.dashboard-list-item .status-awphotographing { background: #dbeafe; color: #1e40af; }
+
+.dashboard-list-item .auction-title {
+  font-weight: 600;
+  color: var(--color-blue);
+  font-size: 1em;
 }
-.status-badge.pending {
-  background: var(--color-status-pending);
-  color: #fff;
+.dashboard-list-item .auction-meta {
+  color: #555;
+  font-size: 0.92em;
+  margin-bottom: 2px;
 }
-.status-badge.alert {
-  background: var(--color-status-alert);
-  color: #fff;
+.dashboard-list-item .auction-estimate {
+  color: #43a047;
+  font-weight: 600;
+  font-size: 1.01em;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  background: #fff;
+  box-shadow: 0 1px 6px var(--color-shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.dashboard-table th,
+.dashboard-table td {
+  padding: 10px 8px;
+  text-align: left;
+}
+.dashboard-table thead {
+  background: var(--color-blue-light);
+}
+.dashboard-table th {
+  font-weight: 600;
+  color: #222;
+  font-size: 1.01rem;
+  border-bottom: 2px solid #e0e8f5;
+}
+.dashboard-table tbody tr:hover {
+  background: #f2f7fd;
+}
+.dashboard-table td {
+  border-bottom: 1px solid #f0f3f7;
+}
+.dashboard-table td:last-child {
+  text-align: right;
+}
+.dashboard-table .storage-status-available {
+  color: var(--color-status-new);
+  font-weight: 600;
+}
+.dashboard-table .storage-status-full {
+  color: var(--color-status-alert);
+  font-weight: 600;
+}
+.dashboard-table .storage-status-inuse {
+  color: var(--color-blue);
+  font-weight: 600;
+}
+
+/* Chart */
+#dashboard-status-chart {
+  margin-top: 14px;
+  min-height: 220px;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px var(--color-shadow);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Barcode Scanning */
@@ -372,44 +486,11 @@ h2 {
 }
 
 /* Analytics */
-.kpi-cards {
-  display: flex;
-  gap: 28px;
-  margin-bottom: 36px;
-  flex-wrap: wrap;
-}
-
-.kpi-card {
-  background: var(--color-card);
-  border-radius: var(--radius);
-  box-shadow: 0 2px 10px var(--color-shadow);
-  padding: 22px 34px;
-  min-width: 180px;
-  min-height: 90px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.kpi-title {
-  color: var(--color-gray);
-  font-size: 0.95em;
-  font-weight: 500;
-}
-
-.kpi-value {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--color-blue);
-}
-
 .charts-section {
   display: flex;
   gap: 32px;
   flex-wrap: wrap;
 }
-
 .chart-card {
   background: var(--color-card);
   border-radius: var(--radius);
@@ -423,7 +504,6 @@ h2 {
   flex-direction: column;
   align-items: center;
 }
-
 .chart-title {
   font-size: 1.1rem;
   color: #222;
@@ -600,7 +680,7 @@ h2 {
   .main-container {
     padding: 0 6px 40px 6px;
   }
-  .card-grid, .zone-grid {
+  .card-grid, .zone-grid, .dashboard-list {
     grid-template-columns: 1fr 1fr;
   }
   .charts-section {
@@ -608,7 +688,7 @@ h2 {
   }
 }
 @media (max-width: 600px) {
-  .card-grid, .zone-grid {
+  .card-grid, .zone-grid, .dashboard-list {
     grid-template-columns: 1fr;
   }
   .kpi-cards {
