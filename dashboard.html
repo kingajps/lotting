@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard | Auction Warehouse</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-row">
+        <span class="logo-icon">
+          <!-- SVG omitted for brevity, copy from your original -->
+        </span>
+        <div>
+          <h1 class="header-title">Auction Warehouse</h1>
+          <span class="app-subtitle">Management System</span>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Navigation Tabs (optional: can be included or swapped for a sidebar/menu) -->
+  <nav class="nav-tabs" aria-label="Main navigation">
+    <button class="tab-btn active">Dashboard</button>
+    <a class="tab-btn" href="scan.html">Barcode Scanner</a>
+    <a class="tab-btn" href="inventory.html">Inventory</a>
+    <a class="tab-btn" href="storage.html">Storage Map</a>
+    <a class="tab-btn" href="cases.html">Cases</a>
+    <a class="tab-btn" href="analytics.html">Analytics</a>
+  </nav>
+  <main class="main-container">
+    <nav class="breadcrumb">
+      <span>Auction Warehouse</span> / <span>Dashboard</span>
+    </nav>
+    <section id="dashboard-main" tabindex="0">
+      <h2 class="dashboard-title">Auction Warehouse Dashboard</h2>
+      <p class="dashboard-desc">Overview of your warehouse operations and inventory status</p>
+      <!-- KPI Cards -->
+      <div class="dashboard-kpi-row">
+        <!-- Copy your KPI cards here, unchanged -->
+        <!-- ... -->
+      </div>
+      <div class="dashboard-main-row">
+        <div class="dashboard-main-col">
+          <div class="dashboard-card">
+            <div class="dashboard-card-title">Recent Items</div>
+            <div class="dashboard-card-subtitle">Latest items added to inventory</div>
+            <div id="dashboard-recent-items" class="dashboard-list"></div>
+          </div>
+        </div>
+        <div class="dashboard-side-col">
+          <div class="dashboard-card">
+            <div class="dashboard-card-title">Upcoming Auctions</div>
+            <div id="dashboard-upcoming-auctions" class="dashboard-auctions-list"></div>
+          </div>
+          <div class="dashboard-card">
+            <div class="dashboard-card-title">Storage Status</div>
+            <div id="dashboard-storage-status" class="dashboard-storage-status-list"></div>
+          </div>
+          <div class="dashboard-card">
+            <div class="dashboard-card-title">Quick Actions</div>
+            <div class="dashboard-actions-col">
+              <button class="quick-action-btn primary" id="dashboard-action-scan">Scan New Item</button>
+              <button class="quick-action-btn" id="dashboard-action-add">Add New Inventory Item</button>
+              <button class="quick-action-btn" id="dashboard-action-map">View Storage Map</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dashboard-distribution-row">
+        <div class="dashboard-card">
+          <div class="dashboard-card-title">Item Status Distribution</div>
+          <div id="dashboard-status-distribution" class="dashboard-status-distribution-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <!-- Copy your footer code here -->
+  </footer>
+  <script src="dashboard.js"></script>
+</body>
+</html>
