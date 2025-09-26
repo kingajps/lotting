@@ -31,6 +31,14 @@ h2 {
   font-size: 1.4rem;
 }
 
+.app-subtitle {
+  display: block;
+  font-size: 1.05em;
+  color: #666;
+  margin-top: 4px;
+  letter-spacing: .03em;
+}
+
 /* Header */
 .app-header {
   background: #fff;
@@ -85,6 +93,12 @@ h2 {
   margin: 32px auto 0 auto;
   padding: 0 24px 48px 24px;
   min-height: 80vh;
+}
+
+.section-desc {
+  color: #7b7b7b;
+  font-size: 1em;
+  margin-bottom: 16px;
 }
 
 /* Tab Sections */
