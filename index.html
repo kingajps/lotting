@@ -2,56 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Auction Warehouse Dashboard</title>
+  <title>Auction & Lotting App</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Header -->
   <header class="app-header">
-    <h1>Auction Warehouse Dashboard</h1>
-    <span class="app-subtitle">Chartered Surveyors & Asset Auction Platform</span>
+    <div class="header-content">
+      <h1>Lot Scan Upload</h1>
+      <span class="app-subtitle">Chartered Surveyors & Asset Auction Platform</span>
+    </div>
   </header>
+  <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
-    <button class="tab-btn active" data-tab="recent" aria-controls="tab-recent" aria-selected="true">Recent Items</button>
-    <button class="tab-btn" data-tab="barcode" aria-controls="tab-barcode" aria-selected="false">Barcode Scanning</button>
-    <button class="tab-btn" data-tab="inventory" aria-controls="tab-inventory" aria-selected="false">Inventory Tracking</button>
-    <button class="tab-btn" data-tab="storage" aria-controls="tab-storage" aria-selected="false">Storage Management</button>
+    <button class="tab-btn active" data-tab="lots" aria-controls="tab-lots" aria-selected="true">Lots</button>
+    <button class="tab-btn" data-tab="scan" aria-controls="tab-scan" aria-selected="false">Scan</button>
+    <button class="tab-btn" data-tab="inventory" aria-controls="tab-inventory" aria-selected="false">Inventory</button>
+    <button class="tab-btn" data-tab="storage" aria-controls="tab-storage" aria-selected="false">Storage</button>
     <button class="tab-btn" data-tab="cases" aria-controls="tab-cases" aria-selected="false">Cases</button>
     <button class="tab-btn" data-tab="analytics" aria-controls="tab-analytics" aria-selected="false">Analytics</button>
   </nav>
+  <!-- Main Content -->
   <main class="main-container">
-    <!-- Recent Items Tab -->
-    <section id="tab-recent" class="tab-section active" tabindex="0">
-      <h2>Recent Items</h2>
-      <p class="section-desc">View the most recently added lots and inventory items.</p>
-      <div id="recent-items" class="card-grid"></div>
+    <!-- Lots Tab -->
+    <section id="tab-lots" class="tab-section active" tabindex="0">
+      <div class="section-header">
+        <h2>Lots</h2>
+        <button class="primary-btn" id="add-lot-btn">+ Add Lot</button>
+      </div>
+      <div id="lots-list" class="card-grid"></div>
     </section>
-
-    <!-- Barcode Scanning Tab -->
-    <section id="tab-barcode" class="tab-section" tabindex="0">
-      <h2>Barcode Scanning</h2>
-      <p class="section-desc">Scan or enter barcodes to quickly lookup inventory items.</p>
+    <!-- Scan Tab -->
+    <section id="tab-scan" class="tab-section" tabindex="0">
+      <h2>Scan Barcode</h2>
       <div class="barcode-panel">
-        <input type="text" id="barcode-input" placeholder="Enter barcode or item ID..." autocomplete="off" />
+        <input type="text" id="barcode-input" placeholder="Enter or scan barcode..." autocomplete="off" />
         <button id="barcode-scan-btn">Scan</button>
       </div>
       <div id="barcode-result" class="barcode-result"></div>
     </section>
-
-    <!-- Inventory Tracking Tab -->
+    <!-- Inventory Tab -->
     <section id="tab-inventory" class="tab-section" tabindex="0">
-      <h2>Inventory Tracking</h2>
-      <p class="section-desc">Filter, track and manage all inventory lots.</p>
-      <div class="inventory-filters">
-        <select id="filter-category" aria-label="Filter by category"></select>
-        <select id="filter-status" aria-label="Filter by status"></select>
-        <select id="filter-location" aria-label="Filter by location"></select>
+      <div class="section-header">
+        <h2>Inventory</h2>
+        <div class="inventory-filters">
+          <select id="filter-category" aria-label="Filter by category"></select>
+          <select id="filter-status" aria-label="Filter by status"></select>
+          <select id="filter-location" aria-label="Filter by location"></select>
+        </div>
       </div>
       <table id="inventory-table" class="inventory-table" aria-label="Inventory table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Quantity</th>
+            <th>Item</th>
+            <th>Qty</th>
             <th>Zone</th>
             <th>Status</th>
             <th>Actions</th>
@@ -60,73 +65,59 @@
         <tbody></tbody>
       </table>
     </section>
-
-    <!-- Storage Management Tab -->
+    <!-- Storage Tab -->
     <section id="tab-storage" class="tab-section" tabindex="0">
-      <h2>Storage Management</h2>
-      <p class="section-desc">View storage zones, rack details, and live capacity.</p>
+      <div class="section-header">
+        <h2>Storage Zones</h2>
+      </div>
       <div id="zone-cards" class="zone-grid"></div>
     </section>
-
     <!-- Cases Tab -->
     <section id="tab-cases" class="tab-section" tabindex="0">
       <div class="cases-container">
-        <div class="cases-max-width">
-          <!-- Header -->
-          <div class="cases-header">
-            <div>
-              <h1 class="cases-title">Case Manager</h1>
-              <p class="cases-subtitle">Manage client cases and consignments</p>
-            </div>
-            <button class="cases-add-button" id="add-case-btn">
-              <span style="font-size:1.2em;">&#43;</span>
-              <span>New Case</span>
-            </button>
-          </div>
-          <!-- Search and Filters -->
-          <div class="cases-search-container">
-            <div class="cases-search-grid">
-              <div class="cases-search-input-container">
-                <span class="cases-search-icon">&#128269;</span>
-                <input
-                  type="text"
-                  placeholder="Search cases, clients, case numbers..."
-                  class="cases-search-input"
-                />
-              </div>
-              <div>
-                <select class="cases-filter-select">
-                  <option value="">All Statuses</option>
-                  <option value="Active">Active</option>
-                  <option value="Processing">Processing</option>
-                  <option value="Ready">Ready</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
-              <div class="cases-results-info">
-                <span class="cases-results-count">Showing X of Y cases</span>
-              </div>
-            </div>
-          </div>
-          <!-- Cases Grid (dynamic by JS) -->
-          <div class="cases-grid"></div>
-          <!-- Empty State (shown by JS) -->
-          <div class="cases-empty" style="display:none;"></div>
+        <div class="cases-header">
+          <h2>Cases</h2>
+          <button class="primary-btn" id="add-case-btn">+ New Case</button>
         </div>
+        <div class="cases-search-container">
+          <div class="cases-search-grid">
+            <div class="cases-search-input-container">
+              <span class="cases-search-icon">&#128269;</span>
+              <input
+                type="text"
+                placeholder="Search cases, clients, numbers..."
+                class="cases-search-input"
+              />
+            </div>
+            <div>
+              <select class="cases-filter-select">
+                <option value="">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Processing">Processing</option>
+                <option value="Ready">Ready</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="cases-results-info">
+              <span class="cases-results-count">Showing X of Y cases</span>
+            </div>
+          </div>
+        </div>
+        <div class="cases-grid"></div>
+        <div class="cases-empty" style="display:none;"></div>
       </div>
     </section>
-
     <!-- Analytics Tab -->
     <section id="tab-analytics" class="tab-section" tabindex="0">
-      <h2>Analytics</h2>
-      <p class="section-desc">Key performance indicators and visual analytics for lots, scans, and inventory.</p>
+      <div class="section-header">
+        <h2>Analytics</h2>
+      </div>
       <div id="kpi-cards" class="kpi-cards card-grid"></div>
       <div id="charts-section" class="charts-section card-grid"></div>
     </section>
   </main>
-  <!-- Zone inventory popup -->
-  <!-- Will be dynamically injected by JS -->
+  <!-- Zone Inventory Popup (injected by JS) -->
   <script src="script.js"></script>
 </body>
 </html>
