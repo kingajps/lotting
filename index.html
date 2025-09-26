@@ -17,9 +17,9 @@
   <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
     <button class="tab-btn active" data-tab="dashboard" aria-controls="tab-dashboard" aria-selected="true">Dashboard</button>
-    <button class="tab-btn" data-tab="scan" aria-controls="tab-scan" aria-selected="false">Scan</button>
+    <button class="tab-btn" data-tab="scan" aria-controls="tab-scan" aria-selected="false">Barcode Scanner</button>
     <button class="tab-btn" data-tab="inventory" aria-controls="tab-inventory" aria-selected="false">Inventory</button>
-    <button class="tab-btn" data-tab="storage" aria-controls="tab-storage" aria-selected="false">Storage</button>
+    <button class="tab-btn" data-tab="storage" aria-controls="tab-storage" aria-selected="false">Storage Map</button>
     <button class="tab-btn" data-tab="cases" aria-controls="tab-cases" aria-selected="false">Cases</button>
     <button class="tab-btn" data-tab="analytics" aria-controls="tab-analytics" aria-selected="false">Analytics</button>
   </nav>
@@ -82,14 +82,41 @@
         <div id="dashboard-status-chart"></div>
       </div>
     </section>
-    <!-- Scan Tab -->
+    <!-- Barcode Scanner Tab -->
     <section id="tab-scan" class="tab-section" tabindex="0">
-      <h2>Scan Barcode</h2>
-      <div class="barcode-panel">
-        <input type="text" id="barcode-input" placeholder="Enter or scan barcode..." autocomplete="off" />
-        <button id="barcode-scan-btn">Scan</button>
+      <nav class="breadcrumb">
+        <span>Auction Warehouse</span> / <span>Barcode Scanner</span>
+      </nav>
+      <h2 class="barcode-title">Barcode Scanner</h2>
+      <p class="barcode-desc">Scan items to automatically retrieve product information</p>
+      <div class="barcode-card">
+        <h3 class="barcode-card-title">Scan Barcode</h3>
+        <div class="barcode-scanner-box">
+          <div class="barcode-scanner-icon">
+            <!-- Camera icon SVG -->
+            <svg width="56" height="56" fill="none" viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="28" fill="#e3f0fb"/>
+              <path d="M32 24a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM17 23.5a2.5 2.5 0 0 1 2.5-2.5h17a2.5 2.5 0 0 1 2.5 2.5V34a3 3 0 0 1-3 3H20a3 3 0 0 1-3-3v-10.5Z" stroke="#2563eb" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="barcode-scanner-ready">Ready to Scan</div>
+          <div class="barcode-scanner-info">Position the barcode within the camera frame</div>
+          <button class="barcode-camera-btn" id="barcode-start-camera-btn">Start Camera</button>
+        </div>
       </div>
-      <div id="barcode-result" class="barcode-result"></div>
+      <div class="barcode-card barcode-manual-entry">
+        <h3 class="barcode-card-title">Manual Barcode Entry</h3>
+        <div class="barcode-manual-form">
+          <input type="text" id="barcode-manual-input" placeholder="Enter barcode manually" />
+          <button class="barcode-lookup-btn" id="barcode-lookup-btn">
+            <svg width="18" height="18" fill="none" viewBox="0 0 18 18" style="vertical-align:middle;margin-right:6px;">
+              <circle cx="8.5" cy="8.5" r="6.5" stroke="#2563eb" stroke-width="2"/>
+              <path d="M15.5 15.5l-3-3" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Lookup
+          </button>
+        </div>
+      </div>
     </section>
     <!-- Inventory Tab -->
     <section id="tab-inventory" class="tab-section" tabindex="0">
