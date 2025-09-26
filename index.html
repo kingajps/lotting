@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Auction & Lotting App</title>
+  <title>Warehouse Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -10,28 +10,77 @@
   <!-- Header -->
   <header class="app-header">
     <div class="header-content">
-      <h1>Lot Scan Upload</h1>
+      <h1>Warehouse Dashboard</h1>
       <span class="app-subtitle">Chartered Surveyors & Asset Auction Platform</span>
     </div>
   </header>
   <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
-    <button class="tab-btn active" data-tab="lots" aria-controls="tab-lots" aria-selected="true">Lots</button>
+    <button class="tab-btn active" data-tab="dashboard" aria-controls="tab-dashboard" aria-selected="true">Dashboard</button>
     <button class="tab-btn" data-tab="scan" aria-controls="tab-scan" aria-selected="false">Scan</button>
     <button class="tab-btn" data-tab="inventory" aria-controls="tab-inventory" aria-selected="false">Inventory</button>
     <button class="tab-btn" data-tab="storage" aria-controls="tab-storage" aria-selected="false">Storage</button>
     <button class="tab-btn" data-tab="cases" aria-controls="tab-cases" aria-selected="false">Cases</button>
     <button class="tab-btn" data-tab="analytics" aria-controls="tab-analytics" aria-selected="false">Analytics</button>
   </nav>
-  <!-- Main Content -->
   <main class="main-container">
-    <!-- Lots Tab -->
-    <section id="tab-lots" class="tab-section active" tabindex="0">
-      <div class="section-header">
-        <h2>Lots</h2>
-        <button class="primary-btn" id="add-lot-btn">+ Add Lot</button>
+    <!-- Dashboard Tab -->
+    <section id="tab-dashboard" class="tab-section active" tabindex="0">
+      <h2>Overview of your warehouse operations and inventory status</h2>
+      <div class="kpi-cards card-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Total Items</div>
+          <div class="kpi-value" id="dashboard-total-items">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Storage Utilisation</div>
+          <div class="kpi-value" id="dashboard-storage-util">0%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Active Cases</div>
+          <div class="kpi-value" id="dashboard-active-cases">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Items Sold This Week</div>
+          <div class="kpi-value" id="dashboard-items-sold">0</div>
+        </div>
       </div>
-      <div id="lots-list" class="card-grid"></div>
+      <!-- Quick Actions -->
+      <div class="dashboard-actions">
+        <button class="primary-btn" id="dashboard-action-scan">Scan New Item</button>
+        <button class="primary-btn" id="dashboard-action-add">Add New Inventory Item</button>
+        <button class="primary-btn" id="dashboard-action-map">View Storage Map</button>
+      </div>
+      <!-- Recent Items -->
+      <div class="dashboard-section">
+        <h3>Recent Items</h3>
+        <div id="dashboard-recent-items" class="dashboard-list"></div>
+      </div>
+      <!-- Upcoming Auctions -->
+      <div class="dashboard-section">
+        <h3>Upcoming Auctions This Week</h3>
+        <div id="dashboard-upcoming-auctions" class="dashboard-list"></div>
+      </div>
+      <!-- Storage Status -->
+      <div class="dashboard-section">
+        <h3>Storage Status</h3>
+        <table class="dashboard-table" id="dashboard-storage-table">
+          <thead>
+            <tr>
+              <th>Zone</th>
+              <th>Available</th>
+              <th>Used</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <!-- Item Status Distribution Chart -->
+      <div class="dashboard-section">
+        <h3>Item Status Distribution</h3>
+        <div id="dashboard-status-chart"></div>
+      </div>
     </section>
     <!-- Scan Tab -->
     <section id="tab-scan" class="tab-section" tabindex="0">
