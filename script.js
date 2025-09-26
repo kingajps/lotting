@@ -1,6 +1,5 @@
 // ------------------ Simulated Data ------------------
 
-// Inventory Items (for dashboard, inventory, recent items, and status chart)
 const inventory = [
   {
     id: "ITEM-001",
@@ -59,7 +58,6 @@ const inventory = [
   }
 ];
 
-// Zones data (for dashboard storage status, storage tab)
 const zones = [
   {
     name: "Unit 32",
@@ -78,7 +76,6 @@ const zones = [
   }
 ];
 
-// Cases data
 const cases = [
   {
     id: "CASE-2024-001",
@@ -104,7 +101,6 @@ const cases = [
   }
 ];
 
-// Auctions (for dashboard upcoming auctions)
 const auctions = [
   {
     title: "Johnson Estate Auction",
@@ -128,7 +124,6 @@ const auctions = [
   }
 ];
 
-// Status types for the status chart
 const statusTypes = [
   { key: "a/w lotting", label: "A/W Lotting", color: "#7c3aed" },
   { key: "a/w photographing", label: "A/W Photographing", color: "#1a73e8" },
@@ -141,16 +136,13 @@ const statusTypes = [
 // ------------------ Dashboard Tab Functions ------------------
 function renderDashboardKPIs() {
   document.getElementById("dashboard-total-items").textContent = inventory.length;
-  // Storage utilisation: Used/Capacity across all zones
   const totalCapacity = zones.reduce((sum, z) => sum + z.capacity, 0);
   const totalUsed = zones.reduce((sum, z) => sum + z.used, 0);
   const util = totalCapacity ? Math.round((totalUsed / totalCapacity) * 100) : 0;
   document.getElementById("dashboard-storage-util").textContent = util + "%";
-  // Active cases = cases with status Processing or Ready
   document.getElementById("dashboard-active-cases").textContent = cases.filter(
     c => c.status === "Processing" || c.status === "Ready"
   ).length;
-  // Items sold this week
   document.getElementById("dashboard-items-sold").textContent = inventory.filter(i => i.soldWeek).length;
 }
 
@@ -184,7 +176,6 @@ function renderDashboardUpcomingAuctions() {
   auctions.forEach(auction => {
     const div = document.createElement("div");
     div.className = "dashboard-list-item";
-    // Storage status per auction zone
     const storageStatus = auction.storage.map(s =>
       `${s.zone}: ${s.available}/${s.available + s.used} available`
     ).join(", ");
@@ -227,13 +218,10 @@ function renderDashboardStorageStatus() {
 
 function renderDashboardStatusChart() {
   const container = document.getElementById("dashboard-status-chart");
-  // Distribution count for each status
   const statusCounts = statusTypes.map(s => ({
     ...s,
     count: inventory.filter(i => i.status === s.key).length
   }));
-
-  // SVG bar chart
   const max = Math.max(...statusCounts.map(s => s.count), 1);
   const barWidth = 48, gap = 18, chartHeight = 120;
   let bars = statusCounts.map((s, idx) => {
@@ -249,7 +237,6 @@ function renderDashboardStatusChart() {
   </svg>`;
 }
 
-// Quick Actions (simulate navigation)
 function setupDashboardActions() {
   document.getElementById("dashboard-action-scan").onclick = () => {
     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
@@ -271,34 +258,37 @@ function setupDashboardActions() {
   };
 }
 
-// ------------------ Scan Tab ------------------
-function renderBarcodeResult(item) {
-  const result = document.getElementById("barcode-result");
-  if (!item) {
-    result.className = "barcode-result";
-    result.innerHTML = "<span style='color:#e53935;font-weight:600'>No item found for this barcode.</span>";
-    return;
-  }
-  result.className = "barcode-result active";
-  result.innerHTML = `
-    <div style="font-weight:600;font-size:1.1em;margin-bottom:4px">${item.name}</div>
-    <div style="color:#888;margin-bottom:4px">Location: ${item.zone || "N/A"}</div>
-    <span class="status-badge status-${item.status.replace(/[^a-z]/gi, '').toLowerCase()}">${item.status}</span>
-  `;
-}
+// ------------------ Barcode Scanner Tab ------------------
 
-function setupBarcodeScan() {
-  const btn = document.getElementById("barcode-scan-btn");
-  const input = document.getElementById("barcode-input");
-  btn.onclick = () => {
-    const code = input.value.trim();
-    const found = inventory.find(i => i.id === code);
-    renderBarcodeResult(found);
-  };
-  input.onkeypress = (e) => {
-    if (e.key === "Enter") btn.click();
-  };
-}
+// Manual barcode lookup
+document.addEventListener("DOMContentLoaded", function() {
+  const lookupBtn = document.getElementById("barcode-lookup-btn");
+  if (lookupBtn) {
+    lookupBtn.onclick = () => {
+      const code = document.getElementById("barcode-manual-input").value.trim();
+      const found = inventory.find(i => i.id === code);
+      if (found) {
+        alert(
+          `Found Item:\n` +
+          `Name: ${found.name}\n` +
+          `Price: £${found.price}\n` +
+          `Condition: ${found.condition}\n` +
+          `Category: ${found.category}\n` +
+          `Status: ${found.status}\n` +
+          `Zone: ${found.zone}`
+        );
+      } else {
+        alert("No item found for this barcode.");
+      }
+    };
+  }
+  const cameraBtn = document.getElementById("barcode-start-camera-btn");
+  if (cameraBtn) {
+    cameraBtn.onclick = () => {
+      alert("Camera starting... (Demo placeholder)");
+    };
+  }
+});
 
 // ------------------ Inventory Tab ------------------
 function fillFilters() {
@@ -496,7 +486,6 @@ window.onload = function() {
   renderDashboardStorageStatus();
   renderDashboardStatusChart();
   setupDashboardActions();
-  setupBarcodeScan();
   fillFilters();
   renderInventoryTable();
   setupInventoryFilters();
