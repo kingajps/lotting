@@ -1,32 +1,40 @@
 // ------------------ Simulated Data ------------------
 
-const recentItems = [
+// Lots data (displayed in "Lots" tab)
+const lots = [
   {
-    id: "AA001",
+    id: "LOT-001",
     name: "Antique Vase",
     barcode: "123456789001",
     status: "new",
+    quantity: 1,
+    zone: "Unit 32",
     time: "Just now"
   },
   {
-    id: "BB002",
+    id: "LOT-002",
     name: "Electric Guitar",
     barcode: "123456789002",
     status: "pending",
+    quantity: 3,
+    zone: "Unit 30",
     time: "8 minutes ago"
   },
   {
-    id: "CC003",
+    id: "LOT-003",
     name: "Collectible Toy Car",
     barcode: "123456789003",
     status: "new",
+    quantity: 12,
+    zone: "Unit 32",
     time: "25 minutes ago"
   }
 ];
 
+// Inventory data (displayed in "Inventory" tab)
 const inventory = [
   {
-    id: "AA001",
+    id: "LOT-001",
     name: "Antique Vase",
     barcode: "123456789001",
     quantity: 1,
@@ -37,7 +45,7 @@ const inventory = [
     last_updated: "2025-09-24"
   },
   {
-    id: "BB002",
+    id: "LOT-002",
     name: "Electric Guitar",
     barcode: "123456789002",
     quantity: 3,
@@ -48,7 +56,7 @@ const inventory = [
     last_updated: "2025-09-23"
   },
   {
-    id: "CC003",
+    id: "LOT-003",
     name: "Collectible Toy Car",
     barcode: "123456789003",
     quantity: 12,
@@ -58,10 +66,9 @@ const inventory = [
     location: "Floor Storage Area 1",
     last_updated: "2025-09-24"
   }
-  // Add more items as needed
 ];
 
-// ---------- UPDATED ZONES DATA STRUCTURE ----------
+// Zones data (displayed in "Storage" tab)
 const zones = [
   {
     name: "Unit 32",
@@ -100,38 +107,91 @@ const zones = [
   }
 ];
 
+// Cases data (displayed in "Cases" tab)
+const cases = [
+  {
+    id: "CASE-2024-001",
+    title: "Estate Sale - Johnson Family",
+    client: "Johnson Family Estate",
+    received: "15/01/2024",
+    items: 25,
+    value: "£12,500",
+    status: "Processing",
+    description: "Complete household contents including furniture, electronics, and collectibles from a 50-year family home in Surrey",
+    progress: 50
+  },
+  {
+    id: "CASE-2024-002",
+    title: "Artwork Consignment - Smith",
+    client: "James Smith",
+    received: "22/02/2024",
+    items: 8,
+    value: "£8,000",
+    status: "Ready",
+    description: "Modern art collection consignment for upcoming auction.",
+    progress: 90
+  },
+  {
+    id: "CASE-2024-003",
+    title: "Jewelry Collection - Lee",
+    client: "Lee Family",
+    received: "28/03/2024",
+    items: 12,
+    value: "£22,500",
+    status: "Completed",
+    description: "Estate jewelry consignment completed and returned.",
+    progress: 100
+  }
+];
+
+// Analytics data (displayed in "Analytics" tab)
+const kpis = [
+  { title: "Total Lots", value: lots.length },
+  { title: "Total Inventory Items", value: inventory.reduce((sum, i) => sum + i.quantity, 0) },
+  { title: "Active Cases", value: cases.filter(c => c.status === "Processing" || c.status === "Ready").length }
+];
+
 // ------------------ Utilities ------------------
 function statusText(status) {
   switch (status) {
     case "new": return "New";
     case "pending": return "Pending";
     case "alert": return "Alert";
+    case "Processing": return "Processing";
+    case "Ready": return "Ready";
+    case "Completed": return "Completed";
+    case "Cancelled": return "Cancelled";
     default: return "Unknown";
   }
 }
 
-// ------------------ Recent Items ------------------
-function renderRecentItems() {
-  const grid = document.getElementById("recent-items");
-  grid.innerHTML = "";
-  recentItems.forEach(item => {
+// ------------------ Lots Tab ------------------
+function renderLots() {
+  const lotsList = document.getElementById("lots-list");
+  lotsList.innerHTML = "";
+  lots.forEach(lot => {
     const card = document.createElement("div");
-    card.className = "item-card";
+    card.className = "lot-card";
     card.innerHTML = `
-      <div class="item-info">
-        <div class="item-name">${item.name}</div>
-        <div class="item-meta">
-          <span>Barcode: ${item.barcode}</span>
-          <span class="status-badge ${item.status}">${statusText(item.status)}</span>
+      <div class="lot-info">
+        <div class="lot-name">${lot.name}</div>
+        <div class="lot-meta">
+          <span>ID: ${lot.id}</span>
+          <span>Barcode: ${lot.barcode}</span>
+          <span class="status-badge ${lot.status}">${statusText(lot.status)}</span>
         </div>
-        <div class="item-time">${item.time}</div>
+        <div class="lot-meta">
+          <span>Qty: ${lot.quantity}</span>
+          <span>Zone: ${lot.zone}</span>
+        </div>
+        <div class="item-time">${lot.time}</div>
       </div>
     `;
-    grid.appendChild(card);
+    lotsList.appendChild(card);
   });
 }
 
-// ------------------ Barcode Scanning ------------------
+// ------------------ Barcode Scanning Tab ------------------
 function renderBarcodeResult(item) {
   const result = document.getElementById("barcode-result");
   if (!item) {
@@ -141,7 +201,6 @@ function renderBarcodeResult(item) {
   }
   result.className = "barcode-result active";
   result.innerHTML = `
-    <img src="${item.image || 'https://via.placeholder.com/80?text=No+Image'}" alt="${item.name}" style="max-width:80px;border-radius:8px;margin-bottom:8px;" />
     <div style="font-weight:600;font-size:1.1em;margin-bottom:4px">${item.name}</div>
     <div style="color:#888;margin-bottom:4px">Location: ${item.zone || item.location || "N/A"}</div>
     <span class="status-badge ${item.status}">${statusText(item.status)}</span>
@@ -153,7 +212,8 @@ function setupBarcodeScan() {
   const input = document.getElementById("barcode-input");
   btn.onclick = () => {
     const code = input.value.trim();
-    const found = inventory.find(i => i.id === code || i.barcode === code);
+    const found = inventory.find(i => i.id === code || i.barcode === code) ||
+                  lots.find(l => l.id === code || l.barcode === code);
     renderBarcodeResult(found);
   };
   input.onkeypress = (e) => {
@@ -161,7 +221,7 @@ function setupBarcodeScan() {
   };
 }
 
-// ------------------ Inventory Tracking ------------------
+// ------------------ Inventory Tab ------------------
 function fillFilters() {
   const catSel = document.getElementById("filter-category");
   const statusSel = document.getElementById("filter-status");
@@ -213,7 +273,7 @@ function setupInventoryFilters() {
   });
 }
 
-// ------------------ Storage Management ------------------
+// ------------------ Storage Tab ------------------
 function renderZoneCards() {
   const grid = document.getElementById("zone-cards");
   grid.innerHTML = "";
@@ -260,13 +320,7 @@ function showZoneInventory(zoneName) {
   `;
 }
 
-// ------------------ Analytics ------------------
-const kpis = [
-  { title: "Total Items", value: 16 },
-  { title: "Turnover Rate", value: "2.1x/mo" },
-  { title: "Scan Frequency", value: "52/wk" }
-];
-
+// ------------------ Analytics Tab ------------------
 function renderKPIs() {
   const kpiBox = document.getElementById("kpi-cards");
   kpiBox.innerHTML = "";
@@ -328,57 +382,7 @@ function renderCharts() {
   `));
 }
 
-// ------------------ Tab Navigation ------------------
-function setupTabs() {
-  const tabs = document.querySelectorAll(".tab-btn");
-  const sections = document.querySelectorAll(".tab-section");
-  tabs.forEach(tab => {
-    tab.onclick = () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      sections.forEach(s => s.classList.remove("active"));
-      tab.classList.add("active");
-      document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
-    };
-  });
-}
-
-const cases = [
-  {
-    id: "CASE-2024-001",
-    title: "Estate Sale - Johnson Family",
-    client: "Johnson Family Estate",
-    received: "15/01/2024",
-    items: 25,
-    value: "£12,500",
-    status: "Processing",
-    description: "Complete household contents including furniture, electronics, and collectibles from a 50-year family home in Surrey",
-    progress: 50
-  },
-  {
-    id: "CASE-2024-002",
-    title: "Artwork Consignment - Smith",
-    client: "James Smith",
-    received: "22/02/2024",
-    items: 8,
-    value: "£8,000",
-    status: "Ready",
-    description: "Modern art collection consignment for upcoming auction.",
-    progress: 90
-  },
-  {
-    id: "CASE-2024-003",
-    title: "Jewelry Collection - Lee",
-    client: "Lee Family",
-    received: "28/03/2024",
-    items: 12,
-    value: "£22,500",
-    status: "Completed",
-    description: "Estate jewelry consignment completed and returned.",
-    progress: 100
-  }
-  // Add more cases as needed
-];
-
+// ------------------ Cases Tab ------------------
 function renderCasesTab() {
   const casesGrid = document.querySelector("#tab-cases .cases-grid");
   const countLabel = document.querySelector(".cases-results-count");
@@ -439,7 +443,6 @@ function renderCasesTab() {
   countLabel.textContent = `Showing ${filtered.length} of ${cases.length} cases`;
 }
 
-// Setup event listeners for search/filter
 function setupCasesTab() {
   const searchInput = document.querySelector(".cases-search-input");
   const statusSelect = document.querySelector(".cases-filter-select");
@@ -450,10 +453,24 @@ function setupCasesTab() {
   renderCasesTab();
 }
 
-// Call this from window.onload after tab switching logic
+// ------------------ Tab Navigation ------------------
+function setupTabs() {
+  const tabs = document.querySelectorAll(".tab-btn");
+  const sections = document.querySelectorAll(".tab-section");
+  tabs.forEach(tab => {
+    tab.onclick = () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
+    };
+  });
+}
+
+// ------------------ Initial Load ------------------
 window.onload = function() {
   setupTabs();
-  renderRecentItems();
+  renderLots();
   setupBarcodeScan();
   fillFilters();
   renderInventoryTable();
