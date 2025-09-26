@@ -1,113 +1,84 @@
 // ------------------ Simulated Data ------------------
 
-// Lots data (displayed in "Lots" tab)
-const lots = [
-  {
-    id: "LOT-001",
-    name: "Antique Vase",
-    barcode: "123456789001",
-    status: "new",
-    quantity: 1,
-    zone: "Unit 32",
-    time: "Just now"
-  },
-  {
-    id: "LOT-002",
-    name: "Electric Guitar",
-    barcode: "123456789002",
-    status: "pending",
-    quantity: 3,
-    zone: "Unit 30",
-    time: "8 minutes ago"
-  },
-  {
-    id: "LOT-003",
-    name: "Collectible Toy Car",
-    barcode: "123456789003",
-    status: "new",
-    quantity: 12,
-    zone: "Unit 32",
-    time: "25 minutes ago"
-  }
-];
-
-// Inventory data (displayed in "Inventory" tab)
+// Inventory Items (for dashboard, inventory, recent items, and status chart)
 const inventory = [
   {
-    id: "LOT-001",
+    id: "ITEM-001",
     name: "Antique Vase",
-    barcode: "123456789001",
-    quantity: 1,
-    zone: "Unit 32",
-    status: "new",
+    price: 1200,
+    condition: "Excellent",
     category: "Antiques",
-    location: "Mezzanine 1, Bay 2, Level 3",
-    last_updated: "2025-09-24"
-  },
-  {
-    id: "LOT-002",
-    name: "Electric Guitar",
-    barcode: "123456789002",
-    quantity: 3,
-    zone: "Unit 30",
-    status: "pending",
-    category: "Instruments",
-    location: "Rack 2, Bay 4, Level 2",
-    last_updated: "2025-09-23"
-  },
-  {
-    id: "LOT-003",
-    name: "Collectible Toy Car",
-    barcode: "123456789003",
-    quantity: 12,
+    status: "a/w lotting",
     zone: "Unit 32",
-    status: "new",
+    recent: true,
+    soldWeek: false
+  },
+  {
+    id: "ITEM-002",
+    name: "Electric Guitar",
+    price: 800,
+    condition: "Good",
+    category: "Instruments",
+    status: "listed",
+    zone: "Unit 30",
+    recent: true,
+    soldWeek: true
+  },
+  {
+    id: "ITEM-003",
+    name: "Collectible Toy Car",
+    price: 75,
+    condition: "Fair",
     category: "Toys",
-    location: "Floor Storage Area 1",
-    last_updated: "2025-09-24"
+    status: "listed",
+    zone: "Unit 32",
+    recent: true,
+    soldWeek: false
+  },
+  {
+    id: "ITEM-004",
+    name: "Office Desk",
+    price: 240,
+    condition: "Good",
+    category: "Furniture",
+    status: "catalogued",
+    zone: "Unit 32",
+    recent: false,
+    soldWeek: false
+  },
+  {
+    id: "ITEM-005",
+    name: "Gold Necklace",
+    price: 3200,
+    condition: "Excellent",
+    category: "Jewelry",
+    status: "sold",
+    zone: "Unit 30",
+    recent: false,
+    soldWeek: true
   }
 ];
 
-// Zones data (displayed in "Storage" tab)
+// Zones data (for dashboard storage status, storage tab)
 const zones = [
   {
     name: "Unit 32",
-    details: [
-      "3 Mezzanines (5 bays each, 4 levels per bay)",
-      "3 Racks (6 bays each, 3 levels per bay)",
-      "6 Floor Storage Areas"
-    ],
-    capacity: 80,
-    full: false
+    capacity: 20,
+    used: 15
   },
   {
     name: "Unit 30",
-    details: [
-      "3 Racks (6 bays each, 3 levels per bay)",
-      "6 Floor Storage Areas"
-    ],
-    capacity: 65,
-    full: false
-  },
-  {
-    name: "On Site",
-    details: [
-      "Unlimited and unspecified storage"
-    ],
-    capacity: 100,
-    full: false
+    capacity: 15,
+    used: 7
   },
   {
     name: "In Transit",
-    details: [
-      "Van"
-    ],
-    capacity: 30,
-    full: false
+    capacity: 3,
+    used: 2
   }
 ];
 
-// Cases data (displayed in "Cases" tab)
+// Cases data
 const cases = [
   {
     id: "CASE-2024-001",
@@ -130,68 +101,177 @@ const cases = [
     status: "Ready",
     description: "Modern art collection consignment for upcoming auction.",
     progress: 90
+  }
+];
+
+// Auctions (for dashboard upcoming auctions)
+const auctions = [
+  {
+    title: "Johnson Estate Auction",
+    caseName: "Johnson Family Estate",
+    datetime: "2025-09-28 14:00",
+    lots: 12,
+    estimate: "£14,000",
+    storage: [
+      { zone: "Unit 32", available: 5, used: 7 }
+    ]
   },
   {
-    id: "CASE-2024-003",
-    title: "Jewelry Collection - Lee",
-    client: "Lee Family",
-    received: "28/03/2024",
-    items: 12,
-    value: "£22,500",
-    status: "Completed",
-    description: "Estate jewelry consignment completed and returned.",
-    progress: 100
+    title: "Smith Artworks Auction",
+    caseName: "James Smith",
+    datetime: "2025-09-29 11:30",
+    lots: 8,
+    estimate: "£8,500",
+    storage: [
+      { zone: "Unit 30", available: 8, used: 7 }
+    ]
   }
 ];
 
-// Analytics data (displayed in "Analytics" tab)
-const kpis = [
-  { title: "Total Lots", value: lots.length },
-  { title: "Total Inventory Items", value: inventory.reduce((sum, i) => sum + i.quantity, 0) },
-  { title: "Active Cases", value: cases.filter(c => c.status === "Processing" || c.status === "Ready").length }
+// Status types for the status chart
+const statusTypes = [
+  { key: "a/w lotting", label: "A/W Lotting", color: "#7c3aed" },
+  { key: "a/w photographing", label: "A/W Photographing", color: "#1a73e8" },
+  { key: "catalogued", label: "Catalogued", color: "#e0e3e8" },
+  { key: "listed", label: "Listed", color: "#e3f0fb" },
+  { key: "sold", label: "Sold", color: "#43a047" },
+  { key: "unsold", label: "Unsold", color: "#e53935" }
 ];
 
-// ------------------ Utilities ------------------
-function statusText(status) {
-  switch (status) {
-    case "new": return "New";
-    case "pending": return "Pending";
-    case "alert": return "Alert";
-    case "Processing": return "Processing";
-    case "Ready": return "Ready";
-    case "Completed": return "Completed";
-    case "Cancelled": return "Cancelled";
-    default: return "Unknown";
-  }
+// ------------------ Dashboard Tab Functions ------------------
+function renderDashboardKPIs() {
+  document.getElementById("dashboard-total-items").textContent = inventory.length;
+  // Storage utilisation: Used/Capacity across all zones
+  const totalCapacity = zones.reduce((sum, z) => sum + z.capacity, 0);
+  const totalUsed = zones.reduce((sum, z) => sum + z.used, 0);
+  const util = totalCapacity ? Math.round((totalUsed / totalCapacity) * 100) : 0;
+  document.getElementById("dashboard-storage-util").textContent = util + "%";
+  // Active cases = cases with status Processing or Ready
+  document.getElementById("dashboard-active-cases").textContent = cases.filter(
+    c => c.status === "Processing" || c.status === "Ready"
+  ).length;
+  // Items sold this week
+  document.getElementById("dashboard-items-sold").textContent = inventory.filter(i => i.soldWeek).length;
 }
 
-// ------------------ Lots Tab ------------------
-function renderLots() {
-  const lotsList = document.getElementById("lots-list");
-  lotsList.innerHTML = "";
-  lots.forEach(lot => {
-    const card = document.createElement("div");
-    card.className = "lot-card";
-    card.innerHTML = `
-      <div class="lot-info">
-        <div class="lot-name">${lot.name}</div>
-        <div class="lot-meta">
-          <span>ID: ${lot.id}</span>
-          <span>Barcode: ${lot.barcode}</span>
-          <span class="status-badge ${lot.status}">${statusText(lot.status)}</span>
-        </div>
-        <div class="lot-meta">
-          <span>Qty: ${lot.quantity}</span>
-          <span>Zone: ${lot.zone}</span>
-        </div>
-        <div class="item-time">${lot.time}</div>
-      </div>
+function renderDashboardRecentItems() {
+  const container = document.getElementById("dashboard-recent-items");
+  container.innerHTML = "";
+  const recent = inventory.filter(i => i.recent);
+  if (!recent.length) {
+    container.innerHTML = "<span style='color:#888'>No recent items.</span>";
+    return;
+  }
+  recent.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "dashboard-list-item";
+    div.innerHTML = `
+      <div class="item-name">${item.name}</div>
+      <div class="item-meta">Price: £${item.price} | Condition: ${item.condition} | Category: ${item.category}</div>
+      <div class="item-meta">Status: <span class="item-status status-${item.status.replace(/[^a-z]/gi, '').toLowerCase()}">${item.status}</span></div>
     `;
-    lotsList.appendChild(card);
+    container.appendChild(div);
   });
 }
 
-// ------------------ Barcode Scanning Tab ------------------
+function renderDashboardUpcomingAuctions() {
+  const container = document.getElementById("dashboard-upcoming-auctions");
+  container.innerHTML = "";
+  if (!auctions.length) {
+    container.innerHTML = "<span style='color:#888'>No upcoming auctions.</span>";
+    return;
+  }
+  auctions.forEach(auction => {
+    const div = document.createElement("div");
+    div.className = "dashboard-list-item";
+    // Storage status per auction zone
+    const storageStatus = auction.storage.map(s =>
+      `${s.zone}: ${s.available}/${s.available + s.used} available`
+    ).join(", ");
+    div.innerHTML = `
+      <div class="auction-title">${auction.title}</div>
+      <div class="auction-meta">Case: ${auction.caseName}</div>
+      <div class="auction-meta">Date/Time: ${auction.datetime}</div>
+      <div class="auction-meta">Lots: ${auction.lots}</div>
+      <div class="auction-estimate">Estimate: ${auction.estimate}</div>
+      <div class="auction-meta">Storage: ${storageStatus}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function renderDashboardStorageStatus() {
+  const tbody = document.querySelector("#dashboard-storage-table tbody");
+  tbody.innerHTML = "";
+  zones.forEach(zone => {
+    const available = zone.capacity - zone.used;
+    let statusClass = "storage-status-available";
+    let statusText = "Available";
+    if (available === 0) {
+      statusClass = "storage-status-full";
+      statusText = "Full";
+    } else if (zone.used > 0 && available > 0) {
+      statusClass = "storage-status-inuse";
+      statusText = "In Use";
+    }
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${zone.name}</td>
+      <td>${available}</td>
+      <td>${zone.used}</td>
+      <td class="${statusClass}">${statusText}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderDashboardStatusChart() {
+  const container = document.getElementById("dashboard-status-chart");
+  // Distribution count for each status
+  const statusCounts = statusTypes.map(s => ({
+    ...s,
+    count: inventory.filter(i => i.status === s.key).length
+  }));
+
+  // SVG bar chart
+  const max = Math.max(...statusCounts.map(s => s.count), 1);
+  const barWidth = 48, gap = 18, chartHeight = 120;
+  let bars = statusCounts.map((s, idx) => {
+    const barHeight = Math.round((s.count / max) * (chartHeight - 40));
+    return `
+      <rect x="${idx * (barWidth + gap) + 12}" y="${chartHeight - barHeight - 24}" width="${barWidth}" height="${barHeight}" fill="${s.color}" rx="7"/>
+      <text x="${idx * (barWidth + gap) + 36}" y="${chartHeight - 8}" font-size="12" text-anchor="middle" fill="#222">${s.label}</text>
+      <text x="${idx * (barWidth + gap) + 36}" y="${chartHeight - barHeight - 30}" font-size="14" text-anchor="middle" fill="#2563eb" font-weight="600">${s.count}</text>
+    `;
+  }).join("");
+  container.innerHTML = `<svg width="100%" height="${chartHeight}" viewBox="0 0 360 ${chartHeight}">
+    ${bars}
+  </svg>`;
+}
+
+// Quick Actions (simulate navigation)
+function setupDashboardActions() {
+  document.getElementById("dashboard-action-scan").onclick = () => {
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".tab-section").forEach(sec => sec.classList.remove("active"));
+    document.querySelector('.tab-btn[data-tab="scan"]').classList.add("active");
+    document.getElementById("tab-scan").classList.add("active");
+  };
+  document.getElementById("dashboard-action-add").onclick = () => {
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".tab-section").forEach(sec => sec.classList.remove("active"));
+    document.querySelector('.tab-btn[data-tab="inventory"]').classList.add("active");
+    document.getElementById("tab-inventory").classList.add("active");
+  };
+  document.getElementById("dashboard-action-map").onclick = () => {
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".tab-section").forEach(sec => sec.classList.remove("active"));
+    document.querySelector('.tab-btn[data-tab="storage"]').classList.add("active");
+    document.getElementById("tab-storage").classList.add("active");
+  };
+}
+
+// ------------------ Scan Tab ------------------
 function renderBarcodeResult(item) {
   const result = document.getElementById("barcode-result");
   if (!item) {
@@ -202,8 +282,8 @@ function renderBarcodeResult(item) {
   result.className = "barcode-result active";
   result.innerHTML = `
     <div style="font-weight:600;font-size:1.1em;margin-bottom:4px">${item.name}</div>
-    <div style="color:#888;margin-bottom:4px">Location: ${item.zone || item.location || "N/A"}</div>
-    <span class="status-badge ${item.status}">${statusText(item.status)}</span>
+    <div style="color:#888;margin-bottom:4px">Location: ${item.zone || "N/A"}</div>
+    <span class="status-badge status-${item.status.replace(/[^a-z]/gi, '').toLowerCase()}">${item.status}</span>
   `;
 }
 
@@ -212,8 +292,7 @@ function setupBarcodeScan() {
   const input = document.getElementById("barcode-input");
   btn.onclick = () => {
     const code = input.value.trim();
-    const found = inventory.find(i => i.id === code || i.barcode === code) ||
-                  lots.find(l => l.id === code || l.barcode === code);
+    const found = inventory.find(i => i.id === code);
     renderBarcodeResult(found);
   };
   input.onkeypress = (e) => {
@@ -229,11 +308,11 @@ function fillFilters() {
 
   let cats = [...new Set(inventory.map(i => i.category))];
   let stats = [...new Set(inventory.map(i => i.status))];
-  let locs = [...new Set(inventory.map(i => i.location))];
+  let locs = [...new Set(inventory.map(i => i.zone))];
 
   catSel.innerHTML = `<option value="">All Categories</option>` + cats.map(c => `<option>${c}</option>`).join("");
-  statusSel.innerHTML = `<option value="">All Status</option>` + stats.map(s => `<option>${statusText(s)}</option>`).join("");
-  locSel.innerHTML = `<option value="">All Locations</option>` + locs.map(l => `<option>${l}</option>`).join("");
+  statusSel.innerHTML = `<option value="">All Status</option>` + stats.map(s => `<option>${s}</option>`).join("");
+  locSel.innerHTML = `<option value="">All Zones</option>` + locs.map(l => `<option>${l}</option>`).join("");
 }
 
 function renderInventoryTable() {
@@ -246,17 +325,17 @@ function renderInventoryTable() {
 
   let filtered = inventory.filter(i =>
     (!cat || i.category === cat) &&
-    (!stat || statusText(i.status) === stat) &&
-    (!loc || i.location === loc)
+    (!stat || i.status === stat) &&
+    (!loc || i.zone === loc)
   );
 
   filtered.forEach(item => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${item.name}</td>
-      <td>${item.quantity}</td>
+      <td>${item.quantity ? item.quantity : 1}</td>
       <td>${item.zone}</td>
-      <td><span class="status-badge ${item.status}">${statusText(item.status)}</span></td>
+      <td><span class="status-badge status-${item.status.replace(/[^a-z]/gi, '').toLowerCase()}">${item.status}</span></td>
       <td>
         <button class="table-action-btn" title="Edit">&#9998;</button>
         <button class="table-action-btn" title="View">&#128065;</button>
@@ -283,12 +362,14 @@ function renderZoneCards() {
     card.innerHTML = `
       <div class="zone-name">${zone.name}</div>
       <ul class="zone-details">
-        ${zone.details.map(detail => `<li>${detail}</li>`).join("")}
+        <li>Capacity: ${zone.capacity}</li>
+        <li>Used: ${zone.used}</li>
+        <li>Available: ${zone.capacity - zone.used}</li>
       </ul>
       <div class="capacity-bar">
-        <div class="capacity-bar-fill" style="width:${Math.min(zone.capacity,100)}%;background:${zone.capacity>100?'#e53935':'#1a73e8'}"></div>
+        <div class="capacity-bar-fill" style="width:${Math.round((zone.used/zone.capacity)*100)}%;background:${zone.used>=zone.capacity?'#e53935':'#1a73e8'}"></div>
       </div>
-      ${zone.full ? '<span class="zone-alert">Overfilled</span>' : ''}
+      ${zone.used >= zone.capacity ? '<span class="zone-alert">Full</span>' : ''}
     `;
     card.onclick = () => showZoneInventory(zone.name);
     grid.appendChild(card);
@@ -312,74 +393,13 @@ function showZoneInventory(zoneName) {
         ${items.length === 0 ? "<li>No items in this zone.</li>" : items.map(item => `
           <li>
             <strong>${item.name}</strong> <br/>
-            Location: ${item.location ? item.location : "N/A"}
+            Price: £${item.price} | Condition: ${item.condition}<br/>
+            Status: ${item.status}
           </li>
         `).join("")}
       </ul>
     </div>
   `;
-}
-
-// ------------------ Analytics Tab ------------------
-function renderKPIs() {
-  const kpiBox = document.getElementById("kpi-cards");
-  kpiBox.innerHTML = "";
-  kpis.forEach(kpi => {
-    const card = document.createElement("div");
-    card.className = "kpi-card";
-    card.innerHTML = `
-      <div class="kpi-title">${kpi.title}</div>
-      <div class="kpi-value">${kpi.value}</div>
-    `;
-    kpiBox.appendChild(card);
-  });
-}
-
-// Mock chart rendering with SVG
-function makeChartCard(title, svg) {
-  const div = document.createElement("div");
-  div.className = "chart-card";
-  div.innerHTML = `<div class="chart-title">${title}</div>${svg}`;
-  return div;
-}
-
-function renderCharts() {
-  const charts = document.getElementById("charts-section");
-  charts.innerHTML = "";
-
-  charts.appendChild(makeChartCard("Items per Category", `
-    <svg width="220" height="120">
-      <rect x="20" y="40" width="30" height="60" fill="#1a73e8"/>
-      <rect x="70" y="70" width="30" height="30" fill="#43a047"/>
-      <rect x="120" y="20" width="30" height="80" fill="#fbc02d"/>
-      <text x="20" y="115" font-size="12">Antiques</text>
-      <text x="70" y="115" font-size="12">Instruments</text>
-      <text x="120" y="115" font-size="12">Toys</text>
-    </svg>
-  `));
-
-  charts.appendChild(makeChartCard("Scans Over Time", `
-    <svg width="220" height="120">
-      <polyline points="10,100 40,80 70,95 100,60 130,20 160,40 190,30"
-        fill="none" stroke="#1a73e8" stroke-width="3"/>
-      <circle cx="10" cy="100" r="3" fill="#1a73e8"/>
-      <circle cx="40" cy="80" r="3" fill="#1a73e8"/>
-      <circle cx="70" cy="95" r="3" fill="#1a73e8"/>
-      <circle cx="100" cy="60" r="3" fill="#1a73e8"/>
-      <circle cx="130" cy="20" r="3" fill="#1a73e8"/>
-      <circle cx="160" cy="40" r="3" fill="#1a73e8"/>
-      <circle cx="190" cy="30" r="3" fill="#1a73e8"/>
-    </svg>
-  `));
-
-  charts.appendChild(makeChartCard("Status Distribution", `
-    <svg width="120" height="120" viewBox="0 0 32 32">
-      <circle r="16" cx="16" cy="16" fill="#f5f7fa"/>
-      <path d="M16 16 L16 0 A16 16 0 0 1 31.2 12.7 Z" fill="#1a73e8"/>
-      <path d="M16 16 L31.2 12.7 A16 16 0 0 1 16 32 Z" fill="#43a047"/>
-      <path d="M16 16 L16 32 A16 16 0 0 1 16 0 Z" fill="#fbc02d"/>
-    </svg>
-  `));
 }
 
 // ------------------ Cases Tab ------------------
@@ -470,13 +490,16 @@ function setupTabs() {
 // ------------------ Initial Load ------------------
 window.onload = function() {
   setupTabs();
-  renderLots();
+  renderDashboardKPIs();
+  renderDashboardRecentItems();
+  renderDashboardUpcomingAuctions();
+  renderDashboardStorageStatus();
+  renderDashboardStatusChart();
+  setupDashboardActions();
   setupBarcodeScan();
   fillFilters();
   renderInventoryTable();
   setupInventoryFilters();
   renderZoneCards();
-  renderKPIs();
-  renderCharts();
   setupCasesTab();
 };
