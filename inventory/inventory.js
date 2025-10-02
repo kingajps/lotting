@@ -4,47 +4,87 @@
 const mockInventory = [
   {
     name: "Dell Laptop",
-    desc: "Dell Inspiron 15 3000",
+    brand: "Dell",
+    model: "Inspiron 15 3000",
+    year: 2020,
+    desc: "Dell Inspiron 15 3000, Intel i5, 8GB RAM, 256GB SSD, Windows 11 Home.",
+    details: "A reliable laptop for work or study.",
     barcode: "987654321098",
     status: "Photographed",
     condition: "Like New",
     value: "£320",
+    estimatedValue: 320,
     category: "Electronics",
     location: "U32-ELEC-A1",
-    case: "CASE-2024-002"
+    unit: "Unit 32",
+    case: "CASE-2024-002",
+    loggedBy: "Sarah Johnson",
+    loggedAt: "15/01/2024, 10:05:00",
+    dims: { length: "35.8cm", width: "24.9cm", height: "2.0cm", weight: "1.9kg" },
+    notes: "General good condition, some scuffs on the lid."
   },
   {
     name: "iPad Air",
-    desc: "Apple iPad Air (4th generation)",
+    brand: "Apple",
+    model: "iPad Air (4th generation)",
+    year: 2021,
+    desc: "Apple iPad Air with 64GB storage, Wi-Fi model in Space Grey",
+    details: "Apple iPad Air with 64GB storage, Wi-Fi model in Space Grey",
     barcode: "456789123456",
     status: "Listed",
     condition: "Good",
     value: "£160",
+    estimatedValue: 160,
     category: "Electronics",
     location: "U32-ELEC-A1",
-    case: "CASE-2024-002"
+    unit: "Unit 32",
+    case: "CASE-2024-002",
+    loggedBy: "Sarah Johnson",
+    loggedAt: "18/01/2024, 11:30:00",
+    dims: { length: "24.8cm", width: "17.8cm", height: "0.6cm", weight: "0.46kg" },
+    notes: "Screen protector applied, minor wear on corners."
   },
   {
     name: "Oak Dining Chairs (Set of 6)",
-    desc: "Heritage Furniture Classic Oak",
+    brand: "Heritage Furniture",
+    model: "Classic Oak",
+    year: 2017,
+    desc: "Set of 6 oak dining chairs, classic design.",
+    details: "Beautiful set of 6 Heritage oak dining chairs in excellent condition.",
     barcode: "123456789012",
     status: "Catalogued",
     condition: "Good",
     value: "£230",
+    estimatedValue: 230,
     category: "Furniture",
     location: "U32-FURN-B1",
-    case: "CASE-2024-001"
+    unit: "Unit 32",
+    case: "CASE-2024-001",
+    loggedBy: "Tom Baker",
+    loggedAt: "10/01/2024, 15:20:00",
+    dims: { length: "104cm", width: "44cm", height: "48cm", weight: "15kg" },
+    notes: "No major marks or scratches."
   },
   {
     name: "Oak Dining Table",
-    desc: "Heritage Furniture Classic Oak",
+    brand: "Heritage Furniture",
+    model: "Classic Oak",
+    year: 2017,
+    desc: "Heritage Furniture Classic Oak dining table.",
+    details: "Solid oak dining table with minor cosmetic marks.",
     barcode: "123456789012",
     status: "Catalogued",
     condition: "Good",
     value: "£420",
+    estimatedValue: 420,
     category: "Furniture",
     location: "U32-FURN-B1",
-    case: "CASE-2024-001"
+    unit: "Unit 32",
+    case: "CASE-2024-001",
+    loggedBy: "Tom Baker",
+    loggedAt: "10/01/2024, 15:22:00",
+    dims: { length: "180cm", width: "90cm", height: "75cm", weight: "38kg" },
+    notes: "Some scratches and small dents on tabletop."
   }
 ];
 
@@ -53,6 +93,7 @@ function populateFilters() {
   // Categories
   const catSet = Array.from(new Set(mockInventory.map(i => i.category)));
   const catSelect = document.getElementById("inventory-category-filter");
+  catSelect.innerHTML = `<option value="">All Categories</option>`;
   catSet.forEach(c => {
     const opt = document.createElement("option");
     opt.value = c;
@@ -62,6 +103,7 @@ function populateFilters() {
   // Statuses
   const statusSet = Array.from(new Set(mockInventory.map(i => i.status)));
   const statSelect = document.getElementById("inventory-status-filter");
+  statSelect.innerHTML = `<option value="">All Statuses</option>`;
   statusSet.forEach(s => {
     const opt = document.createElement("option");
     opt.value = s;
@@ -71,6 +113,7 @@ function populateFilters() {
   // Cases
   const caseSet = Array.from(new Set(mockInventory.map(i => i.case)));
   const caseSelect = document.getElementById("inventory-case-filter");
+  caseSelect.innerHTML = `<option value="">All Cases</option>`;
   caseSet.forEach(cs => {
     const opt = document.createElement("option");
     opt.value = cs;
@@ -90,7 +133,7 @@ function renderItems(items) {
   }
   document.getElementById("inventory-empty").style.display = "none";
   document.getElementById("inventory-results-count").textContent = `Showing ${items.length} of ${mockInventory.length} items`;
-  items.forEach(i => {
+  items.forEach((i, idx) => {
     const card = document.createElement("div");
     card.className = "inventory-card";
     card.innerHTML = `
@@ -99,7 +142,7 @@ function renderItems(items) {
       </div>
       <div class="inventory-card-main">
         <div class="inventory-card-title">${i.name}</div>
-        <div class="inventory-card-desc">${i.desc}</div>
+        <div class="inventory-card-desc">${i.model || i.desc}</div>
         <div class="inventory-card-barcode">${i.barcode}</div>
         <div class="inventory-card-row">
           <span class="inventory-card-status ${i.status.toLowerCase()}">${i.status}</span>
@@ -115,12 +158,20 @@ function renderItems(items) {
         </div>
       </div>
       <div class="inventory-card-actions">
-        <button class="inventory-card-view-btn" title="View">View</button>
+        <button class="inventory-card-view-btn" title="View" data-index="${idx}">View</button>
         <button class="inventory-card-actions-btn" title="Edit">&#9998;</button>
         <button class="inventory-card-actions-btn" title="Delete">&#128465;</button>
       </div>
     `;
     grid.appendChild(card);
+  });
+
+  // Attach view button listeners
+  document.querySelectorAll('.inventory-card-view-btn').forEach(btn => {
+    btn.onclick = function() {
+      const idx = Number(btn.getAttribute('data-index'));
+      showDetailModal(mockInventory[idx]);
+    };
   });
 }
 
@@ -131,8 +182,9 @@ function applyFilters() {
   if (search) {
     filtered = filtered.filter(i =>
       i.name.toLowerCase().includes(search) ||
-      i.desc.toLowerCase().includes(search) ||
-      i.barcode.toLowerCase().includes(search)
+      (i.model && i.model.toLowerCase().includes(search)) ||
+      (i.desc && i.desc.toLowerCase().includes(search)) ||
+      (i.barcode && i.barcode.toLowerCase().includes(search))
     );
   }
   const cat = document.getElementById("inventory-category-filter").value;
@@ -144,8 +196,8 @@ function applyFilters() {
   const sort = document.getElementById("inventory-sort-filter").value;
   if (sort === "name-az") filtered.sort((a, b) => a.name.localeCompare(b.name));
   if (sort === "name-za") filtered.sort((a, b) => b.name.localeCompare(a.name));
-  if (sort === "value-high") filtered.sort((a, b) => Number(b.value.replace(/[^0-9.-]+/g,"")) - Number(a.value.replace(/[^0-9.-]+/g,"")));
-  if (sort === "value-low") filtered.sort((a, b) => Number(a.value.replace(/[^0-9.-]+/g,"")) - Number(b.value.replace(/[^0-9.-]+/g,"")));
+  if (sort === "value-high") filtered.sort((a, b) => (b.estimatedValue || 0) - (a.estimatedValue || 0));
+  if (sort === "value-low") filtered.sort((a, b) => (a.estimatedValue || 0) - (b.estimatedValue || 0));
   renderItems(filtered);
 }
 
@@ -160,7 +212,6 @@ function setupListeners() {
 
 // === Modal logic for + Add New Item ===
 function openInventoryModal() {
-  // Get scrollbar width and compensate for it to avoid content shift
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
@@ -184,6 +235,127 @@ function closeInventoryModal() {
   document.body.style.overflow = "";
   document.body.style.marginRight = "";
   document.getElementById("inventory-modal-backdrop").style.display = "none";
+}
+
+// === Item Details Modal Logic ===
+function showDetailModal(item) {
+  const modalBackdrop = document.getElementById('inventory-detail-modal-backdrop');
+  const modal = document.getElementById('inventory-detail-modal');
+  // Prevent page shift
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+
+  // Compose modal content
+  modal.innerHTML = `
+    <button class="detail-modal-close-btn" id="detail-modal-close-btn">&times;</button>
+    <div class="detail-modal-title">Item Details</div>
+    <div class="detail-modal-section-title">Basic Information</div>
+    <div class="detail-modal-row">
+      <div>
+        <div class="detail-modal-label">Name</div>
+        <div class="detail-modal-value">${item.name || ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-label">Brand</div>
+        <div class="detail-modal-value">${item.brand || ""}</div>
+      </div>
+    </div>
+    <div class="detail-modal-row">
+      <div>
+        <div class="detail-modal-label">Model</div>
+        <div class="detail-modal-value">${item.model || ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-label">Year</div>
+        <div class="detail-modal-value">${item.year || ""}</div>
+      </div>
+    </div>
+    <div class="detail-modal-row">
+      <div>
+        <div class="detail-modal-label">Category</div>
+        <div class="detail-modal-value">${item.category || ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-label">Condition</div>
+        <div class="detail-modal-value condition">${item.condition || ""}</div>
+      </div>
+    </div>
+    <div class="detail-modal-section-title">Description</div>
+    <div class="detail-modal-value" style="margin-bottom:10px;">${item.details || item.desc || ""}</div>
+    <div class="detail-modal-section-title">Status & Value</div>
+    <div class="detail-modal-row">
+      <div>
+        <div class="detail-modal-label">Status</div>
+        <div class="detail-modal-badge ${item.status ? item.status.toLowerCase() : ""}">${item.status || ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-label">Estimated Value</div>
+        <div class="detail-modal-value estimated-value">£${item.estimatedValue || (item.value ? item.value.replace(/[^\d]/g,'') : "0")}</div>
+      </div>
+    </div>
+    <div class="detail-modal-section-title">Location & Case</div>
+    <div class="detail-modal-row">
+      <div>
+        <div class="detail-modal-label">Storage Location</div>
+        <div class="detail-modal-value">${item.location || ""}</div>
+        <div class="detail-modal-label" style="font-size: 0.98em;">Unit</div>
+        <div class="detail-modal-value">${item.unit || ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-label">Case</div>
+        <div class="detail-modal-value">${item.case || ""}</div>
+      </div>
+    </div>
+    <div class="detail-modal-section-title">Tracking Information</div>
+    <div class="detail-modal-row">
+      <div>
+        <div class="detail-modal-label">Logged By</div>
+        <div class="detail-modal-value">${item.loggedBy || ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-label">Logged At</div>
+        <div class="detail-modal-value">${item.loggedAt || ""}</div>
+      </div>
+    </div>
+    <div class="detail-modal-section-title">Dimensions</div>
+    <div class="detail-modal-dims-row">
+      <div>
+        <div class="detail-modal-dims-label">Length</div>
+        <div class="detail-modal-value">${item.dims && item.dims.length ? item.dims.length : ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-dims-label">Width</div>
+        <div class="detail-modal-value">${item.dims && item.dims.width ? item.dims.width : ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-dims-label">Height</div>
+        <div class="detail-modal-value">${item.dims && item.dims.height ? item.dims.height : ""}</div>
+      </div>
+      <div>
+        <div class="detail-modal-dims-label">Weight</div>
+        <div class="detail-modal-value">${item.dims && item.dims.weight ? item.dims.weight : ""}</div>
+      </div>
+    </div>
+    <div class="detail-modal-section-title">Notes</div>
+    <div class="detail-modal-notes">${item.notes || ""}</div>
+    <div class="detail-modal-section-title">Barcode</div>
+    <div class="detail-modal-barcode">${item.barcode || ""}</div>
+    <div class="detail-modal-actions">
+      <button class="primary-btn" title="Edit Item">Edit Item</button>
+      <button class="detail-modal-secondary-btn" title="Print Label">Print Label</button>
+      <button class="detail-modal-secondary-btn" id="detail-modal-close-btn2" title="Close">Close</button>
+    </div>
+  `;
+  modalBackdrop.style.display = "flex";
+
+  // Close modal logic
+  document.getElementById('detail-modal-close-btn').onclick =
+  document.getElementById('detail-modal-close-btn2').onclick = function () {
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    modalBackdrop.style.display = "none";
+  };
 }
 
 // === Init ===
