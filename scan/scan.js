@@ -33,7 +33,7 @@ function removeOldResult() {
 
 // === Manual Barcode Lookup ===
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("barcode-lookup-btn").onclick = function () {
+  function performLookup() {
     const barcode = document.getElementById("barcode-manual-input").value.trim();
     if (!barcode) {
       displayBarcodeResult(null);
@@ -41,7 +41,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     const result = mockBarcodes[barcode] || null;
     displayBarcodeResult(result);
-  };
+  }
+
+  document.getElementById("barcode-lookup-btn").onclick = performLookup;
+
+  // Listen for Enter key on the input
+  document.getElementById("barcode-manual-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      performLookup();
+    }
+  });
 
   // === Camera Scanner Button (demo only) ===
   document.getElementById("barcode-start-camera-btn").onclick = function () {
