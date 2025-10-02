@@ -159,38 +159,46 @@ function setupListeners() {
 }
 
 // === Modal logic for + Add New Item ===
+function openInventoryModal() {
+  // Get scrollbar width and compensate for it to avoid content shift
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+  // Populate selects in modal
+  const cats = Array.from(new Set(mockInventory.map(i => i.category)));
+  const cases = Array.from(new Set(mockInventory.map(i => i.case)));
+  const locs = Array.from(new Set(mockInventory.map(i => i.location)));
+  const catSel = document.getElementById("item-category");
+  const caseSel = document.getElementById("item-case");
+  const locSel = document.getElementById("item-location");
+  catSel.innerHTML = `<option value="">Select Category</option>`;
+  cats.forEach(c => { catSel.innerHTML += `<option value="${c}">${c}</option>`; });
+  caseSel.innerHTML = `<option value="">Select Case</option>`;
+  cases.forEach(cs => { caseSel.innerHTML += `<option value="${cs}">${cs}</option>`; });
+  locSel.innerHTML = `<option value="">Select Location</option>`;
+  locs.forEach(lc => { locSel.innerHTML += `<option value="${lc}">${lc}</option>`; });
+  document.getElementById("inventory-modal-backdrop").style.display = "flex";
+}
+
+function closeInventoryModal() {
+  document.body.style.overflow = "";
+  document.body.style.marginRight = "";
+  document.getElementById("inventory-modal-backdrop").style.display = "none";
+}
+
+// === Init ===
 document.addEventListener("DOMContentLoaded", function () {
   populateFilters();
   renderItems(mockInventory);
   setupListeners();
 
-  // Modal open
-  document.getElementById("inventory-new-btn").onclick = function () {
-    // Populate selects in modal
-    const cats = Array.from(new Set(mockInventory.map(i => i.category)));
-    const cases = Array.from(new Set(mockInventory.map(i => i.case)));
-    const locs = Array.from(new Set(mockInventory.map(i => i.location)));
-    const catSel = document.getElementById("item-category");
-    const caseSel = document.getElementById("item-case");
-    const locSel = document.getElementById("item-location");
-    catSel.innerHTML = `<option value="">Select Category</option>`;
-    cats.forEach(c => { catSel.innerHTML += `<option value="${c}">${c}</option>`; });
-    caseSel.innerHTML = `<option value="">Select Case</option>`;
-    cases.forEach(cs => { caseSel.innerHTML += `<option value="${cs}">${cs}</option>`; });
-    locSel.innerHTML = `<option value="">Select Location</option>`;
-    locs.forEach(lc => { locSel.innerHTML += `<option value="${lc}">${lc}</option>`; });
-    document.getElementById("inventory-modal-backdrop").style.display = "flex";
-    document.body.style.overflow = "hidden";
-  };
+  // Modal open/close logic with scrollbar compensation
+  document.getElementById("inventory-new-btn").onclick = openInventoryModal;
   document.getElementById("inventory-modal-close-btn").onclick =
-  document.getElementById("inventory-modal-cancel-btn").onclick = function () {
-    document.getElementById("inventory-modal-backdrop").style.display = "none";
-    document.body.style.overflow = "";
-  };
+  document.getElementById("inventory-modal-cancel-btn").onclick = closeInventoryModal;
   document.getElementById("inventory-modal-form").onsubmit = function(e) {
     e.preventDefault();
     alert("Item added (demo)!");
-    document.getElementById("inventory-modal-backdrop").style.display = "none";
-    document.body.style.overflow = "";
+    closeInventoryModal();
   };
 });
