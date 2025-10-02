@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Inventory | Auction Warehouse</title>
+  <title>Inventory Manager | Auction Warehouse</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="inventory.css" />
 </head>
@@ -25,11 +25,10 @@
       </div>
     </div>
   </header>
-  <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
     <a class="tab-btn" href="/lotting/index.html">Dashboard</a>
     <a class="tab-btn" href="/lotting/scan/scan.html">Barcode Scanner</a>
-    <a class="tab-btn active" href="/lotting/inventory.html">Inventory</a>
+    <a class="tab-btn active" href="/lotting/inventory/inventory.html">Inventory</a>
     <a class="tab-btn" href="/lotting/storage/storage.html">Storage Map</a>
     <a class="tab-btn" href="/lotting/cases/cases.html">Cases</a>
     <a class="tab-btn" href="/lotting/analytics/analytics.html">Analytics</a>
@@ -40,32 +39,31 @@
       <span>Auction Warehouse</span> / <span>Inventory</span>
     </nav>
     <section id="tab-inventory" class="tab-section active" tabindex="0">
-      <h2 class="inventory-title">Inventory Manager</h2>
-      <p class="inventory-desc">Manage and track all items in your warehouse</p>
-      <div class="inventory-filters-bar">
-        <input type="text" id="inventory-search" class="inventory-search" placeholder="Search items, barcodes, brands..." />
-        <select id="filter-category" class="inventory-filter-select">
-          <option value="">All Categories</option>
-        </select>
-        <select id="filter-status" class="inventory-filter-select">
-          <option value="">All Statuses</option>
-        </select>
-        <select id="filter-case" class="inventory-filter-select">
-          <option value="">All Cases</option>
-        </select>
-        <select id="inventory-sort" class="inventory-filter-select">
-          <option value="name">Sort by: Name (A-Z)</option>
-          <option value="value">Sort by: Value (High-Low)</option>
-          <option value="status">Sort by: Status</option>
-        </select>
-        <button class="primary-btn inventory-add-btn" id="inventory-add-btn">+ Add New Item</button>
+      <div class="inventory-header-row">
+        <div>
+          <h2 class="inventory-title">Inventory Manager</h2>
+          <div class="inventory-desc">Manage and track all items in your warehouse</div>
+        </div>
+        <button class="primary-btn inventory-new-btn" id="inventory-new-btn">+ Add New Item</button>
       </div>
-      <div class="inventory-results-info">
-        <span id="inventory-results-count">Showing 0 of 0 items</span>
+      <div class="inventory-filters-card">
+        <input type="text" id="inventory-search" class="inventory-search-input" placeholder="Search items, barcodes, brands..." />
+        <select id="inventory-category-filter" class="inventory-filter-select"><option value="">All Categories</option></select>
+        <select id="inventory-status-filter" class="inventory-filter-select"><option value="">All Statuses</option></select>
+        <select id="inventory-case-filter" class="inventory-filter-select"><option value="">All Cases</option></select>
+        <div class="inventory-sort-group">
+          Sort by:
+          <select id="inventory-sort-filter" class="inventory-filter-select">
+            <option value="name-az">Name (A-Z)</option>
+            <option value="name-za">Name (Z-A)</option>
+            <option value="value-high">Value (High-Low)</option>
+            <option value="value-low">Value (Low-High)</option>
+          </select>
+        </div>
       </div>
-      <div class="inventory-card-grid" id="inventory-card-grid">
-        <!-- JS will fill item cards here -->
-      </div>
+      <div class="inventory-results-count" id="inventory-results-count"></div>
+      <div class="inventory-grid" id="inventory-grid"></div>
+      <div class="inventory-empty" id="inventory-empty" style="display:none;">No items found for your filters.</div>
     </section>
   </main>
   <!-- Footer -->
