@@ -1,127 +1,169 @@
 // Inventory Tab JS
 
-// === Mock Data (Replace with API/backend calls as needed) ===
-const mockItems = [
-  { id: 1, name: "Vintage Camera", barcode: "A123", brand: "Kodak", category: "Electronics", case: "Case 1", status: "Ready", value: 120 },
-  { id: 2, name: "Antique Vase", barcode: "B456", brand: "Ming", category: "Art", case: "Case 2", status: "Processing", value: 340 },
-  { id: 3, name: "Gold Watch", barcode: "C789", brand: "Omega", category: "Jewellery", case: "Case 3", status: "Awaiting", value: 850 },
-  { id: 4, name: "Silver Spoon", barcode: "D234", brand: "Georg Jensen", category: "Silverware", case: "Case 2", status: "Sold", value: 50 },
-  { id: 5, name: "Model Train", barcode: "E567", brand: "Hornby", category: "Collectibles", case: "Case 1", status: "Ready", value: 65 }
+// === Mock Data for Items ===
+const mockInventory = [
+  {
+    name: "Dell Laptop",
+    desc: "Dell Inspiron 15 3000",
+    barcode: "987654321098",
+    status: "Photographed",
+    condition: "Like New",
+    value: "£320",
+    category: "Electronics",
+    location: "U32-ELEC-A1",
+    case: "CASE-2024-002"
+  },
+  {
+    name: "iPad Air",
+    desc: "Apple iPad Air (4th generation)",
+    barcode: "456789123456",
+    status: "Listed",
+    condition: "Good",
+    value: "£160",
+    category: "Electronics",
+    location: "U32-ELEC-A1",
+    case: "CASE-2024-002"
+  },
+  {
+    name: "Oak Dining Chairs (Set of 6)",
+    desc: "Heritage Furniture Classic Oak",
+    barcode: "123456789012",
+    status: "Catalogued",
+    condition: "Good",
+    value: "£230",
+    category: "Furniture",
+    location: "U32-FURN-B1",
+    case: "CASE-2024-001"
+  },
+  {
+    name: "Oak Dining Table",
+    desc: "Heritage Furniture Classic Oak",
+    barcode: "123456789012",
+    status: "Catalogued",
+    condition: "Good",
+    value: "£420",
+    category: "Furniture",
+    location: "U32-FURN-B1",
+    case: "CASE-2024-001"
+  }
 ];
 
 // === Populate Filters ===
 function populateFilters() {
-  // Category
-  const categories = [...new Set(mockItems.map(item => item.category))];
-  const categorySelect = document.getElementById("filter-category");
-  categories.forEach(cat => {
-    const option = document.createElement("option");
-    option.value = cat;
-    option.textContent = cat;
-    categorySelect.appendChild(option);
+  // Categories
+  const catSet = Array.from(new Set(mockInventory.map(i => i.category)));
+  const catSelect = document.getElementById("inventory-category-filter");
+  catSet.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    catSelect.appendChild(opt);
   });
-
-  // Status
-  const statuses = [...new Set(mockItems.map(item => item.status))];
-  const statusSelect = document.getElementById("filter-status");
-  statuses.forEach(stat => {
-    const option = document.createElement("option");
-    option.value = stat;
-    option.textContent = stat;
-    statusSelect.appendChild(option);
+  // Statuses
+  const statusSet = Array.from(new Set(mockInventory.map(i => i.status)));
+  const statSelect = document.getElementById("inventory-status-filter");
+  statusSet.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s;
+    opt.textContent = s;
+    statSelect.appendChild(opt);
   });
-
-  // Case
-  const cases = [...new Set(mockItems.map(item => item.case))];
-  const caseSelect = document.getElementById("filter-case");
-  cases.forEach(cse => {
-    const option = document.createElement("option");
-    option.value = cse;
-    option.textContent = cse;
-    caseSelect.appendChild(option);
+  // Cases
+  const caseSet = Array.from(new Set(mockInventory.map(i => i.case)));
+  const caseSelect = document.getElementById("inventory-case-filter");
+  caseSet.forEach(cs => {
+    const opt = document.createElement("option");
+    opt.value = cs;
+    opt.textContent = cs;
+    caseSelect.appendChild(opt);
   });
 }
 
-// === Render Items ===
+// === Render Items Grid ===
 function renderItems(items) {
-  const grid = document.getElementById("inventory-card-grid");
+  const grid = document.getElementById("inventory-grid");
   grid.innerHTML = "";
-  items.forEach(item => {
+  if (items.length === 0) {
+    document.getElementById("inventory-empty").style.display = "";
+    document.getElementById("inventory-results-count").textContent = `Showing 0 of ${mockInventory.length} items`;
+    return;
+  }
+  document.getElementById("inventory-empty").style.display = "none";
+  document.getElementById("inventory-results-count").textContent = `Showing ${items.length} of ${mockInventory.length} items`;
+  items.forEach(i => {
     const card = document.createElement("div");
     card.className = "inventory-card";
     card.innerHTML = `
-      <div class="inventory-card-title">${item.name}</div>
-      <div class="inventory-card-desc">Barcode: ${item.barcode} &middot; Brand: ${item.brand}</div>
-      <div class="inventory-card-desc">Category: ${item.category} &middot; Case: ${item.case}</div>
-      <div class="inventory-card-desc">Status: <span style="color:#2563eb;font-weight:500;">${item.status}</span> &middot; Value: £${item.value}</div>
-      <div class="card-actions">
-        <button class="card-actions-btn" title="View">View</button>
-        <button class="card-actions-btn" title="Edit">Edit</button>
-        <button class="card-actions-btn" title="Delete">Delete</button>
+      <div class="inventory-card-header">
+        <span class="inventory-card-icon">🗃️</span>
+      </div>
+      <div class="inventory-card-main">
+        <div class="inventory-card-title">${i.name}</div>
+        <div class="inventory-card-desc">${i.desc}</div>
+        <div class="inventory-card-barcode">${i.barcode}</div>
+        <div class="inventory-card-row">
+          <span class="inventory-card-status ${i.status.toLowerCase()}">${i.status}</span>
+          <span class="inventory-card-condition">${i.condition}</span>
+        </div>
+        <div class="inventory-card-row">
+          <span class="inventory-card-value">${i.value}</span>
+          <span class="inventory-card-category">${i.category}</span>
+        </div>
+        <div class="inventory-card-row">
+          <span class="inventory-card-location">📍 ${i.location}</span>
+          <span class="inventory-card-case">#${i.case}</span>
+        </div>
+      </div>
+      <div class="inventory-card-actions">
+        <button class="inventory-card-view-btn" title="View">View</button>
+        <button class="inventory-card-actions-btn" title="Edit">&#9998;</button>
+        <button class="inventory-card-actions-btn" title="Delete">&#128465;</button>
       </div>
     `;
     grid.appendChild(card);
   });
-  updateCount(items.length, mockItems.length);
 }
 
-// === Update Results Count ===
-function updateCount(filtered, total) {
-  document.getElementById("inventory-results-count").textContent = `Showing ${filtered} of ${total} items`;
-}
-
-// === Filter/Search Logic ===
+// === Filter/Search/Sort Logic ===
 function applyFilters() {
-  let filtered = [...mockItems];
-
-  // Search
+  let filtered = [...mockInventory];
   const search = document.getElementById("inventory-search").value.trim().toLowerCase();
   if (search) {
-    filtered = filtered.filter(item =>
-      item.name.toLowerCase().includes(search) ||
-      item.barcode.toLowerCase().includes(search) ||
-      item.brand.toLowerCase().includes(search)
+    filtered = filtered.filter(i =>
+      i.name.toLowerCase().includes(search) ||
+      i.desc.toLowerCase().includes(search) ||
+      i.barcode.toLowerCase().includes(search)
     );
   }
-
-  // Category
-  const category = document.getElementById("filter-category").value;
-  if (category) filtered = filtered.filter(item => item.category === category);
-
-  // Status
-  const status = document.getElementById("filter-status").value;
-  if (status) filtered = filtered.filter(item => item.status === status);
-
-  // Case
-  const caseVal = document.getElementById("filter-case").value;
-  if (caseVal) filtered = filtered.filter(item => item.case === caseVal);
-
-  // Sort
-  const sort = document.getElementById("inventory-sort").value;
-  if (sort === "name") filtered.sort((a, b) => a.name.localeCompare(b.name));
-  if (sort === "value") filtered.sort((a, b) => b.value - a.value);
-  if (sort === "status") filtered.sort((a, b) => a.status.localeCompare(b.status));
-
+  const cat = document.getElementById("inventory-category-filter").value;
+  if (cat) filtered = filtered.filter(i => i.category === cat);
+  const stat = document.getElementById("inventory-status-filter").value;
+  if (stat) filtered = filtered.filter(i => i.status === stat);
+  const cs = document.getElementById("inventory-case-filter").value;
+  if (cs) filtered = filtered.filter(i => i.case === cs);
+  const sort = document.getElementById("inventory-sort-filter").value;
+  if (sort === "name-az") filtered.sort((a, b) => a.name.localeCompare(b.name));
+  if (sort === "name-za") filtered.sort((a, b) => b.name.localeCompare(a.name));
+  if (sort === "value-high") filtered.sort((a, b) => Number(b.value.replace(/[^0-9.-]+/g,"")) - Number(a.value.replace(/[^0-9.-]+/g,"")));
+  if (sort === "value-low") filtered.sort((a, b) => Number(a.value.replace(/[^0-9.-]+/g,"")) - Number(b.value.replace(/[^0-9.-]+/g,"")));
   renderItems(filtered);
 }
 
 // === Event Listeners ===
 function setupListeners() {
   document.getElementById("inventory-search").addEventListener("input", applyFilters);
-  document.getElementById("filter-category").addEventListener("change", applyFilters);
-  document.getElementById("filter-status").addEventListener("change", applyFilters);
-  document.getElementById("filter-case").addEventListener("change", applyFilters);
-  document.getElementById("inventory-sort").addEventListener("change", applyFilters);
-
-  // Add New Item (demo only)
-  document.getElementById("inventory-add-btn").onclick = function () {
-    alert("Add New Item functionality coming soon!");
+  document.getElementById("inventory-category-filter").addEventListener("change", applyFilters);
+  document.getElementById("inventory-status-filter").addEventListener("change", applyFilters);
+  document.getElementById("inventory-case-filter").addEventListener("change", applyFilters);
+  document.getElementById("inventory-sort-filter").addEventListener("change", applyFilters);
+  document.getElementById("inventory-new-btn").onclick = function () {
+    alert("Add New Item form coming soon!");
   };
 }
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
   populateFilters();
-  renderItems(mockItems);
+  renderItems(mockInventory);
   setupListeners();
 });
