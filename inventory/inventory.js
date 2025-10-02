@@ -92,7 +92,9 @@ const mockInventory = [
 // === LocalStorage load/save logic ===
 let itemsData = [];
 function loadItems() {
-  const local = localStorage.getItem(ITEMS_KEY);
+  // Try to load from aw_inventory_data OR fallback to "inventory" key for compatibility with barcode scanner tab
+  let local = localStorage.getItem(ITEMS_KEY);
+  if (!local) local = localStorage.getItem("inventory");
   if (local) {
     try { itemsData = JSON.parse(local); }
     catch { itemsData = JSON.parse(JSON.stringify(mockInventory)); }
@@ -102,7 +104,17 @@ function loadItems() {
 }
 function saveItems() {
   localStorage.setItem(ITEMS_KEY, JSON.stringify(itemsData));
+  localStorage.setItem("inventory", JSON.stringify(itemsData));
 }
+
+// === Listen for external inventory changes (e.g., from barcode tab) ===
+window.addEventListener("storage", function(event) {
+  if (event.key === ITEMS_KEY || event.key === "inventory") {
+    loadItems();
+    populateFilters();
+    renderItems(itemsData);
+  }
+});
 
 // === Populate Filters ===
 function populateFilters() {
