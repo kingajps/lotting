@@ -1,3 +1,6 @@
+// === Persistent storage key ===
+const CASES_KEY = "aw_cases_data";
+
 // === Mock Data for Cases ===
 const mockCases = [
   {
@@ -52,9 +55,24 @@ const mockCases = [
 
 const CASE_STATUSES = ["Processing", "Completed", "InProgress", "Cancelled", "Closed"];
 
+// === LocalStorage load/save logic ===
+let casesData = [];
+function loadCases() {
+  const local = localStorage.getItem(CASES_KEY);
+  if (local) {
+    try { casesData = JSON.parse(local); }
+    catch { casesData = JSON.parse(JSON.stringify(mockCases)); }
+  } else {
+    casesData = JSON.parse(JSON.stringify(mockCases));
+  }
+}
+function saveCases() {
+  localStorage.setItem(CASES_KEY, JSON.stringify(casesData));
+}
+
 // === Populate Status Filter ===
 function populateStatusFilter() {
-  const statuses = Array.from(new Set(mockCases.map(c => c.status)));
+  const statuses = Array.from(new Set(casesData.map(c => c.status)));
   const statusSelect = document.getElementById("cases-status-filter");
   statusSelect.innerHTML = '<option value="">All Statuses</option>';
   statuses.forEach(s => {
@@ -71,11 +89,11 @@ function renderCases(cases) {
   grid.innerHTML = "";
   if (cases.length === 0) {
     document.getElementById("cases-empty").style.display = "";
-    document.getElementById("cases-results-count").textContent = `Showing 0 of ${mockCases.length} cases`;
+    document.getElementById("cases-results-count").textContent = `Showing 0 of ${casesData.length} cases`;
     return;
   }
   document.getElementById("cases-empty").style.display = "none";
-  document.getElementById("cases-results-count").textContent = `Showing ${cases.length} of ${mockCases.length} cases`;
+  document.getElementById("cases-results-count").textContent = `Showing ${cases.length} of ${casesData.length} cases`;
   cases.forEach((c, idx) => {
     const card = document.createElement("div");
     card.className = "cases-card";
@@ -111,7 +129,7 @@ function renderCases(cases) {
       <div class="cases-card-actions">
         <button class="primary-btn cases-card-view-btn" data-index="${idx}">View</button>
         <button class="cases-card-actions-btn cases-card-edit-btn" title="Edit" data-index="${idx}">&#9998;</button>
-        <button class="cases-card-actions-btn" title="Delete">&#128465;</button>
+        <button class="cases-card-actions-btn" title="Delete" data-index="${idx}">&#128465;</button>
       </div>
     `;
     grid.appendChild(card);
@@ -121,7 +139,7 @@ function renderCases(cases) {
   document.querySelectorAll('.cases-card-view-btn').forEach(btn => {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
-      showCaseDetailModal(mockCases[idx]);
+      showCaseDetailModal(casesData[idx]);
     };
   });
 
@@ -129,14 +147,26 @@ function renderCases(cases) {
   document.querySelectorAll('.cases-card-edit-btn').forEach(btn => {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
-      openCaseEditModal(mockCases[idx], idx);
+      openCaseEditModal(casesData[idx], idx);
+    };
+  });
+
+  // Attach delete button listeners
+  document.querySelectorAll('.cases-card-actions-btn[title="Delete"]').forEach(btn => {
+    btn.onclick = function() {
+      const idx = Number(btn.getAttribute('data-index'));
+      if (confirm("Are you sure you want to delete this case?")) {
+        casesData.splice(idx, 1);
+        saveCases();
+        renderCases(casesData);
+      }
     };
   });
 }
 
 // === Filter/Search Logic ===
 function applyCaseFilters() {
-  let filtered = [...mockCases];
+  let filtered = [...casesData];
   const search = document.getElementById("cases-search").value.trim().toLowerCase();
   if (search) {
     filtered = filtered.filter(c =>
@@ -177,8 +207,26 @@ function setupCaseModal() {
   document.getElementById("case-modal-cancel-btn").onclick = closeCaseModal;
   document.getElementById("case-modal-form").onsubmit = function(e) {
     e.preventDefault();
-    alert("Case created (demo)!");
+    // Add new case to casesData
+    const newCase = {
+      id: document.getElementById("case-number").value.trim(),
+      title: document.getElementById("case-title").value.trim(),
+      status: "Processing",
+      client: document.getElementById("case-client-name").value.trim(),
+      contact: document.getElementById("case-client-contact").value.trim(),
+      received: "", // You may want to add this field to your form
+      auction: document.getElementById("case-auction-date").value.trim(),
+      items: 0,
+      value: "",
+      description: document.getElementById("case-desc").value.trim(),
+      notes: document.getElementById("case-notes").value.trim(),
+      itemsList: []
+    };
+    casesData.push(newCase);
+    saveCases();
+    renderCases(casesData);
     closeCaseModal();
+    alert("Case created!");
   };
 }
 
@@ -362,8 +410,8 @@ function openCaseEditModal(caseObj, idx) {
       if (name) itemsList.push({ name, meta, value, status });
     });
 
-    // Update in mockCases
-    mockCases[idx] = {
+    // Update in casesData
+    casesData[idx] = {
       id: newCaseNumber,
       title: newTitle,
       status: modal.querySelector('#edit-case-status').value,
@@ -377,11 +425,12 @@ function openCaseEditModal(caseObj, idx) {
       notes: modal.querySelector('#edit-case-notes').value.trim(),
       itemsList
     };
+    saveCases();
     alert("Case updated!");
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
     modalBackdrop.style.display = "none";
-    renderCases(mockCases);
+    renderCases(casesData);
   };
 }
 
@@ -539,15 +588,16 @@ function showCaseDetailModal(caseObj) {
     modalBackdrop.style.display = "none";
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
-    const idx = mockCases.findIndex(c => c.id === caseObj.id);
+    const idx = casesData.findIndex(c => c.id === caseObj.id);
     openCaseEditModal(caseObj, idx);
   };
 }
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
+  loadCases();
   populateStatusFilter();
-  renderCases(mockCases);
+  renderCases(casesData);
   setupCaseListeners();
   setupCaseModal();
 });
