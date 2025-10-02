@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Cases | Auction Warehouse</title>
+  <title>Case Manager | Auction Warehouse</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="cases.css" />
 </head>
@@ -25,7 +25,6 @@
       </div>
     </div>
   </header>
-  <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
     <a class="tab-btn" href="/lotting/index.html">Dashboard</a>
     <a class="tab-btn" href="/lotting/scan/scan.html">Barcode Scanner</a>
@@ -40,39 +39,20 @@
       <span>Auction Warehouse</span> / <span>Cases</span>
     </nav>
     <section id="tab-cases" class="tab-section active" tabindex="0">
-      <div class="cases-container">
-        <div class="cases-header">
-          <h2>Cases</h2>
-          <button class="primary-btn" id="add-case-btn">+ New Case</button>
+      <div class="cases-header-row">
+        <div>
+          <h2 class="cases-title">Case Manager</h2>
+          <div class="cases-desc">Manage client cases and consignments</div>
         </div>
-        <div class="cases-search-container">
-          <div class="cases-search-grid">
-            <div class="cases-search-input-container">
-              <span class="cases-search-icon">&#128269;</span>
-              <input
-                type="text"
-                placeholder="Search cases, clients, numbers..."
-                class="cases-search-input"
-              />
-            </div>
-            <div>
-              <select class="cases-filter-select">
-                <option value="">All Statuses</option>
-                <option value="Active">Active</option>
-                <option value="Processing">Processing</option>
-                <option value="Ready">Ready</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-            </div>
-            <div class="cases-results-info">
-              <span class="cases-results-count">Showing X of Y cases</span>
-            </div>
-          </div>
-        </div>
-        <div class="cases-grid"></div>
-        <div class="cases-empty" style="display:none;"></div>
+        <button class="primary-btn cases-new-btn" id="cases-new-btn">+ New Case</button>
       </div>
+      <div class="cases-filters-card">
+        <input type="text" id="cases-search" class="cases-search-input" placeholder="Search cases, clients, case numbers..." />
+        <select id="cases-status-filter" class="cases-filter-select"><option value="">All Statuses</option></select>
+      </div>
+      <div class="cases-results-count" id="cases-results-count"></div>
+      <div class="cases-grid" id="cases-grid"></div>
+      <div class="cases-empty" id="cases-empty" style="display:none;">No cases found for your filters.</div>
     </section>
   </main>
   <!-- Footer -->
