@@ -66,6 +66,72 @@
       <div class="inventory-empty" id="inventory-empty" style="display:none;">No items found for your filters.</div>
     </section>
   </main>
+  <!-- Add New Item Modal -->
+  <div id="inventory-modal-backdrop" class="inventory-modal-backdrop" style="display:none;">
+    <div class="inventory-modal">
+      <div class="inventory-modal-header">
+        <span class="inventory-modal-title">Add New Item</span>
+        <button class="inventory-modal-close-btn" id="inventory-modal-close-btn">&times;</button>
+      </div>
+      <form class="inventory-modal-form" id="inventory-modal-form">
+        <div class="inventory-modal-row">
+          <div class="inventory-modal-col">
+            <label>Item Name *</label>
+            <input type="text" required id="item-name" autocomplete="off" />
+          </div>
+          <div class="inventory-modal-col">
+            <label>Brand</label>
+            <input type="text" id="item-brand" autocomplete="off" />
+          </div>
+        </div>
+        <div class="inventory-modal-row">
+          <div class="inventory-modal-col">
+            <label>Category *</label>
+            <select required id="item-category">
+              <option value="">Select Category</option>
+            </select>
+          </div>
+          <div class="inventory-modal-col">
+            <label>Condition *</label>
+            <select required id="item-condition">
+              <option>Good</option>
+              <option>Like New</option>
+              <option>Fair</option>
+              <option>Poor</option>
+            </select>
+          </div>
+        </div>
+        <div class="inventory-modal-row">
+          <div class="inventory-modal-col">
+            <label>Estimated Value (£) *</label>
+            <input type="number" min="0" required id="item-value" value="0" />
+          </div>
+          <div class="inventory-modal-col">
+            <label>Case *</label>
+            <select required id="item-case">
+              <option value="">Select Case</option>
+            </select>
+          </div>
+        </div>
+        <div class="inventory-modal-row">
+          <div class="inventory-modal-col">
+            <label>Storage Location *</label>
+            <select required id="item-location">
+              <option value="">Select Location</option>
+            </select>
+          </div>
+        </div>
+        <div class="inventory-modal-row">
+          <label>Description *</label>
+          <textarea required id="item-desc" rows="2"></textarea>
+        </div>
+        <div class="inventory-modal-actions">
+          <button type="submit" class="primary-btn inventory-modal-add-btn"><span style="font-size:1.2em;vertical-align:middle;margin-right:7px;">🗃️</span> Add Item</button>
+          <button type="button" class="inventory-modal-cancel-btn" id="inventory-modal-cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <!-- Footer -->
   <footer class="dashboard-footer">
     <div class="footer-row">
