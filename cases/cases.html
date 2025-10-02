@@ -55,6 +55,53 @@
       <div class="cases-empty" id="cases-empty" style="display:none;">No cases found for your filters.</div>
     </section>
   </main>
+  <!-- New Case Modal -->
+  <div id="case-modal-backdrop" class="case-modal-backdrop" style="display:none;">
+    <div class="case-modal">
+      <div class="case-modal-header">
+        <span class="case-modal-title">Create New Case</span>
+        <button class="case-modal-close-btn" id="case-modal-close-btn">&times;</button>
+      </div>
+      <form class="case-modal-form" id="case-modal-form">
+        <div class="case-modal-row">
+          <div class="case-modal-col">
+            <label>Case Number *</label>
+            <input type="text" required id="case-number" autocomplete="off" />
+          </div>
+          <div class="case-modal-col">
+            <label>Expected Auction Date</label>
+            <input type="date" id="case-auction-date" placeholder="dd/mm/yyyy" />
+          </div>
+        </div>
+        <div class="case-modal-row">
+          <label>Case Title *</label>
+          <input type="text" required id="case-title" autocomplete="off" />
+        </div>
+        <div class="case-modal-row">
+          <div class="case-modal-col">
+            <label>Client Name *</label>
+            <input type="text" required id="case-client-name" autocomplete="off" />
+          </div>
+          <div class="case-modal-col">
+            <label>Client Contact *</label>
+            <input type="text" required id="case-client-contact" autocomplete="off" />
+          </div>
+        </div>
+        <div class="case-modal-row">
+          <label>Description *</label>
+          <textarea required id="case-desc" rows="3"></textarea>
+        </div>
+        <div class="case-modal-row">
+          <label>Notes</label>
+          <textarea id="case-notes" rows="2"></textarea>
+        </div>
+        <div class="case-modal-actions">
+          <button type="submit" class="primary-btn case-modal-create-btn">+ Create Case</button>
+          <button type="button" class="case-modal-cancel-btn" id="case-modal-cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <!-- Footer -->
   <footer class="dashboard-footer">
     <div class="footer-row">
