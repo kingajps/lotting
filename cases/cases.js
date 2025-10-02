@@ -50,6 +50,8 @@ const mockCases = [
   }
 ];
 
+const CASE_STATUSES = ["Processing", "Completed", "InProgress", "Cancelled", "Closed"];
+
 // === Populate Status Filter ===
 function populateStatusFilter() {
   const statuses = Array.from(new Set(mockCases.map(c => c.status)));
@@ -182,67 +184,243 @@ function setupCaseModal() {
 
 // === Case Edit Modal Logic ===
 function openCaseEditModal(caseObj, idx) {
-  openCaseModal();
-  document.querySelector(".case-modal-title").textContent = "Edit Case";
-  document.getElementById("case-number").value = caseObj.id;
-  document.getElementById("case-title").value = caseObj.title;
-  document.getElementById("case-client-name").value = caseObj.client;
-  document.getElementById("case-client-contact").value = caseObj.contact || "";
-  document.getElementById("case-auction-date").value = caseObj.auction ? formatISODate(caseObj.auction) : "";
-  document.getElementById("case-desc").value = caseObj.description || "";
-  document.getElementById("case-notes").value = caseObj.notes || "";
-  // Make case number editable:
-  document.getElementById("case-number").readOnly = false;
+  // Open a custom edit modal over the case modal backdrop
+  const modalBackdrop = document.getElementById('case-detail-modal-backdrop');
+  let modal = document.getElementById('case-detail-modal');
+  modalBackdrop.style.display = 'flex';
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
 
-  // Overwrite the form submit handler for editing
-  const form = document.getElementById("case-modal-form");
-  const originalHandler = form.onsubmit;
-  form.onsubmit = function(e) {
+  // Render editable form for all fields including items
+  modal.innerHTML = `
+    <button class="case-detail-close-btn" id="case-detail-edit-close-btn">&times;</button>
+    <div class="case-detail-title">Edit Case</div>
+    <form id="case-detail-edit-form" autocomplete="off">
+      <div class="case-detail-main-row">
+        <div class="case-detail-main">
+          <div class="case-detail-section-title">Case Information</div>
+          <div class="case-detail-label-row">
+            <div>
+              <span class="case-detail-label">Case Number</span>
+              <input type="text" id="edit-case-id" value="${caseObj.id}" required style="width:180px;" />
+            </div>
+            <div>
+              <span class="case-detail-label">Status</span>
+              <select id="edit-case-status" required>
+                ${CASE_STATUSES.map(st => `<option${caseObj.status===st?' selected':''}>${st}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="case-detail-label-row">
+            <div>
+              <span class="case-detail-label">Title</span>
+              <input type="text" id="edit-case-title" value="${caseObj.title}" required style="width:180px;" />
+            </div>
+            <div>
+              <span class="case-detail-label">Total Items</span>
+              <input type="number" id="edit-case-items" value="${caseObj.items||''}" min="0" style="width:80px;" />
+            </div>
+          </div>
+          <div class="case-detail-section-title">Client Information</div>
+          <div class="case-detail-label-row">
+            <div>
+              <span class="case-detail-label">Client Name</span>
+              <input type="text" id="edit-case-client" value="${caseObj.client}" required style="width:180px;" />
+            </div>
+            <div>
+              <span class="case-detail-label">Contact</span>
+              <input type="text" id="edit-case-contact" value="${caseObj.contact||''}" style="width:180px;" />
+            </div>
+          </div>
+          <div class="case-detail-section-title">Important Dates</div>
+          <div class="case-detail-label-row">
+            <div>
+              <span class="case-detail-label">Received Date</span>
+              <input type="date" id="edit-case-received" value="${toISODate(caseObj.received)}" style="width:140px;" />
+            </div>
+            <div>
+              <span class="case-detail-label">Expected Auction Date</span>
+              <input type="date" id="edit-case-auction" value="${toISODate(caseObj.auction)}" style="width:140px;" />
+            </div>
+          </div>
+          <div class="case-detail-section-title">Description</div>
+          <textarea id="edit-case-description" rows="2" style="width:100%;">${caseObj.description||''}</textarea>
+          <div class="case-detail-section-title">Notes</div>
+          <textarea id="edit-case-notes" rows="2" style="width:100%;">${caseObj.notes||''}</textarea>
+          <div class="case-detail-section-title">Items in This Case</div>
+          <div id="edit-case-items-list">
+            ${(caseObj.itemsList||[]).map((item,idx) => `
+              <div class="case-detail-item-row" data-itemidx="${idx}">
+                <input type="text" class="edit-item-name" value="${item.name||''}" placeholder="Item Name" style="width:130px;" />
+                <input type="text" class="edit-item-meta" value="${item.meta||''}" placeholder="Meta" style="width:120px;" />
+                <input type="text" class="edit-item-value" value="${item.value||''}" placeholder="Value" style="width:70px;" />
+                <input type="text" class="edit-item-status" value="${item.status||''}" placeholder="Status" style="width:90px;" />
+                <button type="button" class="edit-item-remove-btn" title="Remove" style="color:#c00;">&#128465;</button>
+              </div>
+            `).join('')}
+          </div>
+          <button type="button" id="edit-item-add-btn" style="margin-top:8px;">+ Add Item</button>
+          <div class="case-detail-modal-actions" style="margin-top:20px;">
+            <button class="primary-btn" type="submit">Save</button>
+            <button class="detail-modal-secondary-btn" type="button" id="case-detail-edit-close-btn2">Cancel</button>
+          </div>
+        </div>
+        <div class="case-detail-side">
+          <div class="case-detail-summary-card">
+            <div class="case-detail-summary-label">Value Summary</div>
+            <div class="case-detail-summary-row">
+              <span>Estimated Total:</span>
+              <input type="text" id="edit-case-value" value="${caseObj.value||''}" style="width:70px;"/>
+            </div>
+            <div class="case-detail-summary-row">
+              <span>Items Count:</span>
+              <span id="edit-case-side-items-count">${caseObj.items || (caseObj.itemsList ? caseObj.itemsList.length : 0)}</span>
+            </div>
+            <div class="case-detail-summary-row">
+              <span>Avg. per Item:</span>
+              <span id="edit-case-side-avg-value">
+                £${getAvgPerItem(caseObj.value, caseObj.items || (caseObj.itemsList ? caseObj.itemsList.length : 0))}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  `;
+
+  // Remove item handler
+  modal.querySelectorAll('.edit-item-remove-btn').forEach(btn => {
+    btn.onclick = function() {
+      btn.parentElement.remove();
+      updateItemsSummary();
+    };
+  });
+
+  // Add item handler
+  modal.querySelector('#edit-item-add-btn').onclick = function() {
+    const itemsDiv = modal.querySelector('#edit-case-items-list');
+    const idx = itemsDiv.children.length;
+    const div = document.createElement('div');
+    div.className = "case-detail-item-row";
+    div.innerHTML = `
+      <input type="text" class="edit-item-name" placeholder="Item Name" style="width:130px;" />
+      <input type="text" class="edit-item-meta" placeholder="Meta" style="width:120px;" />
+      <input type="text" class="edit-item-value" placeholder="Value" style="width:70px;" />
+      <input type="text" class="edit-item-status" placeholder="Status" style="width:90px;" />
+      <button type="button" class="edit-item-remove-btn" title="Remove" style="color:#c00;">&#128465;</button>
+    `;
+    itemsDiv.appendChild(div);
+    div.querySelector('.edit-item-remove-btn').onclick = function() {
+      div.remove();
+      updateItemsSummary();
+    };
+    updateItemsSummary();
+  };
+
+  // Live update items count and avg per item in summary
+  function updateItemsSummary() {
+    const itemsDiv = modal.querySelector('#edit-case-items-list');
+    const itemCount = itemsDiv.querySelectorAll('.case-detail-item-row').length;
+    modal.querySelector('#edit-case-side-items-count').textContent = itemCount;
+    const value = modal.querySelector('#edit-case-value').value.replace(/[^\d.]/g, "");
+    modal.querySelector('#edit-case-side-avg-value').textContent =
+      "£" + getAvgPerItem(value, itemCount);
+  }
+
+  // On value or items change, update summary
+  modal.querySelector('#edit-case-value').oninput = updateItemsSummary;
+  modal.querySelector('#edit-case-items-list').oninput = updateItemsSummary;
+
+  // Close modal logic
+  modal.querySelector('#case-detail-edit-close-btn').onclick =
+  modal.querySelector('#case-detail-edit-close-btn2').onclick = function () {
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    modalBackdrop.style.display = "none";
+  };
+
+  // Form submission logic
+  modal.querySelector('#case-detail-edit-form').onsubmit = function(e) {
     e.preventDefault();
-    const newCaseNumber = document.getElementById("case-number").value;
-    // If the case number changed, update the id
-    mockCases[idx].id = newCaseNumber;
-    mockCases[idx].title = document.getElementById("case-title").value;
-    mockCases[idx].client = document.getElementById("case-client-name").value;
-    mockCases[idx].contact = document.getElementById("case-client-contact").value;
-    mockCases[idx].auction = document.getElementById("case-auction-date").value;
-    mockCases[idx].description = document.getElementById("case-desc").value;
-    mockCases[idx].notes = document.getElementById("case-notes").value;
+    // Validate and update case
+    const newCaseNumber = modal.querySelector('#edit-case-id').value.trim();
+    if (!newCaseNumber) return alert("Case Number required");
+    const newTitle = modal.querySelector('#edit-case-title').value.trim();
+    if (!newTitle) return alert("Title required");
+    const newClient = modal.querySelector('#edit-case-client').value.trim();
+    if (!newClient) return alert("Client Name required");
+    const newValue = modal.querySelector('#edit-case-value').value.trim();
+
+    // Collect items
+    const itemsDiv = modal.querySelector('#edit-case-items-list');
+    const itemsList = [];
+    itemsDiv.querySelectorAll('.case-detail-item-row').forEach(row => {
+      const name = row.querySelector('.edit-item-name').value.trim();
+      const meta = row.querySelector('.edit-item-meta').value.trim();
+      const value = row.querySelector('.edit-item-value').value.trim();
+      const status = row.querySelector('.edit-item-status').value.trim();
+      if (name) itemsList.push({ name, meta, value, status });
+    });
+
+    // Update in mockCases
+    mockCases[idx] = {
+      id: newCaseNumber,
+      title: newTitle,
+      status: modal.querySelector('#edit-case-status').value,
+      client: newClient,
+      contact: modal.querySelector('#edit-case-contact').value.trim(),
+      received: fromISODate(modal.querySelector('#edit-case-received').value),
+      auction: fromISODate(modal.querySelector('#edit-case-auction').value),
+      items: parseInt(modal.querySelector('#edit-case-items').value) || itemsList.length,
+      value: newValue,
+      description: modal.querySelector('#edit-case-description').value.trim(),
+      notes: modal.querySelector('#edit-case-notes').value.trim(),
+      itemsList
+    };
     alert("Case updated!");
-    closeCaseModal();
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    modalBackdrop.style.display = "none";
     renderCases(mockCases);
-    form.onsubmit = originalHandler; // Restore original handler
   };
 }
 
-// Utility to format date as yyyy-mm-dd
-function formatISODate(dateStr) {
-  // Accepts e.g. "15/02/2024" or "2024-02-15"
-  if (!dateStr) return "";
-  if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dateStr;
-  const parts = dateStr.split("/");
-  if (parts.length === 3) {
-    return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+// Helpers for date
+function toISODate(str) {
+  if (!str) return "";
+  if (str.includes("-")) return str;
+  if (str.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+    const [d, m, y] = str.split("/");
+    return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
   }
-  return dateStr;
+  return "";
+}
+function fromISODate(str) {
+  if (!str) return "";
+  if (str.includes("/")) return str;
+  if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    const [y, m, d] = str.split("-");
+    return `${d}/${m}/${y}`;
+  }
+  return str;
+}
+function getAvgPerItem(value, count) {
+  value = value ? Number(String(value).replace(/[^\d.]/g,'')) : 0;
+  count = parseInt(count) || 0;
+  return count ? Math.round(value/count) : 0;
 }
 
-// === Case Details Modal Logic ===
+// === Case Details Modal Logic (read-only view) ===
 function showCaseDetailModal(caseObj) {
   const modalBackdrop = document.getElementById('case-detail-modal-backdrop');
   const modal = document.getElementById('case-detail-modal');
-  // Prevent page shift
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
 
-  // Calculate value summary fields
   const totalValue = caseObj.value || "£0";
   const itemCount = caseObj.items || (caseObj.itemsList ? caseObj.itemsList.length : 0);
-  let avgPerItem = 0;
-  if (itemCount && totalValue.replace) {
-    avgPerItem = Number(totalValue.replace(/[^\d.]/g,'')) / itemCount;
-  }
+  let avgPerItem = getAvgPerItem(totalValue, itemCount);
 
   modal.innerHTML = `
     <button class="case-detail-close-btn" id="case-detail-close-btn">&times;</button>
@@ -330,7 +508,7 @@ function showCaseDetailModal(caseObj) {
           </div>
           <div class="case-detail-summary-row">
             <span>Avg. per Item:</span>
-            <span class="case-detail-summary-val">£${avgPerItem ? Math.round(avgPerItem) : "0"}</span>
+            <span class="case-detail-summary-val">£${avgPerItem}</span>
           </div>
         </div>
         <div>
@@ -361,7 +539,6 @@ function showCaseDetailModal(caseObj) {
     modalBackdrop.style.display = "none";
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
-    // Find index of the case to edit
     const idx = mockCases.findIndex(c => c.id === caseObj.id);
     openCaseEditModal(caseObj, idx);
   };
