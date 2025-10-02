@@ -159,7 +159,7 @@ function renderItems(items) {
       </div>
       <div class="inventory-card-actions">
         <button class="inventory-card-view-btn" title="View" data-index="${idx}">View</button>
-        <button class="inventory-card-actions-btn" title="Edit">&#9998;</button>
+        <button class="inventory-card-actions-btn inventory-card-edit-btn" title="Edit" data-index="${idx}">&#9998;</button>
         <button class="inventory-card-actions-btn" title="Delete">&#128465;</button>
       </div>
     `;
@@ -171,6 +171,14 @@ function renderItems(items) {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
       showDetailModal(mockInventory[idx]);
+    };
+  });
+
+  // Attach edit button listeners
+  document.querySelectorAll('.inventory-card-edit-btn').forEach(btn => {
+    btn.onclick = function() {
+      const idx = Number(btn.getAttribute('data-index'));
+      openInventoryEditModal(mockInventory[idx], idx);
     };
   });
 }
@@ -235,6 +243,41 @@ function closeInventoryModal() {
   document.body.style.overflow = "";
   document.body.style.marginRight = "";
   document.getElementById("inventory-modal-backdrop").style.display = "none";
+}
+
+// === Inventory Edit Modal Logic ===
+function openInventoryEditModal(itemObj, idx) {
+  openInventoryModal();
+  document.querySelector(".inventory-modal-title").textContent = "Edit Item";
+  document.getElementById("item-name").value = itemObj.name || "";
+  document.getElementById("item-brand").value = itemObj.brand || "";
+  document.getElementById("item-category").value = itemObj.category || "";
+  document.getElementById("item-condition").value = itemObj.condition || "";
+  document.getElementById("item-value").value = itemObj.estimatedValue || (itemObj.value ? itemObj.value.replace(/[^\d]/g, "") : "");
+  document.getElementById("item-case").value = itemObj.case || "";
+  document.getElementById("item-location").value = itemObj.location || "";
+  document.getElementById("item-desc").value = itemObj.details || itemObj.desc || "";
+  // Disable editing item name
+  document.getElementById("item-name").readOnly = true;
+
+  // Overwrite the form submit handler for editing
+  const form = document.getElementById("inventory-modal-form");
+  const originalHandler = form.onsubmit;
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    mockInventory[idx].brand = document.getElementById("item-brand").value;
+    mockInventory[idx].category = document.getElementById("item-category").value;
+    mockInventory[idx].condition = document.getElementById("item-condition").value;
+    mockInventory[idx].estimatedValue = parseFloat(document.getElementById("item-value").value) || 0;
+    mockInventory[idx].value = "£" + (parseFloat(document.getElementById("item-value").value) || 0);
+    mockInventory[idx].case = document.getElementById("item-case").value;
+    mockInventory[idx].location = document.getElementById("item-location").value;
+    mockInventory[idx].details = document.getElementById("item-desc").value;
+    alert("Item updated!");
+    closeInventoryModal();
+    renderItems(mockInventory);
+    form.onsubmit = originalHandler; // Restore original handler
+  };
 }
 
 // === Item Details Modal Logic ===
@@ -342,7 +385,7 @@ function showDetailModal(item) {
     <div class="detail-modal-section-title">Barcode</div>
     <div class="detail-modal-barcode">${item.barcode || ""}</div>
     <div class="detail-modal-actions">
-      <button class="primary-btn" title="Edit Item">Edit Item</button>
+      <button class="primary-btn" title="Edit Item" id="inventory-detail-edit-btn">Edit Item</button>
       <button class="detail-modal-secondary-btn" title="Print Label">Print Label</button>
       <button class="detail-modal-secondary-btn" id="detail-modal-close-btn2" title="Close">Close</button>
     </div>
@@ -355,6 +398,16 @@ function showDetailModal(item) {
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
     modalBackdrop.style.display = "none";
+  };
+
+  // Edit modal logic
+  document.getElementById('inventory-detail-edit-btn').onclick = function () {
+    modalBackdrop.style.display = "none";
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    // Find index of the item to edit
+    const idx = mockInventory.findIndex(i => i.name === item.name && i.barcode === item.barcode);
+    openInventoryEditModal(item, idx);
   };
 }
 
