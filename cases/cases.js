@@ -1,7 +1,7 @@
 // === Mock Data for Cases ===
 const mockCases = [
   {
-    number: "CASE-2024-001",
+    id: "CASE-2024-001",
     title: "Estate Sale - Johnson Family",
     client: "Johnson Family Estate",
     clientContact: "johnson@email.com",
@@ -9,12 +9,13 @@ const mockCases = [
     items: 25,
     value: "£12,500",
     auction: "15/02/2024",
-    description: "Complete household contents including furniture, electronics, and collectibles from a 50-year family home in Surrey",
+    desc: "Complete household contents including furniture, electronics, and collectibles from a 50-year family home in Surrey",
     notes: "",
-    status: "Ongoing"
+    status: "Ongoing",
+    progress: 45
   },
   {
-    number: "CASE-2024-002",
+    id: "CASE-2024-002",
     title: "Office Clearance - Green Ltd.",
     client: "Green Ltd.",
     clientContact: "green@email.com",
@@ -22,9 +23,10 @@ const mockCases = [
     items: 14,
     value: "£4,000",
     auction: "28/02/2024",
-    description: "Office furniture and IT equipment clearance for Green Ltd.",
+    desc: "Office furniture and IT equipment clearance for Green Ltd.",
     notes: "",
-    status: "Ongoing"
+    status: "Ongoing",
+    progress: 65
   }
 ];
 
@@ -56,24 +58,45 @@ function renderCases(cases) {
     const card = document.createElement("div");
     card.className = "cases-card";
     card.innerHTML = `
-      <div class="cases-card-title">${c.title}</div>
-      <div class="cases-card-number">${c.number}</div>
-      <div class="cases-card-client">
-        <b>Client:</b> ${c.client}
+      <div class="cases-card-title-row">
+        <div class="cases-card-title">${c.title}</div>
+        <span class="cases-card-status-badge ${c.status.toLowerCase()}">${c.status}</span>
       </div>
-      <div class="cases-card-row">
-        <span><b>Received:</b> ${c.received}</span>
-        <span><b>Items:</b> ${c.items}</span>
-        <span><b>Est. Value:</b> ${c.value}</span>
+      <div class="cases-card-id">${c.id}</div>
+      <div class="cases-card-meta">
+        <div class="cases-card-meta-row">
+          <span class="cases-card-meta-label">Client:</span>
+          <span class="cases-card-meta-val bold">${c.client}</span>
+        </div>
+        <div class="cases-card-meta-row">
+          <span class="cases-card-meta-label">Received:</span>
+          <span class="cases-card-meta-val">${c.received}</span>
+        </div>
+        <div class="cases-card-meta-row">
+          <span class="cases-card-meta-label">Items:</span>
+          <span class="cases-card-meta-val bold">${c.items}</span>
+        </div>
+        <div class="cases-card-meta-row">
+          <span class="cases-card-meta-label">Est. Value:</span>
+          <span class="cases-card-meta-val bold">${c.value}</span>
+        </div>
+        <div class="cases-card-meta-row">
+          <span class="cases-card-meta-label">Expected Auction:</span>
+          <span class="cases-card-meta-val">${c.auction}</span>
+        </div>
       </div>
-      <div class="cases-card-row">
-        <span><b>Expected Auction:</b> ${c.auction}</span>
-      </div>
-      <div class="cases-card-desc">${c.description}</div>
+      <div class="cases-card-desc">${c.desc}</div>
       <div class="cases-card-progress">
-        <div class="cases-card-progress-bar"></div>
+        Progress <span style="margin-left:10px;">${c.progress}%</span>
+        <div class="cases-card-progress-bar-bg">
+          <div class="cases-card-progress-bar-fill ${c.status.toLowerCase()}" style="width:${c.progress}%;"></div>
+        </div>
       </div>
-      <button class="cases-card-view-btn">View</button>
+      <div class="cases-card-actions">
+        <button class="primary-btn" title="View">View</button>
+        <button class="cases-card-actions-btn" title="Edit">&#9998;</button>
+        <button class="cases-card-actions-btn" title="Delete">&#128465;</button>
+      </div>
     `;
     grid.appendChild(card);
   });
@@ -85,7 +108,7 @@ function applyCaseFilters() {
   const search = document.getElementById("cases-search").value.trim().toLowerCase();
   if (search) {
     filtered = filtered.filter(c =>
-      c.number.toLowerCase().includes(search) ||
+      c.id.toLowerCase().includes(search) ||
       c.title.toLowerCase().includes(search) ||
       c.client.toLowerCase().includes(search) ||
       (c.clientContact && c.clientContact.toLowerCase().includes(search))
@@ -104,13 +127,11 @@ function setupCaseListeners() {
 
 // === Modal Logic ===
 function openCaseModal() {
-  // Prevent page shift when hiding scrollbar
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
   document.getElementById("case-modal-backdrop").style.display = "flex";
 }
-
 function closeCaseModal() {
   document.body.style.overflow = "";
   document.body.style.marginRight = "";
@@ -120,10 +141,8 @@ function closeCaseModal() {
 // === Modal Submission ===
 function setupCaseModal() {
   document.getElementById("cases-new-btn").onclick = openCaseModal;
-
   document.getElementById("case-modal-close-btn").onclick =
   document.getElementById("case-modal-cancel-btn").onclick = closeCaseModal;
-
   document.getElementById("case-modal-form").onsubmit = function(e) {
     e.preventDefault();
     alert("Case created (demo)!");
