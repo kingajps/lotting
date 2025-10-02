@@ -166,6 +166,23 @@ function filterAndRender() {
   renderZones(filtered);
 }
 
+// --- Persistent Storage Map Data (edit & save to localStorage) ---
+const STORAGE_KEY = "aw_storage_map_data";
+
+// Try to load from localStorage or use mockZones if not present
+let editableZones = [];
+function loadZones() {
+  const local = localStorage.getItem(STORAGE_KEY);
+  if (local) {
+    try { editableZones = JSON.parse(local); } catch { editableZones = JSON.parse(JSON.stringify(mockZones)); }
+  } else {
+    editableZones = JSON.parse(JSON.stringify(mockZones));
+  }
+}
+function saveZones() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(editableZones));
+}
+
 // === Event Listeners ===
 function setupListeners() {
   document.getElementById("map-search").addEventListener("input", filterAndRender);
