@@ -99,6 +99,23 @@ function populateFilters() {
   });
 }
 
+// --- Persistent Storage Map Data (edit & save to localStorage) ---
+const STORAGE_KEY = "aw_storage_map_data";
+
+// Try to load from localStorage or use mockZones if not present
+let editableZones = [];
+function loadZones() {
+  const local = localStorage.getItem(STORAGE_KEY);
+  if (local) {
+    try { editableZones = JSON.parse(local); } catch { editableZones = JSON.parse(JSON.stringify(mockZones)); }
+  } else {
+    editableZones = JSON.parse(JSON.stringify(mockZones));
+  }
+}
+function saveZones() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(editableZones));
+}
+
 // === Render All Zones ===
 function renderZones(zones) {
   const container = document.getElementById("zone-groups");
@@ -166,29 +183,92 @@ function filterAndRender() {
   renderZones(filtered);
 }
 
-// --- Persistent Storage Map Data (edit & save to localStorage) ---
-const STORAGE_KEY = "aw_storage_map_data";
-
-// Try to load from localStorage or use mockZones if not present
-let editableZones = [];
-function loadZones() {
-  const local = localStorage.getItem(STORAGE_KEY);
-  if (local) {
-    try { editableZones = JSON.parse(local); } catch { editableZones = JSON.parse(JSON.stringify(mockZones)); }
-  } else {
-    editableZones = JSON.parse(JSON.stringify(mockZones));
-  }
-}
-function saveZones() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(editableZones));
-}
-
 // === Event Listeners ===
 function setupListeners() {
   document.getElementById("map-search").addEventListener("input", filterAndRender);
   document.getElementById("map-zone-filter").addEventListener("change", filterAndRender);
   document.getElementById("map-status-filter").addEventListener("change", filterAndRender);
 }
+
+// --- Edit Mode UI ---
+let editMode = false;
+function toggleEditMode() {
+  editMode = !editMode;
+  renderZones(editableZones, editMode);
+  document.getElementById("edit-storage-map-btn").textContent = editMode ? "Save Changes" : "Edit Storage Map";
+  if (!editMode) saveZones();
+}
+
+function handleZoneEdit(e, zoneIdx, locIdx, field) {
+  editableZones[zoneIdx].locations[locIdx][field] = e.target.value;
+}
+
+function renderZones(zones, editable = false) {
+  const container = document.getElementById("zone-groups");
+  container.innerHTML = "";
+  let count = 0;
+  zones.forEach((zone, zoneIdx) => {
+    if (!zone.locations.length) return;
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "zone-group";
+    groupDiv.innerHTML = `<div class="zone-group-title">${zone.group}</div>`;
+    const cardsDiv = document.createElement("div");
+    cardsDiv.className = "zone-group-cards";
+    zone.locations.forEach((loc, locIdx) => {
+      count++;
+      const percent = Math.round((loc.used / loc.capacity) * 100);
+      const barColor = getBarColor(percent);
+      const card = document.createElement("div");
+      card.className = "storage-card";
+      if (editable) {
+        card.innerHTML = `
+          <div class="storage-card-header">
+            <input type="text" value="${loc.id}" style="width:110px;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'id')" />
+            <select onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'type')">
+              <option${loc.type==='Shelf'?' selected':''}>Shelf</option>
+              <option${loc.type==='Floor'?' selected':''}>Floor</option>
+            </select>
+          </div>
+          <div class="storage-card-capacity-row">
+            <label>Used: <input type="number" min="0" max="${loc.capacity}" value="${loc.used}" style="width:40px;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'used')" /></label>
+            <label>Capacity: <input type="number" min="1" value="${loc.capacity}" style="width:50px;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'capacity')" /></label>
+          </div>
+          <div class="storage-card-bar-bg">
+            <div class="storage-card-bar-fill" style="background:${barColor};width:${percent}%"></div>
+          </div>
+          <div class="storage-card-items">
+            <label>Items: <input type="number" min="0" value="${loc.items}" style="width:40px;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'items')" /></label>
+          </div>
+        `;
+      } else {
+        card.innerHTML = `
+          <div class="storage-card-header">
+            <span class="storage-card-icon">✔️</span>
+            <span class="storage-card-id">${loc.id}</span>
+            <span class="storage-card-type">${loc.type}</span>
+            <span class="storage-card-dot" style="background:#43a047"></span>
+          </div>
+          <div class="storage-card-capacity-row">
+            <span class="storage-card-capacity-label">Capacity</span>
+            <span class="storage-card-capacity-value">${loc.used}/${loc.capacity}</span>
+          </div>
+          <div class="storage-card-bar-bg">
+            <div class="storage-card-bar-fill" style="background:${barColor};width:${percent}%"></div>
+          </div>
+          <div class="storage-card-util">${percent}% utilized</div>
+          <div class="storage-card-avail">Available: ${loc.capacity - loc.used}</div>
+          <div class="storage-card-items">${loc.items} items stored</div>
+        `;
+      }
+      cardsDiv.appendChild(card);
+    });
+    groupDiv.appendChild(cardsDiv);
+    container.appendChild(groupDiv);
+  });
+  document.getElementById("map-locations-count").textContent = `${count} locations`;
+}
+// Expose for HTML inline handlers
+window.handleZoneEdit = handleZoneEdit;
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
