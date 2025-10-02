@@ -315,3 +315,98 @@ body {
     width: 100%;
   }
 }
+/* --- Inventory Modal / Pop-up styles --- */
+.inventory-detail-modal.modal-open {
+  position: fixed;
+  z-index: 10000;
+  left: 0; top: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.inventory-detail-modal .modal-overlay {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(36, 49, 63, 0.32);
+  z-index: 0;
+}
+.inventory-detail-modal .modal-content {
+  background: #fff;
+  border-radius: 14px;
+  max-width: 430px;
+  width: 94vw;
+  padding: 35px 28px 24px 28px;
+  z-index: 1;
+  box-shadow: 0 6px 32px rgba(37,99,235,0.16);
+  position: relative;
+  animation: fadeIn 0.36s;
+}
+.inventory-detail-modal .modal-title {
+  font-size: 1.42rem;
+  margin-bottom: 13px;
+  color: #2563eb;
+  font-weight: 700;
+}
+.modal-form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+.modal-form-row label {
+  font-size: 1.01rem;
+  font-weight: 500;
+  margin-bottom: 3px;
+  color: #444;
+}
+.modal-form-row input,
+.modal-form-row textarea {
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1px solid #e3eaf2;
+  border-radius: 6px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.18s;
+  resize: none;
+}
+.modal-form-row input:focus,
+.modal-form-row textarea:focus {
+  border-color: #2563eb;
+}
+.detail-modal-actions {
+  display: flex;
+  gap: 13px;
+  margin-top: 22px;
+  justify-content: flex-end;
+}
+.detail-modal-actions .primary-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
+}
+.detail-modal-actions .primary-btn:hover {
+  background: #174ca2;
+}
+.detail-modal-actions .detail-modal-secondary-btn {
+  background: #f1f1f1;
+  color: #444;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1.03rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+.detail-modal-actions .detail-modal-secondary-btn:hover {
+  background: #e3eaf2;
+}
+@media (max-width: 700px) {
+  .inventory-detail-modal .modal-content { width: 97vw; padding: 18px 7vw 18px 7vw; }
+}
