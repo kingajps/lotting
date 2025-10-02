@@ -108,7 +108,7 @@ function renderCases(cases) {
       <div class="cases-card-desc">${c.description}</div>
       <div class="cases-card-actions">
         <button class="primary-btn cases-card-view-btn" data-index="${idx}">View</button>
-        <button class="cases-card-actions-btn" title="Edit">&#9998;</button>
+        <button class="cases-card-actions-btn cases-card-edit-btn" title="Edit" data-index="${idx}">&#9998;</button>
         <button class="cases-card-actions-btn" title="Delete">&#128465;</button>
       </div>
     `;
@@ -120,6 +120,14 @@ function renderCases(cases) {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
       showCaseDetailModal(mockCases[idx]);
+    };
+  });
+
+  // Attach edit button listeners
+  document.querySelectorAll('.cases-card-edit-btn').forEach(btn => {
+    btn.onclick = function() {
+      const idx = Number(btn.getAttribute('data-index'));
+      openCaseEditModal(mockCases[idx], idx);
     };
   });
 }
@@ -170,6 +178,52 @@ function setupCaseModal() {
     alert("Case created (demo)!");
     closeCaseModal();
   };
+}
+
+// === Case Edit Modal Logic ===
+function openCaseEditModal(caseObj, idx) {
+  // Reuse New Case Modal for editing
+  openCaseModal();
+  document.querySelector(".case-modal-title").textContent = "Edit Case";
+  document.getElementById("case-number").value = caseObj.id;
+  document.getElementById("case-title").value = caseObj.title;
+  document.getElementById("case-client-name").value = caseObj.client;
+  document.getElementById("case-client-contact").value = caseObj.contact || "";
+  document.getElementById("case-auction-date").value = caseObj.auction ? formatISODate(caseObj.auction) : "";
+  document.getElementById("case-desc").value = caseObj.description || "";
+  document.getElementById("case-notes").value = caseObj.notes || "";
+  // Disable editing Case Number
+  document.getElementById("case-number").readOnly = true;
+
+  // Overwrite the form submit handler for editing
+  const form = document.getElementById("case-modal-form");
+  const originalHandler = form.onsubmit;
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    // Update the case in mockCases
+    mockCases[idx].title = document.getElementById("case-title").value;
+    mockCases[idx].client = document.getElementById("case-client-name").value;
+    mockCases[idx].contact = document.getElementById("case-client-contact").value;
+    mockCases[idx].auction = document.getElementById("case-auction-date").value;
+    mockCases[idx].description = document.getElementById("case-desc").value;
+    mockCases[idx].notes = document.getElementById("case-notes").value;
+    alert("Case updated!");
+    closeCaseModal();
+    renderCases(mockCases);
+    form.onsubmit = originalHandler; // Restore original handler
+  };
+}
+
+// Utility to format date as yyyy-mm-dd
+function formatISODate(dateStr) {
+  // Accepts e.g. "15/02/2024" or "2024-02-15"
+  if (!dateStr) return "";
+  if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dateStr;
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+  }
+  return dateStr;
 }
 
 // === Case Details Modal Logic ===
@@ -258,7 +312,7 @@ function showCaseDetailModal(caseObj) {
           }
         </div>
         <div class="case-detail-modal-actions">
-          <button class="primary-btn" title="Edit Case">Edit Case</button>
+          <button class="primary-btn" title="Edit Case" id="case-detail-edit-btn">Edit Case</button>
           <button class="detail-modal-secondary-btn" id="case-detail-close-btn2" title="Close">Close</button>
         </div>
       </div>
@@ -281,7 +335,7 @@ function showCaseDetailModal(caseObj) {
         <div>
           <div class="case-detail-section-title" style="margin-top:0;">Quick Actions</div>
           <div class="case-detail-quick-actions">
-            <button class="case-detail-quick-btn edit" title="Edit Case">Edit Case</button>
+            <button class="case-detail-quick-btn edit" title="Edit Case" id="case-detail-edit-btn-2">Edit Case</button>
             <button class="case-detail-quick-btn lot" title="Create Lots">Create Lots</button>
             <button class="case-detail-quick-btn report" title="Generate Report">Generate Report</button>
             <button class="case-detail-quick-btn print" title="Print Labels">Print Labels</button>
@@ -298,6 +352,17 @@ function showCaseDetailModal(caseObj) {
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
     modalBackdrop.style.display = "none";
+  };
+
+  // Edit modal logic (main and sidebar button)
+  document.getElementById('case-detail-edit-btn').onclick =
+  document.getElementById('case-detail-edit-btn-2').onclick = function () {
+    modalBackdrop.style.display = "none";
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    // Find index of the case to edit
+    const idx = mockCases.findIndex(c => c.id === caseObj.id);
+    openCaseEditModal(caseObj, idx);
   };
 }
 
