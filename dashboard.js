@@ -122,13 +122,13 @@ function renderStatusDistribution() {
 // === Quick Actions ===
 function setupQuickActions() {
   document.getElementById("dashboard-action-scan").onclick = function() {
-    window.location.href = "../scan/scan.html";
+    window.location.href = "/lotting/scan/scan.html";
   };
   document.getElementById("dashboard-action-add").onclick = function() {
-    window.location.href = "../inventory/inventory.html";
+    window.location.href = "/lotting/inventory/inventory.html";
   };
   document.getElementById("dashboard-action-map").onclick = function() {
-    window.location.href = "../storage/storage.html";
+    window.location.href = "/lotting/storage/storage.html";
   };
 }
 
