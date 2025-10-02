@@ -1,4 +1,5 @@
-// Inventory Tab JS
+// === Persistent storage key ===
+const ITEMS_KEY = "aw_inventory_data";
 
 // === Mock Data for Items ===
 const mockInventory = [
@@ -88,10 +89,25 @@ const mockInventory = [
   }
 ];
 
+// === LocalStorage load/save logic ===
+let itemsData = [];
+function loadItems() {
+  const local = localStorage.getItem(ITEMS_KEY);
+  if (local) {
+    try { itemsData = JSON.parse(local); }
+    catch { itemsData = JSON.parse(JSON.stringify(mockInventory)); }
+  } else {
+    itemsData = JSON.parse(JSON.stringify(mockInventory));
+  }
+}
+function saveItems() {
+  localStorage.setItem(ITEMS_KEY, JSON.stringify(itemsData));
+}
+
 // === Populate Filters ===
 function populateFilters() {
   // Categories
-  const catSet = Array.from(new Set(mockInventory.map(i => i.category)));
+  const catSet = Array.from(new Set(itemsData.map(i => i.category)));
   const catSelect = document.getElementById("inventory-category-filter");
   catSelect.innerHTML = `<option value="">All Categories</option>`;
   catSet.forEach(c => {
@@ -101,7 +117,7 @@ function populateFilters() {
     catSelect.appendChild(opt);
   });
   // Statuses
-  const statusSet = Array.from(new Set(mockInventory.map(i => i.status)));
+  const statusSet = Array.from(new Set(itemsData.map(i => i.status)));
   const statSelect = document.getElementById("inventory-status-filter");
   statSelect.innerHTML = `<option value="">All Statuses</option>`;
   statusSet.forEach(s => {
@@ -111,7 +127,7 @@ function populateFilters() {
     statSelect.appendChild(opt);
   });
   // Cases
-  const caseSet = Array.from(new Set(mockInventory.map(i => i.case)));
+  const caseSet = Array.from(new Set(itemsData.map(i => i.case)));
   const caseSelect = document.getElementById("inventory-case-filter");
   caseSelect.innerHTML = `<option value="">All Cases</option>`;
   caseSet.forEach(cs => {
@@ -128,11 +144,11 @@ function renderItems(items) {
   grid.innerHTML = "";
   if (items.length === 0) {
     document.getElementById("inventory-empty").style.display = "";
-    document.getElementById("inventory-results-count").textContent = `Showing 0 of ${mockInventory.length} items`;
+    document.getElementById("inventory-results-count").textContent = `Showing 0 of ${itemsData.length} items`;
     return;
   }
   document.getElementById("inventory-empty").style.display = "none";
-  document.getElementById("inventory-results-count").textContent = `Showing ${items.length} of ${mockInventory.length} items`;
+  document.getElementById("inventory-results-count").textContent = `Showing ${items.length} of ${itemsData.length} items`;
   items.forEach((i, idx) => {
     const card = document.createElement("div");
     card.className = "inventory-card";
@@ -145,7 +161,7 @@ function renderItems(items) {
         <div class="inventory-card-desc">${i.model || i.desc}</div>
         <div class="inventory-card-barcode">${i.barcode}</div>
         <div class="inventory-card-row">
-          <span class="inventory-card-status ${i.status.toLowerCase()}">${i.status}</span>
+          <span class="inventory-card-status ${i.status?.toLowerCase()}">${i.status}</span>
           <span class="inventory-card-condition">${i.condition}</span>
         </div>
         <div class="inventory-card-row">
@@ -160,7 +176,7 @@ function renderItems(items) {
       <div class="inventory-card-actions">
         <button class="inventory-card-view-btn" title="View" data-index="${idx}">View</button>
         <button class="inventory-card-actions-btn inventory-card-edit-btn" title="Edit" data-index="${idx}">&#9998;</button>
-        <button class="inventory-card-actions-btn" title="Delete">&#128465;</button>
+        <button class="inventory-card-actions-btn" title="Delete" data-index="${idx}">&#128465;</button>
       </div>
     `;
     grid.appendChild(card);
@@ -170,7 +186,7 @@ function renderItems(items) {
   document.querySelectorAll('.inventory-card-view-btn').forEach(btn => {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
-      showDetailModal(mockInventory[idx]);
+      showDetailModal(itemsData[idx]);
     };
   });
 
@@ -178,14 +194,26 @@ function renderItems(items) {
   document.querySelectorAll('.inventory-card-edit-btn').forEach(btn => {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
-      openInventoryEditModal(mockInventory[idx], idx);
+      openInventoryEditModal(itemsData[idx], idx);
+    };
+  });
+
+  // Attach delete button listeners
+  document.querySelectorAll('.inventory-card-actions-btn[title="Delete"]').forEach(btn => {
+    btn.onclick = function() {
+      const idx = Number(btn.getAttribute('data-index'));
+      if (confirm("Are you sure you want to delete this item?")) {
+        itemsData.splice(idx, 1);
+        saveItems();
+        renderItems(itemsData);
+      }
     };
   });
 }
 
 // === Filter/Search/Sort Logic ===
 function applyFilters() {
-  let filtered = [...mockInventory];
+  let filtered = [...itemsData];
   const search = document.getElementById("inventory-search").value.trim().toLowerCase();
   if (search) {
     filtered = filtered.filter(i =>
@@ -224,9 +252,9 @@ function openInventoryModal() {
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
   // Populate selects in modal
-  const cats = Array.from(new Set(mockInventory.map(i => i.category)));
-  const cases = Array.from(new Set(mockInventory.map(i => i.case)));
-  const locs = Array.from(new Set(mockInventory.map(i => i.location)));
+  const cats = Array.from(new Set(itemsData.map(i => i.category)));
+  const cases = Array.from(new Set(itemsData.map(i => i.case)));
+  const locs = Array.from(new Set(itemsData.map(i => i.location)));
   const catSel = document.getElementById("item-category");
   const caseSel = document.getElementById("item-case");
   const locSel = document.getElementById("item-location");
@@ -376,8 +404,8 @@ function openInventoryEditModal(itemObj, idx) {
   // Form submission logic
   modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
     e.preventDefault();
-    // Update item in mockInventory
-    mockInventory[idx] = {
+    // Update item in itemsData
+    itemsData[idx] = {
       name: modal.querySelector('#edit-item-name').value.trim(),
       brand: modal.querySelector('#edit-item-brand').value.trim(),
       model: modal.querySelector('#edit-item-model').value.trim(),
@@ -403,11 +431,12 @@ function openInventoryEditModal(itemObj, idx) {
       },
       notes: modal.querySelector('#edit-item-notes').value.trim()
     };
+    saveItems();
     alert("Item updated!");
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
     modalBackdrop.style.display = "none";
-    renderItems(mockInventory);
+    renderItems(itemsData);
   };
 }
 
@@ -537,15 +566,16 @@ function showDetailModal(item) {
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
     // Find index of the item to edit
-    const idx = mockInventory.findIndex(i => i.name === item.name && i.barcode === item.barcode);
+    const idx = itemsData.findIndex(i => i.name === item.name && i.barcode === item.barcode);
     openInventoryEditModal(item, idx);
   };
 }
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
+  loadItems();
   populateFilters();
-  renderItems(mockInventory);
+  renderItems(itemsData);
   setupListeners();
 
   // Modal open/close logic with scrollbar compensation
@@ -554,7 +584,32 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("inventory-modal-cancel-btn").onclick = closeInventoryModal;
   document.getElementById("inventory-modal-form").onsubmit = function(e) {
     e.preventDefault();
-    alert("Item added (demo)!");
+    // Add new item to itemsData
+    const newItem = {
+      name: document.getElementById("item-name").value.trim(),
+      brand: document.getElementById("item-brand").value.trim(),
+      model: "", // you can extend the add modal to include these fields if you want
+      year: "",
+      desc: document.getElementById("item-desc").value.trim(),
+      details: document.getElementById("item-desc").value.trim(),
+      barcode: "",
+      status: "",
+      condition: document.getElementById("item-condition").value.trim(),
+      value: "£" + (parseFloat(document.getElementById("item-value").value.trim()) || 0),
+      estimatedValue: parseFloat(document.getElementById("item-value").value.trim()) || 0,
+      category: document.getElementById("item-category").value.trim(),
+      location: document.getElementById("item-location").value.trim(),
+      unit: "",
+      case: document.getElementById("item-case").value.trim(),
+      loggedBy: "",
+      loggedAt: "",
+      dims: { length: "", width: "", height: "", weight: "" },
+      notes: ""
+    };
+    itemsData.push(newItem);
+    saveItems();
+    renderItems(itemsData);
     closeInventoryModal();
+    alert("Item added!");
   };
 });
