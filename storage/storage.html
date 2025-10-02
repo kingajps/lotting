@@ -25,7 +25,6 @@
       </div>
     </div>
   </header>
-  <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
     <a class="tab-btn" href="/lotting/index.html">Dashboard</a>
     <a class="tab-btn" href="/lotting/scan/scan.html">Barcode Scanner</a>
@@ -40,10 +39,15 @@
       <span>Auction Warehouse</span> / <span>Storage Map</span>
     </nav>
     <section id="tab-storage" class="tab-section active" tabindex="0">
-      <div class="section-header">
-        <h2>Storage Zones</h2>
+      <h2 class="map-title">Warehouse Storage Map</h2>
+      <p class="map-desc">Visual overview of storage locations and capacity</p>
+      <div class="map-filters-row">
+        <input type="text" id="map-search" class="map-search" placeholder="Search locations..." />
+        <select id="map-zone-filter"><option value="">All Zones</option></select>
+        <select id="map-status-filter"><option value="">All Statuses</option></select>
+        <div class="map-locations-count"><span id="map-locations-count"></span></div>
       </div>
-      <div id="zone-cards" class="zone-grid"></div>
+      <div id="zone-groups"></div>
     </section>
   </main>
   <!-- Footer -->
