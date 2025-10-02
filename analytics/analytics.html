@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Analytics | Auction Warehouse</title>
+  <title>Analytics Dashboard | Auction Warehouse</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="analytics.css" />
 </head>
@@ -25,7 +25,6 @@
       </div>
     </div>
   </header>
-  <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
     <a class="tab-btn" href="/lotting/index.html">Dashboard</a>
     <a class="tab-btn" href="/lotting/scan/scan.html">Barcode Scanner</a>
@@ -40,11 +39,99 @@
       <span>Auction Warehouse</span> / <span>Analytics</span>
     </nav>
     <section id="tab-analytics" class="tab-section active" tabindex="0">
-      <div class="section-header">
-        <h2>Analytics</h2>
+      <div class="analytics-header-row">
+        <div>
+          <h2 class="analytics-title">Analytics Dashboard</h2>
+          <div class="analytics-desc">Insights and performance metrics for your warehouse operations</div>
+        </div>
+        <select id="analytics-range" class="analytics-range-select">
+          <option>Last 30 days</option>
+          <option>Last 60 days</option>
+          <option>Last 90 days</option>
+        </select>
       </div>
-      <div id="kpi-cards" class="kpi-cards card-grid"></div>
-      <div id="charts-section" class="charts-section card-grid"></div>
+      <div class="analytics-metrics-row">
+        <div class="analytics-metric-card metric-green">
+          <div class="metric-label">Total Inventory Value</div>
+          <div class="metric-value">£1,130</div>
+          <div class="metric-trend up">+12.5% from last month</div>
+        </div>
+        <div class="analytics-metric-card metric-blue">
+          <div class="metric-label">Average Item Value</div>
+          <div class="metric-value">£283</div>
+          <div class="metric-trend up">+8.2% from last month</div>
+        </div>
+        <div class="analytics-metric-card metric-purple">
+          <div class="metric-label">Active Cases</div>
+          <div class="metric-value">2</div>
+          <div class="metric-trend">0 completed this month</div>
+        </div>
+        <div class="analytics-metric-card metric-orange">
+          <div class="metric-label">Storage Efficiency</div>
+          <div class="metric-value">67%</div>
+          <div class="metric-trend">94/140 capacity used</div>
+        </div>
+      </div>
+      <div class="analytics-two-col">
+        <div class="analytics-card analytics-trends-card">
+          <div class="analytics-card-header">
+            <span>Performance Trends</span>
+            <div class="analytics-tabs">
+              <button class="analytics-tab active">Items</button>
+              <button class="analytics-tab">Value</button>
+              <button class="analytics-tab">Cases</button>
+              <button class="analytics-tab">Storage</button>
+            </div>
+          </div>
+          <div id="analytics-trends-bars" class="analytics-trends-bars"></div>
+        </div>
+        <div class="analytics-card analytics-category-card">
+          <div class="analytics-card-header">
+            <span>Category Distribution</span>
+            <span class="analytics-icon-clock">🕒</span>
+          </div>
+          <div id="analytics-category-list" class="analytics-category-list"></div>
+        </div>
+      </div>
+      <div class="analytics-two-col">
+        <div class="analytics-card analytics-status-card">
+          <div class="analytics-card-header">
+            <span>Item Status Overview</span>
+          </div>
+          <div id="analytics-status-bars" class="analytics-status-bars"></div>
+        </div>
+        <div class="analytics-card analytics-activity-card">
+          <div class="analytics-card-header">
+            <span>Recent Activity Summary</span>
+          </div>
+          <div id="analytics-activity-summary" class="analytics-activity-summary"></div>
+        </div>
+      </div>
+      <div class="analytics-card analytics-storage-card">
+        <div class="analytics-card-header">
+          <span>Storage Analytics</span>
+        </div>
+        <div class="analytics-storage-content">
+          <div class="analytics-storage-zones">
+            <div class="analytics-storage-title">Utilisation by Zone</div>
+            <div id="analytics-storage-zones"></div>
+          </div>
+          <div class="analytics-storage-types">
+            <div class="analytics-storage-title">Storage Types</div>
+            <div id="analytics-storage-types"></div>
+          </div>
+          <div class="analytics-storage-status">
+            <div class="analytics-storage-title">Storage Status</div>
+            <div id="analytics-storage-status"></div>
+          </div>
+        </div>
+      </div>
+      <div class="analytics-card analytics-events-card">
+        <div class="analytics-card-header">
+          <span>Upcoming Events & Milestones</span>
+        </div>
+        <div class="analytics-events-row" id="analytics-events-row"></div>
+      </div>
     </section>
   </main>
   <!-- Footer -->
