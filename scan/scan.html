@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="scan.css" />
 </head>
-  <script>
+<script>
   if (sessionStorage.getItem("aw_logged_in") !== "1") {
     window.location.href = "login.html";
   }
@@ -31,10 +31,9 @@
     </div>
   </header>
   <!-- Navigation Tabs -->
-  <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
     <a class="tab-btn" href="/lotting/index.html">Dashboard</a>
-    <a class="tab-btn active" href="/lotting/scan.html">Barcode Scanner</a>
+    <a class="tab-btn active" href="/lotting/scan/scan.html">Barcode Scanner</a>
     <a class="tab-btn" href="/lotting/inventory/inventory.html">Inventory</a>
     <a class="tab-btn" href="/lotting/storage/storage.html">Storage Map</a>
     <a class="tab-btn" href="/lotting/cases/cases.html">Cases</a>
@@ -76,6 +75,7 @@
           </button>
         </div>
       </div>
+      <!-- The inventory modal is dynamically injected by JS -->
     </section>
   </main>
   <!-- Footer -->
