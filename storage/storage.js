@@ -272,7 +272,9 @@ window.handleZoneEdit = handleZoneEdit;
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
+  loadZones();
   populateFilters();
   filterAndRender();
   setupListeners();
+  document.getElementById("edit-storage-map-btn").onclick = toggleEditMode;
 });
