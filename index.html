@@ -25,7 +25,6 @@
       </div>
     </div>
   </header>
-  <!-- Navigation Tabs -->
   <nav class="nav-tabs" aria-label="Main navigation">
     <a class="tab-btn active" href="/lotting/index.html">Dashboard</a>
     <a class="tab-btn" href="/lotting/scan/scan.html">Barcode Scanner</a>
@@ -36,93 +35,69 @@
   </nav>
   <main class="main-container">
     <!-- Breadcrumb -->
-    <nav class="breadcrumb" id="breadcrumb">
+    <nav class="breadcrumb">
       <span>Auction Warehouse</span> / <span>Dashboard</span>
     </nav>
-    <!-- Dashboard Tab Content -->
     <section id="tab-dashboard" class="tab-section active" tabindex="0">
       <h2 class="dashboard-title">Auction Warehouse Dashboard</h2>
-      <p class="dashboard-desc">Overview of your warehouse operations and inventory status</p>
-      <div class="dashboard-kpi-row">
-        <div class="dashboard-kpi-card">
-          <div class="dashboard-kpi-label">Total Items</div>
-          <div class="dashboard-kpi-icon">
-            <svg width="28" height="28" fill="none">
-              <rect width="28" height="28" rx="7" fill="#e3f0fb"/>
-              <path d="M14 8l6 3.5v5c0 .59-.33 1.13-.83 1.37l-4.67 2.12-4.67-2.12A1.34 1.34 0 0 1 8 16.5v-5L14 8Z" fill="#2563eb"/>
-              <path d="M14 8v9.5" stroke="#2563eb" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="dashboard-kpi-value" id="dashboard-total-items">0</div>
-          <div class="dashboard-kpi-trend"><span id="dashboard-total-items-trend">+0 this week</span></div>
+      <div class="dashboard-desc">Overview of your warehouse operations and inventory status</div>
+      <div class="dashboard-metrics-row">
+        <div class="dashboard-metric-card metric-blue">
+          <div class="metric-label">Total Items</div>
+          <div class="metric-value" id="metric-total-items">0</div>
+          <div class="metric-meta" id="metric-total-items-meta">+0 this week</div>
+          <div class="metric-icon">📦</div>
         </div>
-        <div class="dashboard-kpi-card">
-          <div class="dashboard-kpi-label">Storage Utilisation</div>
-          <div class="dashboard-kpi-icon">
-            <svg width="28" height="28" fill="none">
-              <rect width="28" height="28" rx="7" fill="#e3f0fb"/>
-              <path d="M14 8v12M8 14h12" stroke="#43a047" stroke-width="2"/>
-            </svg>
+        <div class="dashboard-metric-card metric-green">
+          <div class="metric-label">Storage Utilisation</div>
+          <div class="metric-value" id="metric-storage-util">0%</div>
+          <div class="metric-bar-bg">
+            <div class="metric-bar-fill" id="metric-storage-bar"></div>
           </div>
-          <div class="dashboard-kpi-value" id="dashboard-storage-util">0%</div>
-          <div class="dashboard-kpi-bar"><div id="dashboard-storage-bar"></div></div>
+          <div class="metric-icon">📍</div>
         </div>
-        <div class="dashboard-kpi-card">
-          <div class="dashboard-kpi-label">Active Cases</div>
-          <div class="dashboard-kpi-icon">
-            <svg width="28" height="28" fill="none">
-              <rect width="28" height="28" rx="7" fill="#f3e8ff"/>
-              <path d="M14 18a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" fill="#7c3aed"/>
-              <path d="M14 14v4" stroke="#7c3aed" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="dashboard-kpi-value" id="dashboard-active-cases">0</div>
-          <div class="dashboard-kpi-trend"><span id="dashboard-active-cases-trend">Processing inventory</span></div>
+        <div class="dashboard-metric-card metric-purple">
+          <div class="metric-label">Active Cases</div>
+          <div class="metric-value" id="metric-active-cases">0</div>
+          <div class="metric-meta" id="metric-active-cases-meta">Processing inventory</div>
+          <div class="metric-icon">👤</div>
         </div>
-        <div class="dashboard-kpi-card">
-          <div class="dashboard-kpi-label">Items Sold</div>
-          <div class="dashboard-kpi-icon">
-            <svg width="28" height="28" fill="none">
-              <rect width="28" height="28" rx="7" fill="#feecd6"/>
-              <path d="M9 15l5-5 5 5" stroke="#fbc02d" stroke-width="2"/>
-              <path d="M14 14v5" stroke="#fbc02d" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="dashboard-kpi-value" id="dashboard-items-sold">0</div>
-          <div class="dashboard-kpi-trend"><span id="dashboard-items-sold-trend">This month</span></div>
+        <div class="dashboard-metric-card metric-orange">
+          <div class="metric-label">Items Sold</div>
+          <div class="metric-value" id="metric-items-sold">0</div>
+          <div class="metric-meta" id="metric-items-sold-meta">This month</div>
+          <div class="metric-icon">📈</div>
         </div>
       </div>
       <div class="dashboard-main-row">
-        <div class="dashboard-main-col">
-          <div class="dashboard-card">
-            <div class="dashboard-card-title">Recent Items</div>
-            <div class="dashboard-card-subtitle">Latest items added to inventory</div>
-            <div id="dashboard-recent-items" class="dashboard-list"></div>
+        <div class="dashboard-main-left">
+          <div class="dashboard-card dashboard-recent-card">
+            <div class="dashboard-card-header">Recent Items</div>
+            <div class="dashboard-card-subheader">Latest items added to inventory</div>
+            <div id="dashboard-recent-list"></div>
           </div>
         </div>
-        <div class="dashboard-side-col">
-          <div class="dashboard-card">
-            <div class="dashboard-card-title">Upcoming Auctions</div>
-            <div id="dashboard-upcoming-auctions" class="dashboard-auctions-list"></div>
+        <div class="dashboard-main-right">
+          <div class="dashboard-card dashboard-upcoming-card">
+            <div class="dashboard-card-header">Upcoming Auctions</div>
+            <div id="dashboard-upcoming-list"></div>
           </div>
-          <div class="dashboard-card">
-            <div class="dashboard-card-title">Storage Status</div>
-            <div id="dashboard-storage-status" class="dashboard-storage-status-list"></div>
-          </div>
-          <div class="dashboard-card">
-            <div class="dashboard-card-title">Quick Actions</div>
-            <div class="dashboard-actions-col">
-              <button class="quick-action-btn primary" id="dashboard-action-scan">Scan New Item</button>
-              <button class="quick-action-btn" id="dashboard-action-add">Add New Inventory Item</button>
-              <button class="quick-action-btn" id="dashboard-action-map">View Storage Map</button>
-            </div>
+          <div class="dashboard-card dashboard-status-card">
+            <div class="dashboard-card-header">Storage Status</div>
+            <div id="dashboard-status-list"></div>
           </div>
         </div>
       </div>
-      <div class="dashboard-distribution-row">
-        <div class="dashboard-card">
-          <div class="dashboard-card-title">Item Status Distribution</div>
-          <div id="dashboard-status-distribution" class="dashboard-status-distribution-list"></div>
+      <div class="dashboard-row">
+        <div class="dashboard-card dashboard-actions-card">
+          <div class="dashboard-card-header">Quick Actions</div>
+          <button class="dashboard-action-btn action-blue" onclick="window.location.href='/lotting/scan/scan.html'">Scan New Item</button>
+          <button class="dashboard-action-btn" onclick="window.location.href='/lotting/inventory/inventory.html'">Add New Inventory Item</button>
+          <button class="dashboard-action-btn" onclick="window.location.href='/lotting/storage/storage.html'">View Storage Map</button>
+        </div>
+        <div class="dashboard-card dashboard-statusdist-card">
+          <div class="dashboard-card-header">Item Status Distribution</div>
+          <div class="dashboard-statusdist-row" id="dashboard-statusdist-row"></div>
         </div>
       </div>
     </section>
