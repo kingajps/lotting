@@ -1,116 +1,266 @@
-// Analytics Tab JS
+// Analytics Dashboard Tab JS
 
-// === Mock Data (Replace with API/backend calls as needed) ===
-const mockKPIs = [
-  { title: "Total Items", value: 348, desc: "+12 this week" },
-  { title: "Active Cases", value: 5, desc: "2 new cases" },
-  { title: "Items Sold", value: 41, desc: "7 this month" },
-  { title: "Storage Utilisation", value: "74%", desc: "Stable" }
+// === Mock Data ===
+const metrics = {
+  inventoryValue: "£1,130",
+  inventoryChange: "+12.5%",
+  avgValue: "£283",
+  avgChange: "+8.2%",
+  activeCases: 2,
+  activeCasesChange: "0",
+  efficiency: "67%",
+  efficiencyDetails: "94/140 capacity used"
+};
+
+const trends = {
+  items: [
+    { label: "Week 1", value: 120 },
+    { label: "Week 2", value: 135 },
+    { label: "Week 3", value: 128 },
+    { label: "Week 4", value: 140 }
+  ],
+  value: [
+    { label: "Week 1", value: 3000 },
+    { label: "Week 2", value: 3400 },
+    { label: "Week 3", value: 3200 },
+    { label: "Week 4", value: 3800 }
+  ],
+  cases: [
+    { label: "Week 1", value: 1 },
+    { label: "Week 2", value: 1 },
+    { label: "Week 3", value: 2 },
+    { label: "Week 4", value: 2 }
+  ],
+  storage: [
+    { label: "Week 1", value: 60 },
+    { label: "Week 2", value: 62 },
+    { label: "Week 3", value: 65 },
+    { label: "Week 4", value: 67 }
+  ]
+};
+
+const statusOverview = [
+  { label: "Received", value: 0, percent: 0, color: "grey" },
+  { label: "Catalogued", value: 2, percent: 50, color: "blue" },
+  { label: "Photographed", value: 1, percent: 25, color: "purple" },
+  { label: "Listed", value: 1, percent: 25, color: "green" },
+  { label: "Sold", value: 0, percent: 0, color: "grey" },
+  { label: "Awaiting Lotting", value: 0, percent: 0, color: "grey" }
 ];
 
-const mockCharts = [
+const activity = [
+  { label: "Items Added", value: 4, icon: "📦", color: "blue", desc: "This week" },
+  { label: "Items Sold", value: 0, icon: "📈", color: "green", desc: "This week" },
+  { label: "Items Photographed", value: 1, icon: "📸", color: "purple", desc: "This week" }
+];
+
+const storageZones = [
+  { label: "Unit 32", percent: 67.1 },
+  { label: "Unit 30", percent: 83.3 },
+  { label: "On Site", percent: 55.0 }
+];
+
+const storageTypes = [
+  { label: "Shelf", value: 3, percent: 75.0 },
+  { label: "Floor", value: 1, percent: 25.0 }
+];
+
+const storageStatus = [
+  { label: "Available", value: 4, percent: 100.0, color: "green" }
+];
+
+const events = [
   {
-    title: "Items Added Over Time",
-    desc: "Monthly additions for past year",
-    type: "bar",
-    data: [22, 29, 18, 35, 27, 31, 24, 36, 28, 33, 41, 38],
-    labels: ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
+    label: "Upcoming Auctions",
+    value: 1,
+    desc: "Scheduled this month",
+    est: "Est. £32,000",
+    color: "blue"
   },
   {
-    title: "Sales Breakdown",
-    desc: "Sold items by category",
-    type: "pie",
-    data: [15, 12, 7, 4, 3],
-    labels: ["Art", "Jewellery", "Electronics", "Silverware", "Collectibles"]
+    label: "Items Ready",
+    value: 1,
+    desc: "Ready for auction",
+    est: "Est. £160",
+    color: "green"
   },
   {
-    title: "Case Status Distribution",
-    desc: "Current case statuses",
-    type: "donut",
-    data: [5, 2, 1, 1],
-    labels: ["Active", "Ready", "Processing", "Completed"]
+    label: "Awaiting Lotting",
+    value: 0,
+    desc: "Need lot allocation",
+    est: "Est. £0",
+    color: "yellow"
   }
 ];
 
-// === Render KPI Cards ===
-function renderKPICards() {
-  const grid = document.getElementById("kpi-cards");
-  grid.innerHTML = "";
-  mockKPIs.forEach(kpi => {
-    const card = document.createElement("div");
-    card.className = "kpi-card";
-    card.innerHTML = `
-      <div class="kpi-card-title">${kpi.title}</div>
-      <div class="kpi-card-value">${kpi.value}</div>
-      <div class="kpi-card-desc">${kpi.desc}</div>
+const categoryDist = [
+  { label: "Furniture", value: 2, percent: 50, color: "#2563eb" },
+  { label: "Electronics", value: 2, percent: 50, color: "#43a047" },
+  { label: "Collectibles", value: 0, percent: 0, color: "#fa8c1f" },
+  { label: "Jewellery", value: 0, percent: 0, color: "#fbc02d" },
+  { label: "Art", value: 0, percent: 0, color: "#f43f5e" },
+  { label: "Tools", value: 0, percent: 0, color: "#a259e7" },
+  { label: "Appliances", value: 0, percent: 0, color: "#6584b9" }
+];
+
+// === Render Trends Bar Chart ===
+function renderTrends(tab = "items") {
+  const bars = trends[tab];
+  const max = Math.max(...bars.map(b => b.value), 1);
+  const container = document.getElementById("analytics-trends-bars");
+  container.innerHTML = "";
+  bars.forEach(b => {
+    const barDiv = document.createElement("div");
+    barDiv.style.position = "relative";
+    barDiv.innerHTML = `
+      <div class="analytics-trends-bar-label">${b.label}</div>
+      <div class="analytics-trends-bar-bg">
+        <div class="analytics-trends-bar-fill" style="width:${(b.value / max) * 100}%"></div>
+        <span class="analytics-trends-bar-value">${b.value}</span>
+      </div>
     `;
-    grid.appendChild(card);
+    container.appendChild(barDiv);
   });
 }
 
-// === Render Charts (Simple SVG Demo) ===
-function renderCharts() {
-  const section = document.getElementById("charts-section");
-  section.innerHTML = "";
-
-  mockCharts.forEach(chart => {
-    const card = document.createElement("div");
-    card.className = "analytics-chart-card";
-    card.innerHTML = `
-      <div class="analytics-chart-title">${chart.title}</div>
-      <div class="analytics-chart-desc">${chart.desc}</div>
-      <div class="analytics-chart-visual">${createChartSVG(chart)}</div>
+// === Render Category Distribution ===
+function renderCategories() {
+  const container = document.getElementById("analytics-category-list");
+  container.innerHTML = "";
+  categoryDist.forEach(cat => {
+    const row = document.createElement("div");
+    row.className = "analytics-category-row";
+    row.innerHTML = `
+      <span class="analytics-category-dot" style="background:${cat.color}"></span>
+      <span class="analytics-category-label">${cat.label}</span>
+      <span class="analytics-category-value">${cat.value} items</span>
+      <span class="analytics-category-percent">${cat.percent}%</span>
     `;
-    section.appendChild(card);
+    container.appendChild(row);
   });
 }
 
-// === Chart SVG Generator (Basic Bar/Pie/Donut) ===
-function createChartSVG(chart) {
-  if (chart.type === "bar") {
-    // Simple Bar Chart
-    const max = Math.max(...chart.data);
-    let bars = chart.data.map((v, i) => `
-      <rect x="${i*30+10}" y="${120-v/max*100}" width="22" height="${v/max*100}" rx="5" fill="#2563eb"/>
-      <text x="${i*30+21}" y="140" font-size="11" text-anchor="middle" fill="#6584b9">${chart.labels[i]}</text>
-    `).join('');
-    return `<svg width="${chart.data.length*30+20}" height="150">${bars}</svg>`;
-  }
-  if (chart.type === "pie" || chart.type === "donut") {
-    // Simple Pie/Donut Chart
-    const sum = chart.data.reduce((a,b)=>a+b,0);
-    let angle = 0;
-    let segments = '';
-    chart.data.forEach((v,i) => {
-      const a1 = angle;
-      const a2 = angle + (v/sum)*360;
-      const large = a2 - a1 > 180 ? 1 : 0;
-      const r = chart.type === "donut" ? 35 : 48;
-      const x1 = 60 + r * Math.cos(Math.PI*a1/180);
-      const y1 = 60 + r * Math.sin(Math.PI*a1/180);
-      const x2 = 60 + r * Math.cos(Math.PI*a2/180);
-      const y2 = 60 + r * Math.sin(Math.PI*a2/180);
-      segments += `
-        <path d="M60,60 L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z" fill="${getColor(i)}"/>
-      `;
-      angle = a2;
-    });
-    let donutHole = chart.type === "donut" ? `<circle cx="60" cy="60" r="24" fill="#f7f9fc"/>` : '';
-    let labels = chart.labels.map((lbl,i) =>
-      `<text x="120" y="${25+i*18}" font-size="12" fill="${getColor(i)}">${lbl} (${chart.data[i]})</text>`
-    ).join('');
-    return `<svg width="180" height="120">${segments}${donutHole}${labels}</svg>`;
-  }
-  return "";
+// === Render Item Status Overview ===
+function renderStatus() {
+  const container = document.getElementById("analytics-status-bars");
+  container.innerHTML = "";
+  statusOverview.forEach(st => {
+    const row = document.createElement("div");
+    row.className = "analytics-status-row";
+    row.innerHTML = `
+      <span class="analytics-status-label">${st.label}</span>
+      <div class="analytics-status-bar-bg">
+        <div class="analytics-status-bar-fill analytics-status-bar-${st.color}" style="width:${st.percent}%"></div>
+      </div>
+      <span class="analytics-status-value">${st.value} items</span>
+      <span class="analytics-status-percent">(${st.percent}%)</span>
+    `;
+    container.appendChild(row);
+  });
 }
 
-function getColor(i) {
-  const palette = ["#2563eb","#43a047","#fbc02d","#7c3aed","#e43e3e","#6584b9","#174ca2","#00bcd4"];
-  return palette[i % palette.length];
+// === Render Activity Summary ===
+function renderActivity() {
+  const container = document.getElementById("analytics-activity-summary");
+  container.innerHTML = "";
+  activity.forEach(act => {
+    const row = document.createElement("div");
+    row.className = `analytics-activity-row activity-${act.color}`;
+    row.innerHTML = `
+      <span class="activity-icon">${act.icon}</span>
+      <span>${act.label}</span>
+      <span class="activity-desc">${act.desc}</span>
+      <span class="activity-value">${act.value}</span>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// === Render Storage Analytics ===
+function renderStorage() {
+  // Utilisation by zone
+  const zoneContainer = document.getElementById("analytics-storage-zones");
+  zoneContainer.innerHTML = "";
+  storageZones.forEach(z => {
+    const row = document.createElement("div");
+    row.className = "analytics-storage-zone-row";
+    row.innerHTML = `
+      <span class="analytics-storage-zone-label">${z.label}</span>
+      <div class="analytics-storage-zone-bar-bg">
+        <div class="analytics-storage-zone-bar-fill" style="width:${z.percent}%"></div>
+      </div>
+      <span class="analytics-storage-zone-value">${z.percent.toFixed(1)}%</span>
+    `;
+    zoneContainer.appendChild(row);
+  });
+
+  // Storage types
+  const typeContainer = document.getElementById("analytics-storage-types");
+  typeContainer.innerHTML = "";
+  storageTypes.forEach(t => {
+    const row = document.createElement("div");
+    row.className = "analytics-storage-types-row";
+    row.innerHTML = `
+      <span class="analytics-storage-types-label">${t.label}</span>
+      <span class="analytics-storage-types-value">${t.value}</span>
+      <span class="analytics-storage-types-percent">(${t.percent}%)</span>
+    `;
+    typeContainer.appendChild(row);
+  });
+
+  // Storage status
+  const statusContainer = document.getElementById("analytics-storage-status");
+  statusContainer.innerHTML = "";
+  storageStatus.forEach(s => {
+    const row = document.createElement("div");
+    row.className = "analytics-storage-status-row";
+    row.innerHTML = `
+      <span class="analytics-storage-status-label">${s.label}</span>
+      <span class="analytics-storage-status-value">${s.value}</span>
+      <span class="analytics-storage-status-percent">(${s.percent}%)</span>
+    `;
+    statusContainer.appendChild(row);
+  });
+}
+
+// === Render Events & Milestones ===
+function renderEvents() {
+  const container = document.getElementById("analytics-events-row");
+  container.innerHTML = "";
+  events.forEach(ev => {
+    const row = document.createElement("div");
+    row.className = `analytics-event-card event-${ev.color}`;
+    row.innerHTML = `
+      <div class="analytics-event-title">${ev.label}</div>
+      <div class="analytics-event-value">${ev.value}</div>
+      <div class="analytics-event-meta">${ev.desc}</div>
+      <div class="analytics-event-desc">${ev.est}</div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// === Tabs for Trends Chart ===
+function setupTrendsTabs() {
+  const tabs = document.querySelectorAll('.analytics-tab');
+  tabs.forEach((tab, idx) => {
+    tab.onclick = () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const keys = ["items", "value", "cases", "storage"];
+      renderTrends(keys[idx]);
+    };
+  });
 }
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
-  renderKPICards();
-  renderCharts();
+  // Metrics row is static text
+  renderTrends("items");
+  renderCategories();
+  renderStatus();
+  renderActivity();
+  renderStorage();
+  renderEvents();
+  setupTrendsTabs();
 });
