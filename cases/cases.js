@@ -3,30 +3,50 @@ const mockCases = [
   {
     id: "CASE-2024-001",
     title: "Estate Sale - Johnson Family",
+    status: "Processing",
     client: "Johnson Family Estate",
-    clientContact: "johnson@email.com",
+    contact: "estate@johnsonlaw.co.uk",
     received: "15/01/2024",
+    auction: "15/02/2024",
     items: 25,
     value: "£12,500",
-    auction: "15/02/2024",
-    desc: "Complete household contents including furniture, electronics, and collectibles from a 50-year family home in Surrey",
-    notes: "",
-    status: "Ongoing",
-    progress: 45
+    description: "Complete household contents including furniture, electronics, and collectibles from a 50-year family home in Surrey",
+    notes: "High-value antiques included, requires careful handling",
+    itemsList: [
+      {
+        name: "Oak Dining Table",
+        meta: "Furniture • Good",
+        value: "£420",
+        status: "Catalogued"
+      },
+      {
+        name: "Oak Dining Chairs (Set of 6)",
+        meta: "Furniture • Good",
+        value: "£230",
+        status: "Catalogued"
+      }
+    ]
   },
   {
     id: "CASE-2024-002",
     title: "Office Clearance - Green Ltd.",
+    status: "Processing",
     client: "Green Ltd.",
-    clientContact: "green@email.com",
+    contact: "info@greenltd.com",
     received: "26/01/2024",
+    auction: "28/02/2024",
     items: 14,
     value: "£4,000",
-    auction: "28/02/2024",
-    desc: "Office furniture and IT equipment clearance for Green Ltd.",
+    description: "Office furniture and IT equipment clearance for Green Ltd.",
     notes: "",
-    status: "Ongoing",
-    progress: 65
+    itemsList: [
+      {
+        name: "Dell Laptop",
+        meta: "Electronics • Like New",
+        value: "£320",
+        status: "Photographed"
+      }
+    ]
   }
 ];
 
@@ -54,7 +74,7 @@ function renderCases(cases) {
   }
   document.getElementById("cases-empty").style.display = "none";
   document.getElementById("cases-results-count").textContent = `Showing ${cases.length} of ${mockCases.length} cases`;
-  cases.forEach(c => {
+  cases.forEach((c, idx) => {
     const card = document.createElement("div");
     card.className = "cases-card";
     card.innerHTML = `
@@ -85,20 +105,22 @@ function renderCases(cases) {
           <span class="cases-card-meta-val">${c.auction}</span>
         </div>
       </div>
-      <div class="cases-card-desc">${c.desc}</div>
-      <div class="cases-card-progress">
-        Progress <span style="margin-left:10px;">${c.progress}%</span>
-        <div class="cases-card-progress-bar-bg">
-          <div class="cases-card-progress-bar-fill ${c.status.toLowerCase()}" style="width:${c.progress}%;"></div>
-        </div>
-      </div>
+      <div class="cases-card-desc">${c.description}</div>
       <div class="cases-card-actions">
-        <button class="primary-btn" title="View">View</button>
+        <button class="primary-btn cases-card-view-btn" data-index="${idx}">View</button>
         <button class="cases-card-actions-btn" title="Edit">&#9998;</button>
         <button class="cases-card-actions-btn" title="Delete">&#128465;</button>
       </div>
     `;
     grid.appendChild(card);
+  });
+
+  // Attach view button listeners
+  document.querySelectorAll('.cases-card-view-btn').forEach(btn => {
+    btn.onclick = function() {
+      const idx = Number(btn.getAttribute('data-index'));
+      showCaseDetailModal(mockCases[idx]);
+    };
   });
 }
 
@@ -111,7 +133,7 @@ function applyCaseFilters() {
       c.id.toLowerCase().includes(search) ||
       c.title.toLowerCase().includes(search) ||
       c.client.toLowerCase().includes(search) ||
-      (c.clientContact && c.clientContact.toLowerCase().includes(search))
+      (c.contact && c.contact.toLowerCase().includes(search))
     );
   }
   const stat = document.getElementById("cases-status-filter").value;
@@ -147,6 +169,135 @@ function setupCaseModal() {
     e.preventDefault();
     alert("Case created (demo)!");
     closeCaseModal();
+  };
+}
+
+// === Case Details Modal Logic ===
+function showCaseDetailModal(caseObj) {
+  const modalBackdrop = document.getElementById('case-detail-modal-backdrop');
+  const modal = document.getElementById('case-detail-modal');
+  // Prevent page shift
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+
+  // Calculate value summary fields
+  const totalValue = caseObj.value || "£0";
+  const itemCount = caseObj.items || (caseObj.itemsList ? caseObj.itemsList.length : 0);
+  let avgPerItem = 0;
+  if (itemCount && totalValue.replace) {
+    avgPerItem = Number(totalValue.replace(/[^\d.]/g,'')) / itemCount;
+  }
+
+  modal.innerHTML = `
+    <button class="case-detail-close-btn" id="case-detail-close-btn">&times;</button>
+    <div class="case-detail-title">Case Details</div>
+    <div class="case-detail-main-row">
+      <div class="case-detail-main">
+        <div class="case-detail-section-title">Case Information</div>
+        <div class="case-detail-label-row">
+          <div>
+            <span class="case-detail-label">Case Number</span>
+            <span class="case-detail-value">${caseObj.id}</span>
+          </div>
+          <div>
+            <span class="case-detail-label">Status</span>
+            <span class="case-detail-status-badge ${caseObj.status ? caseObj.status.toLowerCase() : ""}">${caseObj.status || ""}</span>
+          </div>
+        </div>
+        <div class="case-detail-label-row">
+          <div>
+            <span class="case-detail-label">Title</span>
+            <span class="case-detail-value">${caseObj.title}</span>
+          </div>
+          <div>
+            <span class="case-detail-label">Total Items</span>
+            <span class="case-detail-value">${caseObj.items || (caseObj.itemsList ? caseObj.itemsList.length : 0)}</span>
+          </div>
+        </div>
+        <div class="case-detail-section-title">Client Information</div>
+        <div class="case-detail-label-row">
+          <div>
+            <span class="case-detail-label">Client Name</span>
+            <span class="case-detail-value">${caseObj.client || ""}</span>
+          </div>
+          <div>
+            <span class="case-detail-label">Contact</span>
+            <span class="case-detail-value">${caseObj.contact || ""}</span>
+          </div>
+        </div>
+        <div class="case-detail-section-title">Important Dates</div>
+        <div class="case-detail-label-row">
+          <div>
+            <span class="case-detail-label">Received Date</span>
+            <span class="case-detail-value">${caseObj.received || ""}</span>
+          </div>
+          <div>
+            <span class="case-detail-label">Expected Auction Date</span>
+            <span class="case-detail-value">${caseObj.auction || ""}</span>
+          </div>
+        </div>
+        <div class="case-detail-section-title">Description</div>
+        <div class="case-detail-description-box">${caseObj.description || ""}</div>
+        <div class="case-detail-section-title">Notes</div>
+        <div class="case-detail-notes-box">${caseObj.notes || ""}</div>
+        <div class="case-detail-section-title">Items in This Case</div>
+        <div class="case-detail-items-list">
+          ${caseObj.itemsList && caseObj.itemsList.length
+            ? caseObj.itemsList.map(item => `
+                <div class="case-detail-item-row">
+                  <div>
+                    <div class="item-title">${item.name}</div>
+                    <div class="item-meta">${item.meta || ""}</div>
+                  </div>
+                  <div class="item-value">${item.value || ""}</div>
+                  <div class="item-status">${item.status || ""}</div>
+                </div>
+              `).join("")
+            : `<div class="case-detail-item-row"><div class="item-title muted">No items found for this case.</div></div>`
+          }
+        </div>
+        <div class="case-detail-modal-actions">
+          <button class="primary-btn" title="Edit Case">Edit Case</button>
+          <button class="detail-modal-secondary-btn" id="case-detail-close-btn2" title="Close">Close</button>
+        </div>
+      </div>
+      <div class="case-detail-side">
+        <div class="case-detail-summary-card">
+          <div class="case-detail-summary-label">Value Summary</div>
+          <div class="case-detail-summary-row">
+            <span>Estimated Total:</span>
+            <span class="case-detail-summary-val">${totalValue}</span>
+          </div>
+          <div class="case-detail-summary-row">
+            <span>Items Count:</span>
+            <span class="case-detail-summary-val">${itemCount}</span>
+          </div>
+          <div class="case-detail-summary-row">
+            <span>Avg. per Item:</span>
+            <span class="case-detail-summary-val">£${avgPerItem ? Math.round(avgPerItem) : "0"}</span>
+          </div>
+        </div>
+        <div>
+          <div class="case-detail-section-title" style="margin-top:0;">Quick Actions</div>
+          <div class="case-detail-quick-actions">
+            <button class="case-detail-quick-btn edit" title="Edit Case">Edit Case</button>
+            <button class="case-detail-quick-btn lot" title="Create Lots">Create Lots</button>
+            <button class="case-detail-quick-btn report" title="Generate Report">Generate Report</button>
+            <button class="case-detail-quick-btn print" title="Print Labels">Print Labels</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modalBackdrop.style.display = "flex";
+
+  // Close modal logic
+  document.getElementById('case-detail-close-btn').onclick =
+  document.getElementById('case-detail-close-btn2').onclick = function () {
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    modalBackdrop.style.display = "none";
   };
 }
 
