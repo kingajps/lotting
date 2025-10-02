@@ -124,32 +124,37 @@ function setupListeners() {
   };
 }
 
+// === Modal Logic ===
+function openCaseModal() {
+  // Get scrollbar width
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+  document.getElementById("case-modal-backdrop").style.display = "flex";
+}
+function closeCaseModal() {
+  document.body.style.overflow = "";
+  document.body.style.marginRight = "";
+  document.getElementById("case-modal-backdrop").style.display = "none";
+}
+
+// === Modal Submission ===
+function setupCaseModal() {
+  document.getElementById("cases-new-btn").onclick = openCaseModal;
+  document.getElementById("case-modal-close-btn").onclick =
+  document.getElementById("case-modal-cancel-btn").onclick = closeCaseModal;
+
+  document.getElementById("case-modal-form").onsubmit = function(e) {
+    e.preventDefault();
+    alert("Case created (demo)!");
+    closeCaseModal();
+  };
+}
+
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
   populateStatusFilter();
   renderCases(mockCases);
-  setupListeners();
-});
-
-// Modal logic for + New Case
-document.addEventListener("DOMContentLoaded", function () {
-  // ...existing population, render, setupListeners...
-  // Modal open
-  document.getElementById("cases-new-btn").onclick = function () {
-    document.getElementById("case-modal-backdrop").style.display = "flex";
-    document.body.style.overflow = "hidden";
-  };
-  // Modal close
-  document.getElementById("case-modal-close-btn").onclick =
-  document.getElementById("case-modal-cancel-btn").onclick = function () {
-    document.getElementById("case-modal-backdrop").style.display = "none";
-    document.body.style.overflow = "";
-  };
-  // Prevent default submit for demo
-  document.getElementById("case-modal-form").onsubmit = function(e) {
-    e.preventDefault();
-    alert("Case created (demo)!");
-    document.getElementById("case-modal-backdrop").style.display = "none";
-    document.body.style.overflow = "";
-  };
+  setupCaseListeners();
+  setupCaseModal();
 });
