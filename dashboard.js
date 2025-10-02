@@ -1,143 +1,155 @@
 // Dashboard Tab JS
 
-// === Mock Data (Replace with API or backend calls as needed) ===
-const mockKPIs = {
-  totalItems: 348,
-  totalItemsTrend: "+12 this week",
-  storageUtil: 74,
-  activeCases: 5,
-  activeCasesTrend: "2 new cases",
-  itemsSold: 41,
-  itemsSoldTrend: "7 this month"
+// === Mock Data ===
+const dashboardMetrics = {
+  totalItems: 4,
+  totalItemsMeta: "+4 this week",
+  storageUtil: 72.3,
+  activeCases: 2,
+  activeCasesMeta: "Processing inventory",
+  itemsSold: 0,
+  itemsSoldMeta: "This month"
 };
 
-const mockRecentItems = [
-  { name: "Vintage Camera", barcode: "A123", category: "Electronics", date: "2025-09-21" },
-  { name: "Antique Vase", barcode: "B456", category: "Art", date: "2025-09-20" },
-  { name: "Gold Watch", barcode: "C789", category: "Jewellery", date: "2025-09-18" }
+const recentItems = [
+  {
+    icon: "📦",
+    title: "Oak Dining Table",
+    desc: "Furniture · Good",
+    value: "£420",
+    status: "Catalogued"
+  },
+  {
+    icon: "📦",
+    title: "Oak Dining Chairs (Set of 6)",
+    desc: "Furniture · Good",
+    value: "£230",
+    status: "Catalogued"
+  },
+  {
+    icon: "📦",
+    title: "Dell Laptop",
+    desc: "Electronics · Like New",
+    value: "£320",
+    status: "Photographed"
+  },
+  {
+    icon: "📦",
+    title: "iPad Air",
+    desc: "Electronics · Good",
+    value: "£160",
+    status: "Listed"
+  }
 ];
 
-const mockUpcomingAuctions = [
-  { title: "Monthly Antiques Auction", date: "2025-10-05" },
-  { title: "Jewellery & Watches Sale", date: "2025-10-12" }
+const upcomingAuctions = [
+  {
+    title: "February Estate & Consignment Auction",
+    date: "15/02/2024 at 10:00",
+    lots: 65,
+    est: "Est. £32,000"
+  }
 ];
 
-const mockStorageStatus = [
-  { zone: "A1", percent: 80, status: "Almost Full" },
-  { zone: "B2", percent: 40, status: "Available" },
-  { zone: "C3", percent: 100, status: "Full" }
+const storageStatus = [
+  { id: "U32-ELEC-A1", unit: "Unit 32", value: "15/50", status: "Available" },
+  { id: "U32-FURN-B1", unit: "Unit 32", value: "8/20", status: "Available" },
+  { id: "U30-ANT-C1", unit: "Unit 30", value: "5/30", status: "Available" }
 ];
 
-const mockStatusDistribution = [
-  { label: "Ready", value: 132, color: "#43a047" },
-  { label: "Processing", value: 47, color: "#fbc02d" },
-  { label: "Awaiting", value: 53, color: "#2563eb" },
-  { label: "Sold", value: 41, color: "#7c3aed" }
+const statusDist = [
+  { label: "Received", value: 0 },
+  { label: "Catalogued", value: 2 },
+  { label: "Photographed", value: 1 },
+  { label: "Listed", value: 1 },
+  { label: "Sold", value: 0 },
+  { label: "Awaiting Lotting", value: 0 }
 ];
 
-// === KPI Cards ===
-function renderKPIs() {
-  document.getElementById("dashboard-total-items").textContent = mockKPIs.totalItems;
-  document.getElementById("dashboard-total-items-trend").textContent = mockKPIs.totalItemsTrend;
-  document.getElementById("dashboard-storage-util").textContent = mockKPIs.storageUtil + "%";
-  document.getElementById("dashboard-active-cases").textContent = mockKPIs.activeCases;
-  document.getElementById("dashboard-active-cases-trend").textContent = mockKPIs.activeCasesTrend;
-  document.getElementById("dashboard-items-sold").textContent = mockKPIs.itemsSold;
-  document.getElementById("dashboard-items-sold-trend").textContent = mockKPIs.itemsSoldTrend;
-
-  // Animate storage bar
-  document.getElementById("dashboard-storage-bar").style.width = mockKPIs.storageUtil + "%";
+// === Render Metrics ===
+function renderMetrics() {
+  document.getElementById("metric-total-items").textContent = dashboardMetrics.totalItems;
+  document.getElementById("metric-total-items-meta").textContent = dashboardMetrics.totalItemsMeta;
+  document.getElementById("metric-storage-util").textContent = dashboardMetrics.storageUtil + "%";
+  document.getElementById("metric-storage-bar").style.width = dashboardMetrics.storageUtil + "%";
+  document.getElementById("metric-active-cases").textContent = dashboardMetrics.activeCases;
+  document.getElementById("metric-active-cases-meta").textContent = dashboardMetrics.activeCasesMeta;
+  document.getElementById("metric-items-sold").textContent = dashboardMetrics.itemsSold;
+  document.getElementById("metric-items-sold-meta").textContent = dashboardMetrics.itemsSoldMeta;
 }
 
-// === Recent Items List ===
+// === Render Recent Items ===
 function renderRecentItems() {
-  const container = document.getElementById("dashboard-recent-items");
+  const container = document.getElementById("dashboard-recent-list");
   container.innerHTML = "";
-  mockRecentItems.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "dashboard-list-item";
-    div.innerHTML = `
-      <strong>${item.name}</strong> 
-      <span style="color:#6584b9;font-size:0.97rem;">Barcode: ${item.barcode}</span>
-      <span style="color:#43a047;margin-left:8px;">${item.category}</span>
-      <span style="float:right;color:#777;">${item.date}</span>
+  recentItems.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "dashboard-recent-item";
+    row.innerHTML = `
+      <span class="dashboard-recent-icon">${item.icon}</span>
+      <div class="dashboard-recent-main">
+        <div class="dashboard-recent-title">${item.title}</div>
+        <div class="dashboard-recent-desc">${item.desc}</div>
+      </div>
+      <span class="dashboard-recent-value">${item.value}</span>
+      <span class="dashboard-recent-status">🕒 ${item.status}</span>
     `;
-    container.appendChild(div);
+    container.appendChild(row);
   });
 }
 
-// === Upcoming Auctions List ===
-function renderUpcomingAuctions() {
-  const container = document.getElementById("dashboard-upcoming-auctions");
+// === Render Upcoming Auctions ===
+function renderUpcoming() {
+  const container = document.getElementById("dashboard-upcoming-list");
   container.innerHTML = "";
-  mockUpcomingAuctions.forEach(auction => {
-    const div = document.createElement("div");
-    div.className = "dashboard-auction-item";
-    div.innerHTML = `
-      <span style="font-weight:600;color:#2563eb;">${auction.title}</span>
-      <span style="float:right;color:#6584b9;">${auction.date}</span>
+  upcomingAuctions.forEach(auc => {
+    const row = document.createElement("div");
+    row.className = "dashboard-upcoming-auction";
+    row.innerHTML = `
+      <div class="dashboard-upcoming-title">${auc.title}</div>
+      <div class="dashboard-upcoming-date">${auc.date}</div>
+      <div class="dashboard-upcoming-meta">${auc.lots} lots<br>${auc.est}</div>
     `;
-    container.appendChild(div);
+    container.appendChild(row);
   });
 }
 
-// === Storage Status List ===
+// === Render Storage Status ===
 function renderStorageStatus() {
-  const container = document.getElementById("dashboard-storage-status");
+  const container = document.getElementById("dashboard-status-list");
   container.innerHTML = "";
-  mockStorageStatus.forEach(zone => {
-    const div = document.createElement("div");
-    div.className = "dashboard-storage-zone";
-    div.innerHTML = `
-      <span style="font-weight:500;">Zone ${zone.zone}</span>
-      <span style="margin-left:10px;color:#2563eb;">${zone.percent}%</span>
-      <span style="margin-left:14px;color:#43a047;">${zone.status}</span>
+  storageStatus.forEach(s => {
+    const row = document.createElement("div");
+    row.className = "dashboard-status-row";
+    row.innerHTML = `
+      <span class="dashboard-status-id">${s.id}</span>
+      <span class="dashboard-status-value">${s.value}</span>
+      <span class="dashboard-status-available">${s.status}</span>
     `;
-    container.appendChild(div);
+    container.appendChild(row);
   });
 }
 
-// === Status Distribution Chart ===
-function renderStatusDistribution() {
-  const container = document.getElementById("dashboard-status-distribution");
+// === Render Item Status Distribution ===
+function renderStatusDist() {
+  const container = document.getElementById("dashboard-statusdist-row");
   container.innerHTML = "";
-  let total = mockStatusDistribution.reduce((sum, d) => sum + d.value, 0);
-  mockStatusDistribution.forEach(status => {
-    const percent = ((status.value / total) * 100).toFixed(1);
-    const bar = document.createElement("div");
-    bar.className = "dashboard-status-bar";
-    bar.style.background = status.color;
-    bar.style.height = "22px";
-    bar.style.width = percent + "%";
-    bar.style.marginBottom = "8px";
-    bar.style.borderRadius = "6px";
-    bar.innerHTML = `
-      <span style="color:#fff;padding-left:12px;font-weight:500;">${status.label} (${status.value})</span>
-      <span style="float:right;color:#fff;padding-right:10px;">${percent}%</span>
+  statusDist.forEach(s => {
+    const box = document.createElement("div");
+    box.className = "dashboard-statusdist-box";
+    box.innerHTML = `
+      <div class="dashboard-statusdist-value">${s.value}</div>
+      <div class="dashboard-statusdist-label">${s.label}</div>
     `;
-    container.appendChild(bar);
+    container.appendChild(box);
   });
-}
-
-// === Quick Actions ===
-function setupQuickActions() {
-  document.getElementById("dashboard-action-scan").onclick = function() {
-    window.location.href = "/lotting/scan/scan.html";
-  };
-  document.getElementById("dashboard-action-add").onclick = function() {
-    window.location.href = "/lotting/inventory/inventory.html";
-  };
-  document.getElementById("dashboard-action-map").onclick = function() {
-    window.location.href = "/lotting/storage/storage.html";
-  };
 }
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
-  renderKPIs();
+  renderMetrics();
   renderRecentItems();
-  renderUpcomingAuctions();
+  renderUpcoming();
   renderStorageStatus();
-  renderStatusDistribution();
-  setupQuickActions();
+  renderStatusDist();
 });
