@@ -130,3 +130,26 @@ document.addEventListener("DOMContentLoaded", function () {
   renderCases(mockCases);
   setupListeners();
 });
+
+// Modal logic for + New Case
+document.addEventListener("DOMContentLoaded", function () {
+  // ...existing population, render, setupListeners...
+  // Modal open
+  document.getElementById("cases-new-btn").onclick = function () {
+    document.getElementById("case-modal-backdrop").style.display = "flex";
+    document.body.style.overflow = "hidden";
+  };
+  // Modal close
+  document.getElementById("case-modal-close-btn").onclick =
+  document.getElementById("case-modal-cancel-btn").onclick = function () {
+    document.getElementById("case-modal-backdrop").style.display = "none";
+    document.body.style.overflow = "";
+  };
+  // Prevent default submit for demo
+  document.getElementById("case-modal-form").onsubmit = function(e) {
+    e.preventDefault();
+    alert("Case created (demo)!");
+    document.getElementById("case-modal-backdrop").style.display = "none";
+    document.body.style.overflow = "";
+  };
+});
