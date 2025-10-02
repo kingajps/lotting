@@ -156,21 +156,14 @@ function setupListeners() {
   document.getElementById("inventory-status-filter").addEventListener("change", applyFilters);
   document.getElementById("inventory-case-filter").addEventListener("change", applyFilters);
   document.getElementById("inventory-sort-filter").addEventListener("change", applyFilters);
-  document.getElementById("inventory-new-btn").onclick = function () {
-    alert("Add New Item form coming soon!");
-  };
 }
 
-// === Init ===
+// === Modal logic for + Add New Item ===
 document.addEventListener("DOMContentLoaded", function () {
   populateFilters();
   renderItems(mockInventory);
   setupListeners();
-});
 
-// === Modal logic for + Add New Item ===
-document.addEventListener("DOMContentLoaded", function () {
-  // ...existing code...
   // Modal open
   document.getElementById("inventory-new-btn").onclick = function () {
     // Populate selects in modal
@@ -189,13 +182,11 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("inventory-modal-backdrop").style.display = "flex";
     document.body.style.overflow = "hidden";
   };
-  // Modal close
   document.getElementById("inventory-modal-close-btn").onclick =
   document.getElementById("inventory-modal-cancel-btn").onclick = function () {
     document.getElementById("inventory-modal-backdrop").style.display = "none";
     document.body.style.overflow = "";
   };
-  // Prevent default submit for demo
   document.getElementById("inventory-modal-form").onsubmit = function(e) {
     e.preventDefault();
     alert("Item added (demo)!");
