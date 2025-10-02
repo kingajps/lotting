@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="cases.css" />
 </head>
+  <script>
+  if (sessionStorage.getItem("aw_logged_in") !== "1") {
+    window.location.href = "login.html";
+  }
+</script>
 <body>
   <!-- Header -->
   <header class="app-header">
