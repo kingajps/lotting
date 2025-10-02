@@ -247,36 +247,167 @@ function closeInventoryModal() {
 
 // === Inventory Edit Modal Logic ===
 function openInventoryEditModal(itemObj, idx) {
-  openInventoryModal();
-  document.querySelector(".inventory-modal-title").textContent = "Edit Item";
-  document.getElementById("item-name").value = itemObj.name || "";
-  document.getElementById("item-brand").value = itemObj.brand || "";
-  document.getElementById("item-category").value = itemObj.category || "";
-  document.getElementById("item-condition").value = itemObj.condition || "";
-  document.getElementById("item-value").value = itemObj.estimatedValue || (itemObj.value ? itemObj.value.replace(/[^\d]/g, "") : "");
-  document.getElementById("item-case").value = itemObj.case || "";
-  document.getElementById("item-location").value = itemObj.location || "";
-  document.getElementById("item-desc").value = itemObj.details || itemObj.desc || "";
-  // Disable editing item name
-  document.getElementById("item-name").readOnly = true;
+  // Open a custom edit modal over the inventory detail modal backdrop
+  const modalBackdrop = document.getElementById('inventory-detail-modal-backdrop');
+  let modal = document.getElementById('inventory-detail-modal');
+  modalBackdrop.style.display = 'flex';
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
 
-  // Overwrite the form submit handler for editing
-  const form = document.getElementById("inventory-modal-form");
-  const originalHandler = form.onsubmit;
-  form.onsubmit = function(e) {
+  // Render editable form for all fields
+  modal.innerHTML = `
+    <button class="detail-modal-close-btn" id="inventory-edit-close-btn">&times;</button>
+    <div class="detail-modal-title">Edit Item</div>
+    <form id="inventory-edit-form" autocomplete="off">
+      <div class="detail-modal-section-title">Basic Information</div>
+      <div class="detail-modal-row">
+        <div>
+          <div class="detail-modal-label">Name</div>
+          <input type="text" id="edit-item-name" value="${itemObj.name||''}" required style="width:170px;">
+        </div>
+        <div>
+          <div class="detail-modal-label">Brand</div>
+          <input type="text" id="edit-item-brand" value="${itemObj.brand||''}" style="width:120px;">
+        </div>
+      </div>
+      <div class="detail-modal-row">
+        <div>
+          <div class="detail-modal-label">Model</div>
+          <input type="text" id="edit-item-model" value="${itemObj.model||''}" style="width:170px;">
+        </div>
+        <div>
+          <div class="detail-modal-label">Year</div>
+          <input type="number" id="edit-item-year" value="${itemObj.year||''}" style="width:70px;">
+        </div>
+      </div>
+      <div class="detail-modal-row">
+        <div>
+          <div class="detail-modal-label">Category</div>
+          <input type="text" id="edit-item-category" value="${itemObj.category||''}" style="width:120px;">
+        </div>
+        <div>
+          <div class="detail-modal-label">Condition</div>
+          <input type="text" id="edit-item-condition" value="${itemObj.condition||''}" style="width:120px;">
+        </div>
+      </div>
+      <div class="detail-modal-row">
+        <div>
+          <div class="detail-modal-label">Status</div>
+          <input type="text" id="edit-item-status" value="${itemObj.status||''}" style="width:120px;">
+        </div>
+        <div>
+          <div class="detail-modal-label">Barcode</div>
+          <input type="text" id="edit-item-barcode" value="${itemObj.barcode||''}" style="width:130px;">
+        </div>
+      </div>
+      <div class="detail-modal-section-title">Description</div>
+      <textarea id="edit-item-details" rows="2" style="width:100%;">${itemObj.details||itemObj.desc||''}</textarea>
+      <div class="detail-modal-section-title">Value</div>
+      <div class="detail-modal-row">
+        <div>
+          <div class="detail-modal-label">Estimated Value (£)</div>
+          <input type="number" id="edit-item-value" value="${itemObj.estimatedValue||''}" style="width:90px;">
+        </div>
+        <div>
+          <div class="detail-modal-label">Value (string)</div>
+          <input type="text" id="edit-item-value-str" value="${itemObj.value||''}" style="width:90px;">
+        </div>
+      </div>
+      <div class="detail-modal-section-title">Location & Case</div>
+      <div class="detail-modal-row">
+        <div>
+          <div class="detail-modal-label">Storage Location</div>
+          <input type="text" id="edit-item-location" value="${itemObj.location||''}" style="width:120px;">
+          <div class="detail-modal-label" style="font-size: 0.98em;">Unit</div>
+          <input type="text" id="edit-item-unit" value="${itemObj.unit||''}" style="width:110px;">
+        </div>
+        <div>
+          <div class="detail-modal-label">Case</div>
+          <input type="text" id="edit-item-case" value="${itemObj.case||''}" style="width:120px;">
+        </div>
+      </div>
+      <div class="detail-modal-section-title">Tracking Information</div>
+      <div class="detail-modal-row">
+        <div>
+          <div class="detail-modal-label">Logged By</div>
+          <input type="text" id="edit-item-loggedby" value="${itemObj.loggedBy||''}" style="width:120px;">
+        </div>
+        <div>
+          <div class="detail-modal-label">Logged At</div>
+          <input type="text" id="edit-item-loggedat" value="${itemObj.loggedAt||''}" style="width:150px;">
+        </div>
+      </div>
+      <div class="detail-modal-section-title">Dimensions</div>
+      <div class="detail-modal-dims-row">
+        <div>
+          <div class="detail-modal-dims-label">Length</div>
+          <input type="text" id="edit-item-length" value="${itemObj.dims?.length||''}" style="width:60px;">
+        </div>
+        <div>
+          <div class="detail-modal-dims-label">Width</div>
+          <input type="text" id="edit-item-width" value="${itemObj.dims?.width||''}" style="width:60px;">
+        </div>
+        <div>
+          <div class="detail-modal-dims-label">Height</div>
+          <input type="text" id="edit-item-height" value="${itemObj.dims?.height||''}" style="width:60px;">
+        </div>
+        <div>
+          <div class="detail-modal-dims-label">Weight</div>
+          <input type="text" id="edit-item-weight" value="${itemObj.dims?.weight||''}" style="width:60px;">
+        </div>
+      </div>
+      <div class="detail-modal-section-title">Notes</div>
+      <textarea id="edit-item-notes" rows="2" style="width:100%;">${itemObj.notes||''}</textarea>
+      <div class="detail-modal-actions" style="margin-top:18px;">
+        <button class="primary-btn" type="submit">Save</button>
+        <button class="detail-modal-secondary-btn" type="button" id="inventory-edit-close-btn2">Cancel</button>
+      </div>
+    </form>
+  `;
+
+  // Close modal logic
+  modal.querySelector('#inventory-edit-close-btn').onclick =
+  modal.querySelector('#inventory-edit-close-btn2').onclick = function () {
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    modalBackdrop.style.display = "none";
+  };
+
+  // Form submission logic
+  modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
     e.preventDefault();
-    mockInventory[idx].brand = document.getElementById("item-brand").value;
-    mockInventory[idx].category = document.getElementById("item-category").value;
-    mockInventory[idx].condition = document.getElementById("item-condition").value;
-    mockInventory[idx].estimatedValue = parseFloat(document.getElementById("item-value").value) || 0;
-    mockInventory[idx].value = "£" + (parseFloat(document.getElementById("item-value").value) || 0);
-    mockInventory[idx].case = document.getElementById("item-case").value;
-    mockInventory[idx].location = document.getElementById("item-location").value;
-    mockInventory[idx].details = document.getElementById("item-desc").value;
+    // Update item in mockInventory
+    mockInventory[idx] = {
+      name: modal.querySelector('#edit-item-name').value.trim(),
+      brand: modal.querySelector('#edit-item-brand').value.trim(),
+      model: modal.querySelector('#edit-item-model').value.trim(),
+      year: modal.querySelector('#edit-item-year').value.trim(),
+      category: modal.querySelector('#edit-item-category').value.trim(),
+      condition: modal.querySelector('#edit-item-condition').value.trim(),
+      status: modal.querySelector('#edit-item-status').value.trim(),
+      barcode: modal.querySelector('#edit-item-barcode').value.trim(),
+      details: modal.querySelector('#edit-item-details').value.trim(),
+      desc: modal.querySelector('#edit-item-details').value.trim(),
+      estimatedValue: parseFloat(modal.querySelector('#edit-item-value').value) || 0,
+      value: modal.querySelector('#edit-item-value-str').value.trim(),
+      location: modal.querySelector('#edit-item-location').value.trim(),
+      unit: modal.querySelector('#edit-item-unit').value.trim(),
+      case: modal.querySelector('#edit-item-case').value.trim(),
+      loggedBy: modal.querySelector('#edit-item-loggedby').value.trim(),
+      loggedAt: modal.querySelector('#edit-item-loggedat').value.trim(),
+      dims: {
+        length: modal.querySelector('#edit-item-length').value.trim(),
+        width: modal.querySelector('#edit-item-width').value.trim(),
+        height: modal.querySelector('#edit-item-height').value.trim(),
+        weight: modal.querySelector('#edit-item-weight').value.trim()
+      },
+      notes: modal.querySelector('#edit-item-notes').value.trim()
+    };
     alert("Item updated!");
-    closeInventoryModal();
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    modalBackdrop.style.display = "none";
     renderItems(mockInventory);
-    form.onsubmit = originalHandler; // Restore original handler
   };
 }
 
