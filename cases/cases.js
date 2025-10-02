@@ -182,7 +182,6 @@ function setupCaseModal() {
 
 // === Case Edit Modal Logic ===
 function openCaseEditModal(caseObj, idx) {
-  // Reuse New Case Modal for editing
   openCaseModal();
   document.querySelector(".case-modal-title").textContent = "Edit Case";
   document.getElementById("case-number").value = caseObj.id;
@@ -192,15 +191,17 @@ function openCaseEditModal(caseObj, idx) {
   document.getElementById("case-auction-date").value = caseObj.auction ? formatISODate(caseObj.auction) : "";
   document.getElementById("case-desc").value = caseObj.description || "";
   document.getElementById("case-notes").value = caseObj.notes || "";
-  // Disable editing Case Number
-  document.getElementById("case-number").readOnly = true;
+  // Make case number editable:
+  document.getElementById("case-number").readOnly = false;
 
   // Overwrite the form submit handler for editing
   const form = document.getElementById("case-modal-form");
   const originalHandler = form.onsubmit;
   form.onsubmit = function(e) {
     e.preventDefault();
-    // Update the case in mockCases
+    const newCaseNumber = document.getElementById("case-number").value;
+    // If the case number changed, update the id
+    mockCases[idx].id = newCaseNumber;
     mockCases[idx].title = document.getElementById("case-title").value;
     mockCases[idx].client = document.getElementById("case-client-name").value;
     mockCases[idx].contact = document.getElementById("case-client-contact").value;
