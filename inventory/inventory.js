@@ -127,83 +127,51 @@ const mockInventory = [
 ];
 
 // === LocalStorage load/save logic ===
-let itemsData = [];
-function loadItems() {
+const ITEMS_KEY = "aw_inventory_data"; // make sure this is defined somewhere
+
+function getInventory() {
   // Try to load from aw_inventory_data OR fallback to "inventory" key for compatibility with barcode scanner tab
   let local = localStorage.getItem(ITEMS_KEY);
   if (!local) local = localStorage.getItem("inventory");
   if (local) {
-    try { itemsData = JSON.parse(local); }
-    catch { itemsData = JSON.parse(JSON.stringify(mockInventory)); }
-    // If itemsData is empty, restore mock data
-    if (!Array.isArray(itemsData) || itemsData.length === 0) {
-      itemsData = JSON.parse(JSON.stringify(mockInventory));
-      saveItems();
-    }
-  } else {
-    itemsData = JSON.parse(JSON.stringify(mockInventory));
-    saveItems();
+    try {
+      const arr = JSON.parse(local);
+      if (Array.isArray(arr) && arr.length > 0) return arr;
+    } catch {}
+    // fallback to mock if parse fails or empty
   }
+  // fallback to mockInventory if exists
+  if (typeof mockInventory !== "undefined") {
+    return JSON.parse(JSON.stringify(mockInventory));
+  }
+  return [];
 }
-function saveItems() {
-  localStorage.setItem(ITEMS_KEY, JSON.stringify(itemsData));
-  localStorage.setItem("inventory", JSON.stringify(itemsData));
+function saveInventory(arr) {
+  localStorage.setItem(ITEMS_KEY, JSON.stringify(arr));
+  localStorage.setItem("inventory", JSON.stringify(arr));
 }
 
 // === Listen for external inventory changes (e.g., from barcode tab) ===
 window.addEventListener("storage", function(event) {
   if (event.key === ITEMS_KEY || event.key === "inventory") {
-    loadItems();
     populateFilters();
-    renderItems(itemsData);
+    renderItems();
   }
 });
 
-// === Populate Filters ===
-function populateFilters() {
-  // Categories
-  const catSet = Array.from(new Set(itemsData.map(i => i.category)));
-  const catSelect = document.getElementById("inventory-category-filter");
-  catSelect.innerHTML = `<option value="">All Categories</option>`;
-  catSet.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    catSelect.appendChild(opt);
-  });
-  // Statuses
-  const statusSet = Array.from(new Set(itemsData.map(i => i.status)));
-  const statSelect = document.getElementById("inventory-status-filter");
-  statSelect.innerHTML = `<option value="">All Statuses</option>`;
-  statusSet.forEach(s => {
-    const opt = document.createElement("option");
-    opt.value = s;
-    opt.textContent = s;
-    statSelect.appendChild(opt);
-  });
-  // Cases
-  const caseSet = Array.from(new Set(itemsData.map(i => i.case)));
-  const caseSelect = document.getElementById("inventory-case-filter");
-  caseSelect.innerHTML = `<option value="">All Cases</option>`;
-  caseSet.forEach(cs => {
-    const opt = document.createElement("option");
-    opt.value = cs;
-    opt.textContent = cs;
-    caseSelect.appendChild(opt);
-  });
-}
-
 // === Render Items Grid ===
-function renderItems(items) {
+function renderItems(filteredItems = null) {
+  const allItems = getInventory();
+  const items = Array.isArray(filteredItems) ? filteredItems : allItems;
   const grid = document.getElementById("inventory-grid");
   grid.innerHTML = "";
   if (items.length === 0) {
     document.getElementById("inventory-empty").style.display = "";
-    document.getElementById("inventory-results-count").textContent = `Showing 0 of ${itemsData.length} items`;
+    document.getElementById("inventory-results-count").textContent = `Showing 0 of ${allItems.length} items`;
     return;
   }
   document.getElementById("inventory-empty").style.display = "none";
-  document.getElementById("inventory-results-count").textContent = `Showing ${items.length} of ${itemsData.length} items`;
+  document.getElementById("inventory-results-count").textContent = `Showing ${items.length} of ${allItems.length} items`;
   items.forEach((i, idx) => {
     const card = document.createElement("div");
     card.className = "inventory-card";
@@ -241,7 +209,8 @@ function renderItems(items) {
   document.querySelectorAll('.inventory-card-view-btn').forEach(btn => {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
-      showDetailModal(itemsData[idx]);
+      const allItems = getInventory();
+      showDetailModal(allItems[idx]);
     };
   });
 
@@ -249,7 +218,8 @@ function renderItems(items) {
   document.querySelectorAll('.inventory-card-edit-btn').forEach(btn => {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
-      openInventoryEditModal(itemsData[idx], idx);
+      const allItems = getInventory();
+      openInventoryEditModal(allItems[idx], idx);
     };
   });
 
@@ -258,21 +228,58 @@ function renderItems(items) {
     btn.onclick = function() {
       const idx = Number(btn.getAttribute('data-index'));
       if (confirm("Are you sure you want to delete this item?")) {
-        itemsData.splice(idx, 1);
-        saveItems();
-        renderItems(itemsData);
+        let allItems = getInventory();
+        allItems.splice(idx, 1);
+        saveInventory(allItems);
+        renderItems();
       }
     };
   });
 }
 
+// === Populate Filters ===
+function populateFilters() {
+  const allItems = getInventory();
+  // Categories
+  const catSet = Array.from(new Set(allItems.map(i => i.category)));
+  const catSelect = document.getElementById("inventory-category-filter");
+  catSelect.innerHTML = `<option value="">All Categories</option>`;
+  catSet.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    catSelect.appendChild(opt);
+  });
+  // Statuses
+  const statusSet = Array.from(new Set(allItems.map(i => i.status)));
+  const statSelect = document.getElementById("inventory-status-filter");
+  statSelect.innerHTML = `<option value="">All Statuses</option>`;
+  statusSet.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s;
+    opt.textContent = s;
+    statSelect.appendChild(opt);
+  });
+  // Cases
+  const caseSet = Array.from(new Set(allItems.map(i => i.case)));
+  const caseSelect = document.getElementById("inventory-case-filter");
+  caseSelect.innerHTML = `<option value="">All Cases</option>`;
+  caseSet.forEach(cs => {
+    const opt = document.createElement("option");
+    opt.value = cs;
+    opt.textContent = cs;
+    caseSelect.appendChild(opt);
+  });
+}
+
 // === Filter/Search/Sort Logic ===
 function applyFilters() {
-  let filtered = [...itemsData];
+  const allItems = getInventory(); // Always work from fresh data
+  let filtered = [...allItems];
   const search = document.getElementById("inventory-search").value.trim().toLowerCase();
   if (search) {
     filtered = filtered.filter(i =>
-      i.name.toLowerCase().includes(search) ||
+      (i.name && i.name.toLowerCase().includes(search)) ||
       (i.model && i.model.toLowerCase().includes(search)) ||
       (i.desc && i.desc.toLowerCase().includes(search)) ||
       (i.barcode && i.barcode.toLowerCase().includes(search))
@@ -335,8 +342,9 @@ function openInventoryModal() {
     caseSel.innerHTML += `<option value="${cs.id}">${cs.id} - ${cs.title}</option>`;
   });
 
-  // Location dropdown (existing logic)
-  const locs = Array.from(new Set(itemsData.map(i => i.location)));
+  // Location dropdown (always use fresh inventory)
+  const allItems = getInventory();
+  const locs = Array.from(new Set(allItems.map(i => i.location).filter(lc => lc && lc.trim())));
   const locSel = document.getElementById("item-location");
   locSel.innerHTML = `<option value="">Select Location</option>`;
   locs.forEach(lc => { locSel.innerHTML += `<option value="${lc}">${lc}</option>`; });
@@ -366,15 +374,17 @@ function openInventoryModal() {
     }
   });
 
-  // Prefill loggedBy and loggedAt fields with current user and date/time
-  if (document.getElementById("item-loggedby")) {
-    document.getElementById("item-loggedby").value = sessionStorage.getItem("aw_logged_in_username") || "kingajps";
-  }
-  if (document.getElementById("item-loggedat")) {
-    document.getElementById("item-loggedat").value = (new Date()).toLocaleString();
-  }
+// Prefill loggedBy and loggedAt fields with current user and date/time
+const loggedByField = document.getElementById("item-loggedby");
+if (loggedByField) {
+  loggedByField.value = sessionStorage.getItem("aw_logged_in_username") || "kingajps";
+}
+const loggedAtField = document.getElementById("item-loggedat");
+if (loggedAtField) {
+  loggedAtField.value = (new Date()).toLocaleString();
+}
 
-  document.getElementById("inventory-modal-backdrop").style.display = "flex";
+document.getElementById("inventory-modal-backdrop").style.display = "flex";
 }
 
 function closeInventoryModal() {
@@ -540,43 +550,50 @@ function openInventoryEditModal(itemObj, idx) {
     }
   });
 
-  modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
-    e.preventDefault();
-    itemsData[idx] = {
-      name: modal.querySelector('#edit-item-name').value.trim(),
-      brand: modal.querySelector('#edit-item-brand').value.trim(),
-      model: modal.querySelector('#edit-item-model').value.trim(),
-      year: modal.querySelector('#edit-item-year').value.trim(),
-      category: modal.querySelector('#edit-item-category').value.trim(),
-      condition: modal.querySelector('#edit-item-condition').value.trim(),
-      status: modal.querySelector('#edit-item-status').value.trim(),
-      barcode: modal.querySelector('#edit-item-barcode').value.trim(),
-      details: modal.querySelector('#edit-item-details').value.trim(),
-      desc: modal.querySelector('#edit-item-details').value.trim(),
-      estimatedValue: parseFloat(modal.querySelector('#edit-item-value').value) || 0,
-      value: modal.querySelector('#edit-item-value-str').value.trim(),
-      location: modal.querySelector('#edit-item-location').value.trim(),
-      unit: modal.querySelector('#edit-item-unit').value.trim(),
-      case: modal.querySelector('#edit-item-case').value.trim(),
-      loggedBy: modal.querySelector('#edit-item-loggedby').value.trim(),
-      loggedAt: modal.querySelector('#edit-item-loggedat').value.trim(),
-      dims: {
-        length: modal.querySelector('#edit-item-length').value.trim(),
-        width: modal.querySelector('#edit-item-width').value.trim(),
-        height: modal.querySelector('#edit-item-height').value.trim(),
-        weight: modal.querySelector('#edit-item-weight').value.trim()
-      },
-      notes: modal.querySelector('#edit-item-notes').value.trim()
-    };
-    saveItems();
-    alert("Item updated!");
-    document.body.style.overflow = "";
-    document.body.style.marginRight = "";
-    modalBackdrop.style.display = "none";
-    renderItems(itemsData);
-  };
-}
+modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
+  e.preventDefault();
 
+  // Get the latest inventory from storage
+  let allItems = getInventory();
+
+  // Update the item at idx
+  allItems[idx] = {
+    name: modal.querySelector('#edit-item-name').value.trim(),
+    brand: modal.querySelector('#edit-item-brand').value.trim(),
+    model: modal.querySelector('#edit-item-model').value.trim(),
+    year: modal.querySelector('#edit-item-year').value.trim(),
+    category: modal.querySelector('#edit-item-category').value.trim(),
+    condition: modal.querySelector('#edit-item-condition').value.trim(),
+    status: modal.querySelector('#edit-item-status').value.trim(),
+    barcode: modal.querySelector('#edit-item-barcode').value.trim(),
+    details: modal.querySelector('#edit-item-details').value.trim(),
+    desc: modal.querySelector('#edit-item-details').value.trim(),
+    estimatedValue: parseFloat(modal.querySelector('#edit-item-value').value) || 0,
+    value: modal.querySelector('#edit-item-value-str').value.trim(),
+    location: modal.querySelector('#edit-item-location').value.trim(),
+    unit: modal.querySelector('#edit-item-unit').value.trim(),
+    case: modal.querySelector('#edit-item-case').value.trim(),
+    loggedBy: modal.querySelector('#edit-item-loggedby').value.trim(),
+    loggedAt: modal.querySelector('#edit-item-loggedat').value.trim(),
+    dims: {
+      length: modal.querySelector('#edit-item-length').value.trim(),
+      width: modal.querySelector('#edit-item-width').value.trim(),
+      height: modal.querySelector('#edit-item-height').value.trim(),
+      weight: modal.querySelector('#edit-item-weight').value.trim()
+    },
+    notes: modal.querySelector('#edit-item-notes').value.trim()
+  };
+
+  // Save the updated inventory back to storage
+  saveInventory(allItems);
+
+  alert("Item updated!");
+  document.body.style.overflow = "";
+  document.body.style.marginRight = "";
+  modalBackdrop.style.display = "none";
+  renderItems();
+};
+  
 // === Item Details Modal Logic ===
 function showDetailModal(item) {
   const modalBackdrop = document.getElementById('inventory-detail-modal-backdrop');
@@ -694,12 +711,12 @@ function showDetailModal(item) {
     modalBackdrop.style.display = "none";
   };
 
-// Edit item handler (as before)
 document.getElementById('inventory-detail-edit-btn').onclick = function () {
   modalBackdrop.style.display = "none";
   document.body.style.overflow = "";
   document.body.style.marginRight = "";
-  const idx = itemsData.findIndex(i => i.name === item.name && i.barcode === item.barcode);
+  const allItems = getInventory();
+  const idx = allItems.findIndex(i => i.name === item.name && i.barcode === item.barcode);
   openInventoryEditModal(item, idx);
 };
 
@@ -743,9 +760,8 @@ function generateItemLabelPDF(item) {
   
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
-  loadItems();
   populateFilters();
-  renderItems(itemsData);
+  renderItems();
   setupListeners();
 
   document.getElementById("inventory-new-btn").onclick = openInventoryModal;
@@ -779,10 +795,11 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       notes: document.getElementById("item-notes")?.value.trim() || ""
     };
-    itemsData.push(newItem);
-    saveItems();
-    renderItems(itemsData);
+    let allItems = getInventory();          // Always get fresh array
+    allItems.push(newItem);                 // Add new item
+    saveInventory(allItems);                // Save back to storage
+    renderItems();                          // Refresh grid
     closeInventoryModal();
     alert("Item added!");
   };
-});
+}); // <--- Closing curly brace added here!
