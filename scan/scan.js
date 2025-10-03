@@ -2,7 +2,6 @@
 
 // === Utility Functions ===
 function getCurrentUser() {
-  // Replace with real user logic if/when available
   return sessionStorage.getItem("aw_logged_in_username") || "kingajps";
 }
 function getCurrentDateTime() {
@@ -14,7 +13,6 @@ function randomFrom(arr) {
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-// Use only allowed categories for demo
 const CATEGORY_LIST = [
   "Vehicles",
   "Food & Bev",
@@ -41,6 +39,7 @@ const STATUS_LIST = [
   "Awaiting Lotting"
 ];
 
+// === Case list from cases tab ===
 function getCaseList() {
   try {
     const cases = JSON.parse(localStorage.getItem("aw_cases_data")) || [];
@@ -50,6 +49,19 @@ function getCaseList() {
   }
 }
 
+// === Inventory LocalStorage Helper ===
+function getInventory() {
+  try {
+    return JSON.parse(localStorage.getItem("inventory")) || [];
+  } catch {
+    return [];
+  }
+}
+function saveInventory(arr) {
+  localStorage.setItem("inventory", JSON.stringify(arr));
+}
+
+// === Demo item generator ===
 function randomDemoItem(barcode) {
   const brands = ["Kodak", "Apple", "Omega", "Ming", "Canon", "Sony", "Dell", "Heritage Furniture"];
   const models = ["Classic", "Pro X", "Model S", "Air (4th gen)", "Vintage", "Elite", "Inspire", "Alpha"];
@@ -80,7 +92,6 @@ function randomDemoItem(barcode) {
     loggedBy: getCurrentUser(),
     loggedAt: getCurrentDateTime(),
     dims: randomFrom(dims),
-    // These fields are for manual input
     condition: "",
     status: "",
     location: "",
@@ -181,6 +192,18 @@ function showItemModal(itemData, saveCallback) {
           <input type="text" name="barcode" value="${itemData.barcode || ""}" readonly>
         </div>
         <div class="modal-form-row">
+          <label>Location</label>
+          <input type="text" name="location" value="${itemData.location || ""}">
+        </div>
+        <div class="modal-form-row">
+          <label>Logged By</label>
+          <input type="text" name="loggedBy" value="${itemData.loggedBy || getCurrentUser()}" readonly>
+        </div>
+        <div class="modal-form-row">
+          <label>Logged At</label>
+          <input type="text" name="loggedAt" value="${itemData.loggedAt || getCurrentDateTime()}" readonly>
+        </div>
+        <div class="modal-form-row">
           <label>Notes</label>
           <textarea name="notes">${itemData.notes || ""}</textarea>
         </div>
@@ -203,6 +226,7 @@ function showItemModal(itemData, saveCallback) {
   const valueStrInput = modal.querySelector('#modal-valueStr');
   valueInput.addEventListener("input", function() {
     let val = valueInput.value.replace(/[^0-9.]/g, "");
+    valueInput.value = val;
     valueStrInput.value = "£" + val;
   });
 
@@ -245,30 +269,23 @@ function showItemModal(itemData, saveCallback) {
       details: form.desc.value,
       barcode: form.barcode.value,
       notes: form.notes.value,
-      location: "",
+      location: form.location.value,
       unit: "",
       loggedBy: getCurrentUser(),
       loggedAt: getCurrentDateTime()
     };
-    saveCallback(item);
+    // Save to inventory!
+    const inventory = getInventory();
+    inventory.push(item);
+    saveInventory(inventory);
+    if (typeof saveCallback === "function") saveCallback(item);
     removeOldModal();
+    alert("Item added to inventory!");
   };
 }
 function removeOldModal() {
   const old = document.querySelector(".inventory-detail-modal");
   if (old) old.parentNode.removeChild(old);
-}
-
-// === LocalStorage Inventory Helper ===
-function getInventory() {
-  try {
-    return JSON.parse(localStorage.getItem("inventory")) || [];
-  } catch {
-    return [];
-  }
-}
-function saveInventory(arr) {
-  localStorage.setItem("inventory", JSON.stringify(arr));
 }
 
 // === Barcode Manual Entry ===
@@ -279,14 +296,9 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Please enter a barcode.");
       return;
     }
-    // Show modal with random info (except logged by and logged at)
     const demoItem = randomDemoItem(barcode);
     showItemModal(demoItem, function(newItem) {
-      // Add to inventory and persist
-      const inventory = getInventory();
-      inventory.push(newItem);
-      saveInventory(inventory);
-      alert("Item added to inventory!");
+      // Already handled in showItemModal
     });
   }
 
@@ -295,16 +307,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.key === "Enter") handleManualBarcodeEntry();
   });
 
-  // Camera scan demo: just pick a random barcode and show result (no modal for scan demo)
+  // Camera scan demo: just pick a random barcode and show result (modal, add to inventory)
   document.getElementById("barcode-start-camera-btn").onclick = function () {
     const demoBarcodes = ["A123", "B456", "C789", "D234"];
     const scannedBarcode = randomFrom(demoBarcodes);
     const demoItem = randomDemoItem(scannedBarcode);
     showItemModal(demoItem, function(newItem) {
-      const inventory = getInventory();
-      inventory.push(newItem);
-      saveInventory(inventory);
-      alert("Item added to inventory (from camera scan)!");
+      // Already handled in showItemModal
     });
   };
 });
