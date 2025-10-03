@@ -210,16 +210,21 @@ function setupCaseModal() {
     // Add new case to casesData
     const newCase = {
       id: document.getElementById("case-number").value.trim(),
+      caseManager: document.getElementById('case-manager').value.trim(),
       title: document.getElementById("case-title").value.trim(),
+      companyAddress: document.getElementById('company-address').value.trim(),
       status: "Processing",
       client: document.getElementById("case-client-name").value.trim(),
       contact: document.getElementById("case-client-contact").value.trim(),
+      clientAddress: document.getElementById('client-address').value.trim(),
       received: "", // You may want to add this field to your form
       auction: document.getElementById("case-auction-date").value.trim(),
       items: 0,
       value: "",
       description: document.getElementById("case-desc").value.trim(),
       notes: document.getElementById("case-notes").value.trim(),
+      closedCase: document.getElementById('case-closed').checked,
+      caseReviewed: document.querySelector('input[name="case-reviewed"]:checked')?.value || ""
       itemsList: []
     };
     casesData.push(newCase);
