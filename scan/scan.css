@@ -314,15 +314,22 @@ body {
     gap: 8px;
     width: 100%;
   }
+}
 
 /* Allow modal content to scroll if too tall */
 .inventory-detail-modal .modal-content {
   max-height: 90vh;
   overflow-y: auto;
-  /* rest of your existing rules (background, border-radius, etc.) */
+  background: #fff;
+  border-radius: 14px;
+  max-width: 430px;
+  width: 94vw;
+  padding: 35px 28px 24px 28px;
+  z-index: 1;
+  box-shadow: 0 6px 32px rgba(37,99,235,0.16);
+  position: relative;
+  animation: fadeIn 0.36s;
 }
-}
-/* --- Inventory Modal / Pop-up styles --- */
 .inventory-detail-modal.modal-open {
   position: fixed;
   z-index: 10000;
@@ -336,49 +343,6 @@ body {
   left: 0; top: 0; right: 0; bottom: 0;
   background: rgba(36, 49, 63, 0.32);
   z-index: 0;
-}
-.inventory-detail-modal .modal-content {
-  background: #fff;
-  border-radius: 14px;
-  max-width: 430px;
-  width: 94vw;
-  padding: 35px 28px 24px 28px;
-  z-index: 1;
-  box-shadow: 0 6px 32px rgba(37,99,235,0.16);
-  position: relative;
-  animation: fadeIn 0.36s;
-}
-.inventory-detail-modal .modal-title {
-  font-size: 1.42rem;
-  margin-bottom: 13px;
-  color: #2563eb;
-  font-weight: 700;
-}
-.modal-form-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-}
-.modal-form-row label {
-  font-size: 1.01rem;
-  font-weight: 500;
-  margin-bottom: 3px;
-  color: #444;
-}
-.modal-form-row input,
-.modal-form-row textarea {
-  padding: 10px 12px;
-  font-size: 1rem;
-  border: 1px solid #e3eaf2;
-  border-radius: 6px;
-  outline: none;
-  width: 100%;
-  transition: border-color 0.18s;
-  resize: none;
-}
-.modal-form-row input:focus,
-.modal-form-row textarea:focus {
-  border-color: #2563eb;
 }
 .detail-modal-actions {
   display: flex;
