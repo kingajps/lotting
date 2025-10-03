@@ -1,4 +1,4 @@
-// Barcode Scanner Tab JS (Enhanced with Inventory Modal & LocalStorage Integration)
+// Barcode Scanner Tab JS (Enhanced with Inventory Modal & LocalStorage Integration, with dropdowns and unit auto-formatting)
 
 // === Utility Functions ===
 function getCurrentUser() {
