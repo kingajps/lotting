@@ -166,7 +166,7 @@ function populateFilters() {
   });
 
   // Statuses
-  const statuses = ["Available", "Full", "Maintenance", "OnSite", "Awaiting", "Shipped", "In Use"];
+  const statuses = ["Available", "Full", "OnSite", "Awaiting", "Shipped", "In Use"];
   const statusSelect = document.getElementById("map-status-filter");
   statusSelect.innerHTML = '<option value="">All Statuses</option>';
   statuses.forEach(s => {
