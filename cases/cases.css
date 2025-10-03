@@ -488,6 +488,29 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* --------- Added/edited for new fields --------- */
+.case-modal-row input[type="checkbox"],
+.case-modal-row input[type="radio"] {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.case-modal-row label[for="case-closed"] {
+  margin-left: 6px;
+  font-weight: normal;
+  display: inline;
+}
+.case-modal-row label[for="case-reviewed-yes"],
+.case-modal-row label[for="case-reviewed-no"] {
+  font-weight: normal;
+  display: inline;
+  margin: 0 10px 0 0;
+}
+.case-modal-row label input[type="radio"] {
+  margin-right: 3px;
+}
+/* ----------------------------------------------- */
+
 .case-modal-actions {
   display: flex;
   gap: 15px;
