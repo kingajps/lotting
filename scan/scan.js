@@ -14,10 +14,45 @@ function randomFrom(arr) {
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+// Use only allowed categories for demo
+const CATEGORY_LIST = [
+  "Vehicles",
+  "Food & Bev",
+  "Industrial",
+  "Farm Equipment",
+  "Metalworking",
+  "Construction",
+  "Woodworking",
+  "Electronics",
+  "Other"
+];
+const CONDITION_LIST = [
+  "Good",
+  "Like New",
+  "Fair",
+  "Poor"
+];
+const STATUS_LIST = [
+  "Received",
+  "Catalogued",
+  "Photographed",
+  "Listed",
+  "Sold",
+  "Awaiting Lotting"
+];
+
+function getCaseList() {
+  try {
+    const cases = JSON.parse(localStorage.getItem("aw_cases_data")) || [];
+    return Array.isArray(cases) ? cases : [];
+  } catch {
+    return [];
+  }
+}
+
 function randomDemoItem(barcode) {
   const brands = ["Kodak", "Apple", "Omega", "Ming", "Canon", "Sony", "Dell", "Heritage Furniture"];
   const models = ["Classic", "Pro X", "Model S", "Air (4th gen)", "Vintage", "Elite", "Inspire", "Alpha"];
-  const categories = ["Electronics", "Jewellery", "Art", "Furniture", "Silverware"];
   const names = ["Vintage Camera", "Gold Watch", "Antique Vase", "iPad Air", "Oak Dining Table", "Silver Spoon"];
   const descs = [
     "A valuable collectible item.",
@@ -36,7 +71,7 @@ function randomDemoItem(barcode) {
     brand: randomFrom(brands),
     model: randomFrom(models),
     year: randomInt(1990, 2024),
-    category: randomFrom(categories),
+    category: randomFrom(CATEGORY_LIST),
     barcode: barcode,
     desc: randomFrom(descs),
     details: "Randomly generated demo details.",
@@ -57,14 +92,17 @@ function randomDemoItem(barcode) {
 // === Modal Logic ===
 function showItemModal(itemData, saveCallback) {
   removeOldModal();
-  // Modal HTML structure (to be added to scan/scan.html as well!)
+
+  // Build dropdowns and case list
+  const casesList = getCaseList();
+
   const modal = document.createElement("div");
   modal.className = "inventory-detail-modal modal-open";
   modal.innerHTML = `
     <div class="modal-overlay"></div>
     <div class="modal-content">
       <h2 class="modal-title">Add New Inventory Item</h2>
-      <form id="item-modal-form">
+      <form id="item-modal-form" autocomplete="off">
         <div class="modal-form-row">
           <label>Name</label>
           <input type="text" name="name" value="${itemData.name || ""}" required>
@@ -83,47 +121,64 @@ function showItemModal(itemData, saveCallback) {
         </div>
         <div class="modal-form-row">
           <label>Category</label>
-          <input type="text" name="category" value="${itemData.category || ""}">
+          <select name="category" required>
+            <option value="">Select Category</option>
+            ${CATEGORY_LIST.map(
+              c => `<option value="${c}"${itemData.category === c ? " selected" : ""}>${c}</option>`
+            ).join("")}
+          </select>
         </div>
         <div class="modal-form-row">
-          <label>Barcode</label>
-          <input type="text" name="barcode" value="${itemData.barcode || ""}" readonly>
+          <label>Condition</label>
+          <select name="condition" required>
+            <option value="">Select Condition</option>
+            ${CONDITION_LIST.map(
+              c => `<option value="${c}"${itemData.condition === c ? " selected" : ""}>${c}</option>`
+            ).join("")}
+          </select>
+        </div>
+        <div class="modal-form-row">
+          <label>Status</label>
+          <select name="status" required>
+            <option value="">Select Status</option>
+            ${STATUS_LIST.map(
+              s => `<option value="${s}"${itemData.status === s ? " selected" : ""}>${s}</option>`
+            ).join("")}
+          </select>
+        </div>
+        <div class="modal-form-row">
+          <label>Case</label>
+          <select name="case">
+            <option value="">Select Case</option>
+            ${casesList.map(cs =>
+              `<option value="${cs.id}"${itemData.case === cs.id ? " selected" : ""}>${cs.id} - ${cs.title}</option>`
+            ).join("")}
+          </select>
+        </div>
+        <div class="modal-form-row">
+          <label>Estimated Value (£)</label>
+          <input type="text" name="value" id="modal-value" value="${itemData.value ? itemData.value.replace(/^£/, "") : ""}" pattern="^\\d+(\\.\\d{1,2})?$" required>
+        </div>
+        <div class="modal-form-row">
+          <label>Value (string)</label>
+          <input type="text" name="valueStr" id="modal-valueStr" value="${itemData.value ? itemData.value : ""}" readonly>
+        </div>
+        <div class="modal-form-row">
+          <label>Dimensions</label>
+          <div style="display:flex;gap:5px;align-items:center;">
+            <input type="text" name="length" id="modal-length" placeholder="Length" value="${itemData.dims?.length ? itemData.dims.length.replace(/cm$/,"") : ""}" style="width:60px;">cm
+            <input type="text" name="width" id="modal-width" placeholder="Width" value="${itemData.dims?.width ? itemData.dims.width.replace(/cm$/,"") : ""}" style="width:60px;">cm
+            <input type="text" name="height" id="modal-height" placeholder="Height" value="${itemData.dims?.height ? itemData.dims.height.replace(/cm$/,"") : ""}" style="width:60px;">cm
+            <input type="text" name="weight" id="modal-weight" placeholder="Weight" value="${itemData.dims?.weight ? itemData.dims.weight.replace(/kg$/,"") : ""}" style="width:60px;">kg
+          </div>
         </div>
         <div class="modal-form-row">
           <label>Description</label>
           <textarea name="desc">${itemData.desc || ""}</textarea>
         </div>
         <div class="modal-form-row">
-          <label>Estimated Value</label>
-          <input type="text" name="value" value="${itemData.value || ""}">
-        </div>
-        <div class="modal-form-row">
-          <label>Logged By</label>
-          <input type="text" name="loggedBy" value="${itemData.loggedBy || ""}" readonly>
-        </div>
-        <div class="modal-form-row">
-          <label>Logged At</label>
-          <input type="text" name="loggedAt" value="${itemData.loggedAt || ""}" readonly>
-        </div>
-        <div class="modal-form-row">
-          <label>Dimensions (L×W×H, Weight)</label>
-          <input type="text" name="dims" value="${itemData.dims ? `${itemData.dims.length} × ${itemData.dims.width} × ${itemData.dims.height}, ${itemData.dims.weight}` : ""}">
-        </div>
-        <div class="modal-form-row">
-          <label>Condition</label>
-          <input type="text" name="condition" value="${itemData.condition || ""}">
-        </div>
-        <div class="modal-form-row">
-          <label>Status</label>
-          <input type="text" name="status" value="${itemData.status || ""}">
-        </div>
-        <div class="modal-form-row">
-          <label>Location</label>
-          <input type="text" name="location" value="${itemData.location || ""}">
-        </div>
-        <div class="modal-form-row">
-          <label>Case</label>
-          <input type="text" name="case" value="${itemData.case || ""}">
+          <label>Barcode</label>
+          <input type="text" name="barcode" value="${itemData.barcode || ""}" readonly>
         </div>
         <div class="modal-form-row">
           <label>Notes</label>
@@ -143,45 +198,57 @@ function showItemModal(itemData, saveCallback) {
     removeOldModal();
   };
 
+  // Auto-add £ and set valueStr
+  const valueInput = modal.querySelector('#modal-value');
+  const valueStrInput = modal.querySelector('#modal-valueStr');
+  valueInput.addEventListener("input", function() {
+    let val = valueInput.value.replace(/[^0-9.]/g, "");
+    valueStrInput.value = "£" + val;
+  });
+
+  // Auto-add units to dimensions fields
+  ["length", "width", "height"].forEach(dim => {
+    const el = modal.querySelector(`#modal-${dim}`);
+    el.addEventListener("blur", function() {
+      if (el.value && !el.value.endsWith("cm")) el.value = el.value.replace(/cm$/,"") + "cm";
+    });
+  });
+  const weightEl = modal.querySelector(`#modal-weight`);
+  weightEl.addEventListener("blur", function() {
+    if (weightEl.value && !weightEl.value.endsWith("kg")) weightEl.value = weightEl.value.replace(/kg$/,"") + "kg";
+  });
+
   // Save
   modal.querySelector("#item-modal-form").onsubmit = function(e) {
     e.preventDefault();
     const form = e.target;
-    // Parse dims
-    let dimsObj = {};
-    if (form.dims.value) {
-      const dimMatch = form.dims.value.match(/([\d\.]+cm)\s*×\s*([\d\.]+cm)\s*×\s*([\d\.]+cm),\s*([\d\.]+kg)/);
-      if (dimMatch) {
-        dimsObj = {
-          length: dimMatch[1],
-          width: dimMatch[2],
-          height: dimMatch[3],
-          weight: dimMatch[4]
-        };
-      } else {
-        dimsObj = { length: "", width: "", height: "", weight: "" };
-      }
-    }
-    // Build item
+    const dims = {
+      length: form.length.value ? form.length.value.replace(/cm$/,"") + "cm" : "",
+      width: form.width.value ? form.width.value.replace(/cm$/,"") + "cm" : "",
+      height: form.height.value ? form.height.value.replace(/cm$/,"") + "cm" : "",
+      weight: form.weight.value ? form.weight.value.replace(/kg$/,"") + "kg" : "",
+    };
     const item = {
       name: form.name.value,
       brand: form.brand.value,
       model: form.model.value,
       year: Number(form.year.value) || "",
       category: form.category.value,
-      barcode: form.barcode.value,
-      desc: form.desc.value,
-      details: "", // Optionally extend
-      estimatedValue: Number((form.value.value||"").toString().replace("£","")) || "",
-      value: form.value.value,
-      loggedBy: form.loggedBy.value,
-      loggedAt: form.loggedAt.value,
-      dims: dimsObj,
       condition: form.condition.value,
       status: form.status.value,
-      location: form.location.value,
       case: form.case.value,
-      notes: form.notes.value
+      value: "£" + (parseFloat(form.value.value.replace(/^£/, "")) || 0),
+      estimatedValue: parseFloat(form.value.value.replace(/^£/, "")) || 0,
+      valueStr: valueStrInput.value,
+      dims,
+      desc: form.desc.value,
+      details: form.desc.value,
+      barcode: form.barcode.value,
+      notes: form.notes.value,
+      location: "",
+      unit: "",
+      loggedBy: getCurrentUser(),
+      loggedAt: getCurrentDateTime()
     };
     saveCallback(item);
     removeOldModal();
@@ -219,7 +286,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const inventory = getInventory();
       inventory.push(newItem);
       saveInventory(inventory);
-      // Optionally: show confirmation, refresh inventory tab, etc.
       alert("Item added to inventory!");
     });
   }
@@ -234,7 +300,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const demoBarcodes = ["A123", "B456", "C789", "D234"];
     const scannedBarcode = randomFrom(demoBarcodes);
     const demoItem = randomDemoItem(scannedBarcode);
-    // For demo: show modal with random info as well
     showItemModal(demoItem, function(newItem) {
       const inventory = getInventory();
       inventory.push(newItem);
@@ -244,6 +309,5 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 });
 
-// Optionally, remove popup on navigation away
 window.addEventListener("hashchange", removeOldModal);
 window.addEventListener("popstate", removeOldModal);
