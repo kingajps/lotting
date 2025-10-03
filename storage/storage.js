@@ -105,6 +105,13 @@ function getBarColor(percent) {
   return "#43a047"; // green for low
 }
 
+// New: get class for card based on percent (for box color)
+function getStorageCardClass(percent) {
+  if (percent >= 76) return "storage-card-red";
+  if (percent >= 50) return "storage-card-amber";
+  return "storage-card-green";
+}
+
 const STORAGE_KEY = "aw_storage_map_data";
 let editableZones = [];
 
@@ -188,8 +195,20 @@ function renderZones(zones, editable = false) {
     cardsDiv.className = "zone-group-cards";
     zone.locations.forEach((loc, locIdx) => {
       count++;
+      let cardClass = "storage-card";
+      let percent = 0;
+      if (
+        zone.group !== "Zone On Site" &&
+        zone.group !== "In Transit" &&
+        typeof loc.capacity === "number" &&
+        typeof loc.used === "number" &&
+        loc.capacity > 0
+      ) {
+        percent = Math.round((loc.used / loc.capacity) * 100);
+        cardClass += " " + getStorageCardClass(percent);
+      }
       const card = document.createElement("div");
-      card.className = "storage-card";
+      card.className = cardClass;
       // Render different layouts for special zones
       if (zone.group === "Zone On Site") {
         // On Site special display
@@ -287,7 +306,6 @@ function renderZones(zones, editable = false) {
           }
         }
       } else { // Standard shelf/floor/unit areas
-        const percent = loc.capacity ? Math.round((loc.used / loc.capacity) * 100) : 0;
         const barColor = getBarColor(percent);
         if (editable) {
           card.innerHTML = `
