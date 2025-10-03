@@ -169,6 +169,7 @@ body {
   flex-wrap: wrap;
 }
 
+/* Colour coded storage cards */
 .storage-card {
   background: #eaffef;
   border-radius: 14px;
@@ -180,7 +181,26 @@ body {
   margin-bottom: 8px;
   border: 2px solid #a2eecb;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s, border-color 0.2s;
 }
+/* Green: 0-49% */
+.storage-card-green {
+  background: #e6faea;
+  border-color: #43a047;
+}
+/* Amber: 50-75% */
+.storage-card-amber {
+  background: #fffbe6;
+  border-color: #fbc02d;
+}
+/* Red: 76%+ */
+.storage-card-red {
+  background: #ffeaea;
+  border-color: #cf2b5e;
+}
+
 .storage-card-header {
   display: flex;
   align-items: center;
