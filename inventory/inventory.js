@@ -694,15 +694,53 @@ function showDetailModal(item) {
     modalBackdrop.style.display = "none";
   };
 
-  document.getElementById('inventory-detail-edit-btn').onclick = function () {
-    modalBackdrop.style.display = "none";
-    document.body.style.overflow = "";
-    document.body.style.marginRight = "";
-    const idx = itemsData.findIndex(i => i.name === item.name && i.barcode === item.barcode);
-    openInventoryEditModal(item, idx);
-  };
-}
+// Edit item handler (as before)
+document.getElementById('inventory-detail-edit-btn').onclick = function () {
+  modalBackdrop.style.display = "none";
+  document.body.style.overflow = "";
+  document.body.style.marginRight = "";
+  const idx = itemsData.findIndex(i => i.name === item.name && i.barcode === item.barcode);
+  openInventoryEditModal(item, idx);
+};
 
+// Print label handler (NEW, add below the above)
+document.querySelector(".detail-modal-secondary-btn[title='Print Label']").onclick = function () {
+  generateItemLabelPDF(item);
+};
+
+function generateItemLabelPDF(item) {
+  // Generate a random string for the QR code (demo)
+  const qrValue = "DEMO-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+  // Generate QR code as data URL
+  const qr = new QRious({ value: qrValue, size: 128 });
+  const qrDataUrl = qr.toDataURL();
+
+  // Create PDF
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: [60, 40]
+  });
+
+  doc.setFontSize(12);
+  doc.text(item.name || "No Name", 5, 10);
+  doc.setFontSize(9);
+  doc.text("Barcode: " + (item.barcode || ""), 5, 16);
+  doc.text("QR: " + qrValue, 5, 22);
+
+  // Add QR image
+  doc.addImage(qrDataUrl, "PNG", 30, 5, 25, 25);
+
+  // Draw border
+  doc.setLineWidth(0.5);
+  doc.rect(2, 2, 56, 36);
+
+  // Download PDF
+  doc.save("Label_" + (item.name || "item") + ".pdf");
+}
+  
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
   loadItems();
