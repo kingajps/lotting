@@ -98,8 +98,14 @@ function loadItems() {
   if (local) {
     try { itemsData = JSON.parse(local); }
     catch { itemsData = JSON.parse(JSON.stringify(mockInventory)); }
+    // If itemsData is empty, restore mock data
+    if (!Array.isArray(itemsData) || itemsData.length === 0) {
+      itemsData = JSON.parse(JSON.stringify(mockInventory));
+      saveItems();
+    }
   } else {
     itemsData = JSON.parse(JSON.stringify(mockInventory));
+    saveItems();
   }
 }
 function saveItems() {
@@ -287,14 +293,12 @@ function closeInventoryModal() {
 
 // === Inventory Edit Modal Logic ===
 function openInventoryEditModal(itemObj, idx) {
-  // Open a custom edit modal over the inventory detail modal backdrop
   const modalBackdrop = document.getElementById('inventory-detail-modal-backdrop');
   let modal = document.getElementById('inventory-detail-modal');
   modalBackdrop.style.display = 'flex';
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
 
-  // Render editable form for all fields
   modal.innerHTML = `
     <button class="detail-modal-close-btn" id="inventory-edit-close-btn">&times;</button>
     <div class="detail-modal-title">Edit Item</div>
@@ -405,7 +409,6 @@ function openInventoryEditModal(itemObj, idx) {
     </form>
   `;
 
-  // Close modal logic
   modal.querySelector('#inventory-edit-close-btn').onclick =
   modal.querySelector('#inventory-edit-close-btn2').onclick = function () {
     document.body.style.overflow = "";
@@ -413,10 +416,8 @@ function openInventoryEditModal(itemObj, idx) {
     modalBackdrop.style.display = "none";
   };
 
-  // Form submission logic
   modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
     e.preventDefault();
-    // Update item in itemsData
     itemsData[idx] = {
       name: modal.querySelector('#edit-item-name').value.trim(),
       brand: modal.querySelector('#edit-item-brand').value.trim(),
@@ -456,12 +457,10 @@ function openInventoryEditModal(itemObj, idx) {
 function showDetailModal(item) {
   const modalBackdrop = document.getElementById('inventory-detail-modal-backdrop');
   const modal = document.getElementById('inventory-detail-modal');
-  // Prevent page shift
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
 
-  // Compose modal content
   modal.innerHTML = `
     <button class="detail-modal-close-btn" id="detail-modal-close-btn">&times;</button>
     <div class="detail-modal-title">Item Details</div>
@@ -564,7 +563,6 @@ function showDetailModal(item) {
   `;
   modalBackdrop.style.display = "flex";
 
-  // Close modal logic
   document.getElementById('detail-modal-close-btn').onclick =
   document.getElementById('detail-modal-close-btn2').onclick = function () {
     document.body.style.overflow = "";
@@ -572,12 +570,10 @@ function showDetailModal(item) {
     modalBackdrop.style.display = "none";
   };
 
-  // Edit modal logic
   document.getElementById('inventory-detail-edit-btn').onclick = function () {
     modalBackdrop.style.display = "none";
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
-    // Find index of the item to edit
     const idx = itemsData.findIndex(i => i.name === item.name && i.barcode === item.barcode);
     openInventoryEditModal(item, idx);
   };
@@ -590,17 +586,15 @@ document.addEventListener("DOMContentLoaded", function () {
   renderItems(itemsData);
   setupListeners();
 
-  // Modal open/close logic with scrollbar compensation
   document.getElementById("inventory-new-btn").onclick = openInventoryModal;
   document.getElementById("inventory-modal-close-btn").onclick =
   document.getElementById("inventory-modal-cancel-btn").onclick = closeInventoryModal;
   document.getElementById("inventory-modal-form").onsubmit = function(e) {
     e.preventDefault();
-    // Add new item to itemsData
     const newItem = {
       name: document.getElementById("item-name").value.trim(),
       brand: document.getElementById("item-brand").value.trim(),
-      model: "", // you can extend the add modal to include these fields if you want
+      model: "",
       year: "",
       desc: document.getElementById("item-desc").value.trim(),
       details: document.getElementById("item-desc").value.trim(),
