@@ -309,6 +309,10 @@ function setupListeners() {
 
 // === Modal logic for + Add New Item ===
 function openInventoryModal() {
+  console.log("openInventoryModal called");
+  ...
+}
+function openInventoryModal() {
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
