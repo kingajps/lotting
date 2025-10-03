@@ -127,7 +127,6 @@ const mockInventory = [
 ];
 
 // === LocalStorage load/save logic ===
-const ITEMS_KEY = "aw_inventory_data"; // make sure this is defined somewhere
 
 function getInventory() {
   // Try to load from aw_inventory_data OR fallback to "inventory" key for compatibility with barcode scanner tab
