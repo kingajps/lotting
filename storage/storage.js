@@ -108,8 +108,26 @@ function getBarColor(percent) {
 const STORAGE_KEY = "aw_storage_map_data";
 let editableZones = [];
 
-function forceRestoreZones() {
-  // Load from localStorage, or use mockZones if not present
+// Only restore missing/empty zones; never overwrite user edits!
+function ensureZonesPresent(zones) {
+  const required = ["Zone On Site", "In Transit"];
+  for (const groupName of required) {
+    const idx = zones.findIndex(z => z.group === groupName);
+    const mockIdx = mockZones.findIndex(z => z.group === groupName);
+    if (mockIdx === -1) continue; // skip if not in mock data
+
+    if (idx === -1) {
+      // Zone is completely missing, add from mock
+      zones.push(JSON.parse(JSON.stringify(mockZones[mockIdx])));
+    } else if (!Array.isArray(zones[idx].locations) || zones[idx].locations.length === 0) {
+      // Zone exists but is empty, restore locations from mock
+      zones[idx].locations = JSON.parse(JSON.stringify(mockZones[mockIdx].locations));
+    }
+    // If it exists and has data, leave it as the user has edited it!
+  }
+}
+
+function loadZones() {
   let zones;
   const local = localStorage.getItem(STORAGE_KEY);
   if (local) {
@@ -118,25 +136,9 @@ function forceRestoreZones() {
   } else {
     zones = JSON.parse(JSON.stringify(mockZones));
   }
-
-  // Always overwrite "Zone On Site" and "In Transit" with mock data
-  const zoneNamesToRestore = ["Zone On Site", "In Transit"];
-  for (const groupName of zoneNamesToRestore) {
-    const idx = zones.findIndex(z => z.group === groupName);
-    const mockIdx = mockZones.findIndex(z => z.group === groupName);
-    if (idx !== -1 && mockIdx !== -1) {
-      zones[idx].locations = JSON.parse(JSON.stringify(mockZones[mockIdx].locations));
-    } else if (mockIdx !== -1) {
-      zones.push(JSON.parse(JSON.stringify(mockZones[mockIdx])));
-    }
-  }
-
+  ensureZonesPresent(zones);
   editableZones = zones;
   saveZones();
-}
-
-function loadZones() {
-  forceRestoreZones();
 }
 function saveZones() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(editableZones));
