@@ -43,12 +43,13 @@ const mockZones = [
     group: "Zone On Site",
     locations: [
       {
-        id: "On Site of Company",
+        id: "Cases with Company",
         type: "CasesOnSite",
         icon: "🏢",
         status: "On Site",
+        company: "Acme Corp.",
         caseCount: 5,
-        desc: "Assets currently at company sites."
+        desc: "Number of cases currently at client company site."
       },
       {
         id: "Awaiting Collection",
@@ -99,10 +100,12 @@ const mockZones = [
 
 // === Utility: Color by utilization percent ===
 function getBarColor(percent) {
-  if (percent >= 80) return "#fbc02d";
-  if (percent >= 60) return "#1976d2";
-  return "#43a047";
+  if (percent >= 80) return "#fbc02d"; // yellow for high
+  if (percent >= 60) return "#1976d2"; // blue for medium
+  return "#43a047"; // green for low
 }
+
+// New: get class for card based on percent (for box color)
 function getStorageCardClass(percent) {
   if (percent >= 76) return "storage-card-red";
   if (percent >= 50) return "storage-card-amber";
@@ -118,12 +121,16 @@ function ensureZonesPresent(zones) {
   for (const groupName of required) {
     const idx = zones.findIndex(z => z.group === groupName);
     const mockIdx = mockZones.findIndex(z => z.group === groupName);
-    if (mockIdx === -1) continue;
+    if (mockIdx === -1) continue; // skip if not in mock data
+
     if (idx === -1) {
+      // Zone is completely missing, add from mock
       zones.push(JSON.parse(JSON.stringify(mockZones[mockIdx])));
     } else if (!Array.isArray(zones[idx].locations) || zones[idx].locations.length === 0) {
+      // Zone exists but is empty, restore locations from mock
       zones[idx].locations = JSON.parse(JSON.stringify(mockZones[mockIdx].locations));
     }
+    // If it exists and has data, leave it as the user has edited it!
   }
 }
 
@@ -144,143 +151,9 @@ function saveZones() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(editableZones));
 }
 
-// === Inventory/Case Data Utilities ===
-function getInventory() {
-  try {
-    return JSON.parse(localStorage.getItem("inventory")) || [];
-  } catch {
-    return [];
-  }
-}
-function getCases() {
-  try {
-    return JSON.parse(localStorage.getItem("aw_cases_data")) || [];
-  } catch {
-    return [];
-  }
-}
-// Returns [{company, address, caseNumbers:[], items:[{name, qty}]}]
-function getOnSiteCompanies() {
-  // Get all inventory items with location "On Site" or similar, or with location/case/caseObj status "On Site".
-  // We'll use inventory + cases data.
-  const inventory = getInventory();
-  const cases = getCases();
-
-  // Map caseId to caseObj for address
-  const caseMap = {};
-  cases.forEach(cs => { caseMap[cs.id] = cs; });
-
-  // Group items by company (from case)
-  const companyMap = {};
-  inventory.forEach(item => {
-    // Heuristic: On Site items detected if location contains "On Site" (case insensitive)
-    if (item.location && item.location.toLowerCase().includes("on site")) {
-      const caseObj = caseMap[item.case] || {};
-      // Use client name as company, address from case if available
-      const company = (caseObj.client || "Unknown Company").trim();
-      const address = (caseObj.contact || caseObj.address || "No address").trim();
-      const caseNum = item.case || "N/A";
-      if (!companyMap[company]) {
-        companyMap[company] = {
-          company,
-          address,
-          caseNumbers: new Set(),
-          items: {}
-        };
-      }
-      companyMap[company].caseNumbers.add(caseNum);
-      companyMap[company].items[item.name] = (companyMap[company].items[item.name] || 0) + 1;
-    }
-  });
-  // Convert to array and flatten sets
-  return Object.values(companyMap).map(comp => ({
-    company: comp.company,
-    address: comp.address,
-    caseNumbers: Array.from(comp.caseNumbers),
-    items: Object.entries(comp.items).map(([name, qty]) => ({ name, qty }))
-  }));
-}
-
-// === Modal Logic ===
-function removeZoneModal() {
-  // Only remove from document.body; never from a section/footer!
-  const modal = document.getElementById("zone-modal-backdrop");
-  if (modal && modal.parentNode === document.body) {
-    modal.parentNode.removeChild(modal);
-  }
-}
-
-function showOnSiteCompanyListModal() {
-  removeZoneModal();
-  const companies = getOnSiteCompanies();
-  const backdrop = document.createElement("div");
-  backdrop.className = "zone-modal-backdrop";
-  backdrop.id = "zone-modal-backdrop";
-  backdrop.innerHTML = `
-    <div class="zone-modal">
-      <div class="zone-modal-header">
-        Companies with On Site Assets
-        <button class="zone-modal-close-btn" id="zone-modal-close-btn">&times;</button>
-      </div>
-      <div class="zone-modal-list">
-        ${companies.length === 0
-          ? `<div style="color:#888;">No companies with on-site assets found.</div>`
-          : companies.map((c, i) =>
-            `<button class="zone-modal-list-btn" data-company-idx="${i}">${c.company}</button>`
-          ).join('')}
-      </div>
-    </div>
-  `;
-  // MODAL FIX: Append to document.body ONLY!
-  document.body.appendChild(backdrop);
-  document.getElementById("zone-modal-close-btn").onclick = removeZoneModal;
-  if (companies.length > 0) {
-    backdrop.querySelectorAll(".zone-modal-list-btn").forEach(btn => {
-      btn.onclick = () => {
-        showOnSiteCompanyDetailModal(companies[btn.getAttribute("data-company-idx")]);
-      };
-    });
-  }
-}
-function showOnSiteCompanyDetailModal(companyObj) {
-  removeZoneModal();
-  const backdrop = document.createElement("div");
-  backdrop.className = "zone-modal-backdrop";
-  backdrop.id = "zone-modal-backdrop";
-  backdrop.innerHTML = `
-    <div class="zone-modal">
-      <div class="zone-modal-header">
-        ${companyObj.company}
-        <button class="zone-modal-close-btn" id="zone-modal-close-btn">&times;</button>
-      </div>
-      <div class="zone-modal-detail-row">
-        <span class="zone-modal-detail-label">Address:</span>
-        <span class="zone-modal-detail-value">${companyObj.address || "N/A"}</span>
-      </div>
-      <div class="zone-modal-detail-row">
-        <span class="zone-modal-detail-label">Case Number(s):</span>
-        <span class="zone-modal-detail-value">${companyObj.caseNumbers.join(", ")}</span>
-      </div>
-      <div class="zone-modal-section-title">Items at this site:</div>
-      <table class="zone-modal-items-table">
-        <thead><tr><th>Item Name</th><th>Quantity</th></tr></thead>
-        <tbody>
-        ${companyObj.items.length === 0
-          ? `<tr><td colspan="2" style="color:#888;">No items found.</td></tr>`
-          : companyObj.items.map(item =>
-            `<tr><td>${item.name}</td><td>${item.qty}</td></tr>`
-          ).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-  // MODAL FIX: Append to document.body ONLY!
-  document.body.appendChild(backdrop);
-  document.getElementById("zone-modal-close-btn").onclick = removeZoneModal;
-}
-
 // === Populate Filters ===
 function populateFilters() {
+  // Zones
   const zoneSet = Array.from(new Set(editableZones.map(z => z.group)));
   const zoneSelect = document.getElementById("map-zone-filter");
   zoneSelect.innerHTML = '<option value="">All Zones</option>';
@@ -291,6 +164,7 @@ function populateFilters() {
     zoneSelect.appendChild(opt);
   });
 
+  // Statuses
   const statuses = ["Available", "Full", "Maintenance", "On Site", "OnSite", "Awaiting", "Shipped", "In Use"];
   const statusSelect = document.getElementById("map-status-filter");
   statusSelect.innerHTML = '<option value="">All Statuses</option>';
@@ -311,6 +185,7 @@ function renderZones(zones, editable = false) {
     if (!zone.locations.length) return;
     const groupDiv = document.createElement("div");
     groupDiv.className = "zone-group";
+    // Add "Add Area/Location" button per zone in edit mode
     let addAreaBtn = "";
     if (editable) {
       addAreaBtn = `<button class="add-area-btn" onclick="window.addAreaToZone(${zoneIdx})">+ Add Area</button>`;
@@ -334,35 +209,39 @@ function renderZones(zones, editable = false) {
       }
       const card = document.createElement("div");
       card.className = cardClass;
-
       // Render different layouts for special zones
       if (zone.group === "Zone On Site") {
         // On Site special display
-        if (loc.type === "CasesOnSite") {
-          // "On Site of Company"
+        if (editable) {
           card.innerHTML = `
             <div class="storage-card-header">
-              <span style="font-size:1.3em">${loc.icon}</span>
-              <span class="storage-card-id" style="cursor:pointer;text-decoration:underline;color:#2563eb;">${loc.id}</span>
+              <input type="text" value="${loc.id}" style="width:140px;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'id')" />
+              <span style="margin-left:8px;font-size:1.3em">${loc.icon}</span>
             </div>
-            <div class="storage-card-desc">${loc.desc || ""}</div>
-            <div class="storage-card-items"><b>Click to view companies</b></div>
+            <div class="storage-card-desc"><input type="text" value="${loc.desc||''}" style="width:95%;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'desc')" /></div>
+            ${loc.type === "CasesOnSite" ? `
+              <label>Company: <input type="text" value="${loc.company || ''}" style="width:120px;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'company')" /></label>
+              <label>Cases: <input type="number" min="0" value="${loc.caseCount || 0}" style="width:55px;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'caseCount')" /></label>
+            ` : `
+              <label>Assets waiting collection: <input type="number" min="0" value="${loc.assetCount || 0}" style="width:55px;" onchange="window.handleZoneEdit(event,${zoneIdx},${locIdx},'assetCount')" /></label>
+            `}
+            <button class="remove-area-btn" onclick="window.removeAreaFromZone(${zoneIdx},${locIdx})">Remove</button>
           `;
-          // Make the full card clickable
-          card.style.cursor = "pointer";
-          card.onclick = showOnSiteCompanyListModal;
         } else {
-          // "Awaiting Collection" and others
           card.innerHTML = `
             <div class="storage-card-header">
               <span style="font-size:1.3em">${loc.icon}</span>
               <span class="storage-card-id">${loc.id}</span>
             </div>
             <div class="storage-card-desc">${loc.desc || ""}</div>
-            <div class="storage-card-items"><b>Assets awaiting collection:</b> ${loc.assetCount||0}</div>
+            ${loc.type === "CasesOnSite"
+              ? `<div class="storage-card-items"><b>Company:</b> ${loc.company||""} | <b>Cases:</b> ${loc.caseCount||0}</div>`
+              : `<div class="storage-card-items"><b>Assets awaiting collection:</b> ${loc.assetCount||0}</div>`
+            }
           `;
         }
       } else if (zone.group === "In Transit") {
+        // In Transit special display
         if (editable) {
           if (loc.type === "Van") {
             card.innerHTML = `
@@ -426,7 +305,7 @@ function renderZones(zones, editable = false) {
             `;
           }
         }
-      } else {
+      } else { // Standard shelf/floor/unit areas
         const barColor = getBarColor(percent);
         if (editable) {
           card.innerHTML = `
@@ -491,6 +370,7 @@ window.handleVanBookingEdit = function(e, zoneIdx, locIdx, field) {
 };
 window.addAreaToZone = function(zoneIdx) {
   const zone = editableZones[zoneIdx];
+  // Default new area based on zone type
   let newArea = {};
   if (zone.group === "Zone On Site") {
     newArea = {
@@ -498,6 +378,7 @@ window.addAreaToZone = function(zoneIdx) {
       type: "CasesOnSite",
       icon: "🏢",
       status: "On Site",
+      company: "",
       caseCount: 0,
       desc: ""
     };
@@ -534,6 +415,7 @@ window.removeAreaFromZone = function(zoneIdx, locIdx) {
 };
 
 function toDatetimeLocal(str) {
+  // Converts "YYYY-MM-DD HH:MM" or "YYYY-MM-DDTHH:MM" to "YYYY-MM-DDTHH:MM"
   if (!str) return "";
   return str.replace(" ", "T");
 }
@@ -543,6 +425,8 @@ function filterAndRender() {
   const search = document.getElementById("map-search").value.trim().toLowerCase();
   const zone = document.getElementById("map-zone-filter").value;
   const status = document.getElementById("map-status-filter").value;
+
+  // Filter editableZones/groups
   const filtered = editableZones.map(group => {
     let filteredLocs = group.locations;
     if (zone && group.group !== zone) filteredLocs = [];
@@ -582,8 +466,4 @@ document.addEventListener("DOMContentLoaded", function () {
   setupListeners();
   const btn = document.getElementById("edit-storage-map-btn");
   if (btn) btn.onclick = toggleEditMode;
-  // Modal should close on ESC
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") removeZoneModal();
-  });
 });
