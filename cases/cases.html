@@ -93,6 +93,30 @@
           </div>
         </div>
         <div class="case-modal-row">
+          <div class="case-modal-col">
+            <label>Case Manager</label>
+            <input type="text" id="case-manager" autocomplete="off" />
+          </div>
+          <div class="case-modal-col">
+            <label>Closed Case</label>
+            <input type="checkbox" id="case-closed" />
+            <label for="case-closed" style="display:inline;">Closed</label>
+          </div>
+        </div>
+        <div class="case-modal-row">
+          <label>Company Address</label>
+          <textarea id="company-address" rows="2"></textarea>
+        </div>
+        <div class="case-modal-row">
+          <label>Client Address</label>
+          <textarea id="client-address" rows="2"></textarea>
+        </div>
+        <div class="case-modal-row">
+          <label>Case Reviewed</label>
+          <label><input type="radio" name="case-reviewed" value="Yes" /> Yes</label>
+          <label><input type="radio" name="case-reviewed" value="No" /> No</label>
+        </div>
+        <div class="case-modal-row">
           <label>Description *</label>
           <textarea required id="case-desc" rows="3"></textarea>
         </div>
