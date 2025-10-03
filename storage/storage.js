@@ -105,48 +105,38 @@ function getBarColor(percent) {
   return "#43a047"; // green for low
 }
 
-// --- Persistent Storage Map Data (edit & save to localStorage) ---
 const STORAGE_KEY = "aw_storage_map_data";
 let editableZones = [];
 
-// Insert or update required zones from mockZones into loaded zones
-function ensureRequiredZones(zones) {
-  const requiredGroups = ["Zone On Site", "In Transit"];
-  let changed = false;
-  for (const group of requiredGroups) {
-    const mockZone = mockZones.find(z => z.group === group);
-    const idx = zones.findIndex(z => z.group === group);
-    if (mockZone && idx === -1) {
-      zones.push(JSON.parse(JSON.stringify(mockZone)));
-      changed = true;
-    }
-    // Optionally, update locations if the group exists but locations are missing
-    if (mockZone && idx !== -1 && (!zones[idx].locations || zones[idx].locations.length === 0)) {
-      zones[idx].locations = JSON.parse(JSON.stringify(mockZone.locations));
-      changed = true;
-    }
-  }
-  return changed;
-}
-
-// Try to load from localStorage or use mockZones if not present
-function loadZones() {
+function forceRestoreZones() {
+  // Load from localStorage, or use mockZones if not present
+  let zones;
   const local = localStorage.getItem(STORAGE_KEY);
   if (local) {
-    try {
-      editableZones = JSON.parse(local);
-      // Ensure required zones always exist
-      if (ensureRequiredZones(editableZones)) {
-        saveZones();
-      }
-    } catch {
-      editableZones = JSON.parse(JSON.stringify(mockZones));
-      saveZones();
-    }
+    try { zones = JSON.parse(local); }
+    catch { zones = JSON.parse(JSON.stringify(mockZones)); }
   } else {
-    editableZones = JSON.parse(JSON.stringify(mockZones));
-    saveZones();
+    zones = JSON.parse(JSON.stringify(mockZones));
   }
+
+  // Always overwrite "Zone On Site" and "In Transit" with mock data
+  const zoneNamesToRestore = ["Zone On Site", "In Transit"];
+  for (const groupName of zoneNamesToRestore) {
+    const idx = zones.findIndex(z => z.group === groupName);
+    const mockIdx = mockZones.findIndex(z => z.group === groupName);
+    if (idx !== -1 && mockIdx !== -1) {
+      zones[idx].locations = JSON.parse(JSON.stringify(mockZones[mockIdx].locations));
+    } else if (mockIdx !== -1) {
+      zones.push(JSON.parse(JSON.stringify(mockZones[mockIdx])));
+    }
+  }
+
+  editableZones = zones;
+  saveZones();
+}
+
+function loadZones() {
+  forceRestoreZones();
 }
 function saveZones() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(editableZones));
@@ -166,7 +156,7 @@ function populateFilters() {
   });
 
   // Statuses
-  const statuses = ["Available", "Full", "On Site", "Awaiting", "Shipped", "In Use"];
+  const statuses = ["Available", "Full", "Maintenance", "On Site", "OnSite", "Awaiting", "Shipped", "In Use"];
   const statusSelect = document.getElementById("map-status-filter");
   statusSelect.innerHTML = '<option value="">All Statuses</option>';
   statuses.forEach(s => {
