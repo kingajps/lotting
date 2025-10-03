@@ -288,7 +288,7 @@ body {
     width: 100%;
     max-width: none;
   }
- /* Modal Styles for Company List / Details */
+/* Modal Styles for Company List / Details */
 .zone-modal-backdrop {
   position: fixed;
   z-index: 9999;
@@ -309,6 +309,7 @@ body {
   flex-direction: column;
   position: relative;
   animation: fadeIn 0.35s;
+  z-index: 10000;
 }
 .zone-modal-header {
   font-size: 1.45rem;
@@ -399,7 +400,6 @@ body {
 @media (max-width: 700px) {
   .zone-modal { width: 96vw; padding: 18px 7vw 18px 7vw; }
 }
-
 .dashboard-footer {
   background: #2563eb;
   color: #fff;
