@@ -366,6 +366,14 @@ function openInventoryModal() {
     }
   });
 
+  // Prefill loggedBy and loggedAt fields with current user and date/time
+  if (document.getElementById("item-loggedby")) {
+    document.getElementById("item-loggedby").value = sessionStorage.getItem("aw_logged_in_username") || "kingajps";
+  }
+  if (document.getElementById("item-loggedat")) {
+    document.getElementById("item-loggedat").value = (new Date()).toLocaleString();
+  }
+
   document.getElementById("inventory-modal-backdrop").style.display = "flex";
 }
 
@@ -710,8 +718,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const newItem = {
       name: document.getElementById("item-name").value.trim(),
       brand: document.getElementById("item-brand").value.trim(),
-      model: "",
-      year: "",
+      model: document.getElementById("item-model")?.value.trim() || "",
+      year: document.getElementById("item-year")?.value.trim() || "",
       desc: document.getElementById("item-desc").value.trim(),
       details: document.getElementById("item-desc").value.trim(),
       barcode: "",
@@ -723,15 +731,15 @@ document.addEventListener("DOMContentLoaded", function () {
       location: document.getElementById("item-location").value.trim(),
       unit: "",
       case: document.getElementById("item-case").value.trim(),
-      loggedBy: "",
-      loggedAt: "",
+      loggedBy: document.getElementById("item-loggedby")?.value.trim() || (sessionStorage.getItem("aw_logged_in_username") || "kingajps"),
+      loggedAt: document.getElementById("item-loggedat")?.value.trim() || (new Date()).toLocaleString(),
       dims: {
         length: document.getElementById("item-length")?.value ? document.getElementById("item-length").value.replace(/cm$/,"") + "cm" : "",
         width: document.getElementById("item-width")?.value ? document.getElementById("item-width").value.replace(/cm$/,"") + "cm" : "",
         height: document.getElementById("item-height")?.value ? document.getElementById("item-height").value.replace(/cm$/,"") + "cm" : "",
         weight: document.getElementById("item-weight")?.value ? document.getElementById("item-weight").value.replace(/kg$/,"") + "kg" : ""
       },
-      notes: ""
+      notes: document.getElementById("item-notes")?.value.trim() || ""
     };
     itemsData.push(newItem);
     saveItems();
