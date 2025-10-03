@@ -109,13 +109,43 @@ function getBarColor(percent) {
 const STORAGE_KEY = "aw_storage_map_data";
 let editableZones = [];
 
+// Insert or update required zones from mockZones into loaded zones
+function ensureRequiredZones(zones) {
+  const requiredGroups = ["Zone On Site", "In Transit"];
+  let changed = false;
+  for (const group of requiredGroups) {
+    const mockZone = mockZones.find(z => z.group === group);
+    const idx = zones.findIndex(z => z.group === group);
+    if (mockZone && idx === -1) {
+      zones.push(JSON.parse(JSON.stringify(mockZone)));
+      changed = true;
+    }
+    // Optionally, update locations if the group exists but locations are missing
+    if (mockZone && idx !== -1 && (!zones[idx].locations || zones[idx].locations.length === 0)) {
+      zones[idx].locations = JSON.parse(JSON.stringify(mockZone.locations));
+      changed = true;
+    }
+  }
+  return changed;
+}
+
 // Try to load from localStorage or use mockZones if not present
 function loadZones() {
   const local = localStorage.getItem(STORAGE_KEY);
   if (local) {
-    try { editableZones = JSON.parse(local); } catch { editableZones = JSON.parse(JSON.stringify(mockZones)); }
+    try {
+      editableZones = JSON.parse(local);
+      // Ensure required zones always exist
+      if (ensureRequiredZones(editableZones)) {
+        saveZones();
+      }
+    } catch {
+      editableZones = JSON.parse(JSON.stringify(mockZones));
+      saveZones();
+    }
   } else {
     editableZones = JSON.parse(JSON.stringify(mockZones));
+    saveZones();
   }
 }
 function saveZones() {
