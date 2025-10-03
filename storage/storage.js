@@ -46,7 +46,7 @@ const mockZones = [
         id: "Cases with Company",
         type: "CasesOnSite",
         icon: "🏢",
-        status: "OnSite",
+        status: "On Site",
         company: "Acme Corp.",
         caseCount: 5,
         desc: "Number of cases currently at client company site."
@@ -166,7 +166,7 @@ function populateFilters() {
   });
 
   // Statuses
-  const statuses = ["Available", "Full", "OnSite", "Awaiting", "Shipped", "In Use"];
+  const statuses = ["Available", "Full", "On Site", "Awaiting", "Shipped", "In Use"];
   const statusSelect = document.getElementById("map-status-filter");
   statusSelect.innerHTML = '<option value="">All Statuses</option>';
   statuses.forEach(s => {
@@ -367,7 +367,7 @@ window.addAreaToZone = function(zoneIdx) {
       id: "New Area",
       type: "CasesOnSite",
       icon: "🏢",
-      status: "OnSite",
+      status: "On Site",
       company: "",
       caseCount: 0,
       desc: ""
