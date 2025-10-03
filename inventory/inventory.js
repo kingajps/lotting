@@ -1,6 +1,43 @@
 // === Persistent storage key ===
 const ITEMS_KEY = "aw_inventory_data";
 
+// === Allowed dropdown lists ===
+const CATEGORY_LIST = [
+  "Vehicles",
+  "Food & Bev",
+  "Industrial",
+  "Farm Equipment",
+  "Metalworking",
+  "Construction",
+  "Woodworking",
+  "Electronics",
+  "Other"
+];
+const CONDITION_LIST = [
+  "Good",
+  "Like New",
+  "Fair",
+  "Poor"
+];
+const STATUS_LIST = [
+  "Received",
+  "Catalogued",
+  "Photographed",
+  "Listed",
+  "Sold",
+  "Awaiting Lotting"
+];
+
+// === Case list from cases tab ===
+function getCaseList() {
+  try {
+    const cases = JSON.parse(localStorage.getItem("aw_cases_data")) || [];
+    return Array.isArray(cases) ? cases : [];
+  } catch {
+    return [];
+  }
+}
+
 // === Mock Data for Items ===
 const mockInventory = [
   {
@@ -269,19 +306,66 @@ function openInventoryModal() {
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
-  // Populate selects in modal
-  const cats = Array.from(new Set(itemsData.map(i => i.category)));
-  const cases = Array.from(new Set(itemsData.map(i => i.case)));
-  const locs = Array.from(new Set(itemsData.map(i => i.location)));
+
+  // Populate dropdowns with fixed lists (category, condition, status, cases)
   const catSel = document.getElementById("item-category");
-  const caseSel = document.getElementById("item-case");
-  const locSel = document.getElementById("item-location");
   catSel.innerHTML = `<option value="">Select Category</option>`;
-  cats.forEach(c => { catSel.innerHTML += `<option value="${c}">${c}</option>`; });
+  CATEGORY_LIST.forEach(c => { catSel.innerHTML += `<option value="${c}">${c}</option>`; });
+
+  const condSel = document.getElementById("item-condition");
+  condSel.innerHTML = `<option value="">Select Condition</option>`;
+  CONDITION_LIST.forEach(c => { condSel.innerHTML += `<option value="${c}">${c}</option>`; });
+
+  let statusSel = document.getElementById("item-status");
+  if (!statusSel) {
+    // Add status dropdown if not present (for compatibility)
+    const row = document.querySelector("#inventory-modal-form .inventory-modal-row:last-of-type");
+    statusSel = document.createElement("select");
+    statusSel.id = "item-status";
+    statusSel.required = true;
+    row.appendChild(statusSel);
+  }
+  statusSel.innerHTML = `<option value="">Select Status</option>`;
+  STATUS_LIST.forEach(s => { statusSel.innerHTML += `<option value="${s}">${s}</option>`; });
+
+  // Cases dropdown (live list from cases)
+  const caseSel = document.getElementById("item-case");
   caseSel.innerHTML = `<option value="">Select Case</option>`;
-  cases.forEach(cs => { caseSel.innerHTML += `<option value="${cs}">${cs}</option>`; });
+  getCaseList().forEach(cs => {
+    caseSel.innerHTML += `<option value="${cs.id}">${cs.id} - ${cs.title}</option>`;
+  });
+
+  // Location dropdown (existing logic)
+  const locs = Array.from(new Set(itemsData.map(i => i.location)));
+  const locSel = document.getElementById("item-location");
   locSel.innerHTML = `<option value="">Select Location</option>`;
   locs.forEach(lc => { locSel.innerHTML += `<option value="${lc}">${lc}</option>`; });
+
+  // Value field: auto-add £ and update value string
+  const valField = document.getElementById("item-value");
+  const valueStrField = document.getElementById("item-value-str");
+  if (valField && valueStrField) {
+    valField.addEventListener("input", function() {
+      let val = valField.value.replace(/[^0-9.]/g, "");
+      valField.value = val;
+      valueStrField.value = "£" + val;
+    });
+  }
+
+  // Dimensions fields: force cm/kg
+  ["item-length","item-width","item-height","item-weight"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("blur", function() {
+        if (id !== "item-weight") {
+          if (el.value && !el.value.endsWith("cm")) el.value = el.value.replace(/cm$/,"") + "cm";
+        } else {
+          if (el.value && !el.value.endsWith("kg")) el.value = el.value.replace(/kg$/,"") + "kg";
+        }
+      });
+    }
+  });
+
   document.getElementById("inventory-modal-backdrop").style.display = "flex";
 }
 
@@ -327,17 +411,26 @@ function openInventoryEditModal(itemObj, idx) {
       <div class="detail-modal-row">
         <div>
           <div class="detail-modal-label">Category</div>
-          <input type="text" id="edit-item-category" value="${itemObj.category||''}" style="width:120px;">
+          <select id="edit-item-category" style="width:120px;">
+            <option value="">Select Category</option>
+            ${CATEGORY_LIST.map(c => `<option value="${c}"${itemObj.category===c?" selected":""}>${c}</option>`).join("")}
+          </select>
         </div>
         <div>
           <div class="detail-modal-label">Condition</div>
-          <input type="text" id="edit-item-condition" value="${itemObj.condition||''}" style="width:120px;">
+          <select id="edit-item-condition" style="width:120px;">
+            <option value="">Select Condition</option>
+            ${CONDITION_LIST.map(c => `<option value="${c}"${itemObj.condition===c?" selected":""}>${c}</option>`).join("")}
+          </select>
         </div>
       </div>
       <div class="detail-modal-row">
         <div>
           <div class="detail-modal-label">Status</div>
-          <input type="text" id="edit-item-status" value="${itemObj.status||''}" style="width:120px;">
+          <select id="edit-item-status" style="width:120px;">
+            <option value="">Select Status</option>
+            ${STATUS_LIST.map(s => `<option value="${s}"${itemObj.status===s?" selected":""}>${s}</option>`).join("")}
+          </select>
         </div>
         <div>
           <div class="detail-modal-label">Barcode</div>
@@ -367,7 +460,10 @@ function openInventoryEditModal(itemObj, idx) {
         </div>
         <div>
           <div class="detail-modal-label">Case</div>
-          <input type="text" id="edit-item-case" value="${itemObj.case||''}" style="width:120px;">
+          <select id="edit-item-case" style="width:120px;">
+            <option value="">Select Case</option>
+            ${getCaseList().map(cs => `<option value="${cs.id}"${itemObj.case===cs.id?" selected":""}>${cs.id} - ${cs.title}</option>`).join("")}
+          </select>
         </div>
       </div>
       <div class="detail-modal-section-title">Tracking Information</div>
@@ -415,6 +511,26 @@ function openInventoryEditModal(itemObj, idx) {
     document.body.style.marginRight = "";
     modalBackdrop.style.display = "none";
   };
+
+  // Value field: auto-add £ and update value string
+  modal.querySelector('#edit-item-value').addEventListener("input", function() {
+    let val = modal.querySelector('#edit-item-value').value.replace(/[^0-9.]/g, "");
+    modal.querySelector('#edit-item-value').value = val;
+    modal.querySelector('#edit-item-value-str').value = "£" + val;
+  });
+  // Dimensions: force cm/kg
+  ["edit-item-length","edit-item-width","edit-item-height","edit-item-weight"].forEach(id => {
+    const el = modal.querySelector(`#${id}`);
+    if (el) {
+      el.addEventListener("blur", function() {
+        if (id !== "edit-item-weight") {
+          if (el.value && !el.value.endsWith("cm")) el.value = el.value.replace(/cm$/,"") + "cm";
+        } else {
+          if (el.value && !el.value.endsWith("kg")) el.value = el.value.replace(/kg$/,"") + "kg";
+        }
+      });
+    }
+  });
 
   modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
     e.preventDefault();
@@ -599,17 +715,22 @@ document.addEventListener("DOMContentLoaded", function () {
       desc: document.getElementById("item-desc").value.trim(),
       details: document.getElementById("item-desc").value.trim(),
       barcode: "",
-      status: "",
+      status: document.getElementById("item-status") ? document.getElementById("item-status").value.trim() : "",
       condition: document.getElementById("item-condition").value.trim(),
-      value: "£" + (parseFloat(document.getElementById("item-value").value.trim()) || 0),
-      estimatedValue: parseFloat(document.getElementById("item-value").value.trim()) || 0,
+      value: "£" + (parseFloat(document.getElementById("item-value").value.replace(/^£/, "")) || 0),
+      estimatedValue: parseFloat(document.getElementById("item-value").value.replace(/^£/, "")) || 0,
       category: document.getElementById("item-category").value.trim(),
       location: document.getElementById("item-location").value.trim(),
       unit: "",
       case: document.getElementById("item-case").value.trim(),
       loggedBy: "",
       loggedAt: "",
-      dims: { length: "", width: "", height: "", weight: "" },
+      dims: {
+        length: document.getElementById("item-length")?.value ? document.getElementById("item-length").value.replace(/cm$/,"") + "cm" : "",
+        width: document.getElementById("item-width")?.value ? document.getElementById("item-width").value.replace(/cm$/,"") + "cm" : "",
+        height: document.getElementById("item-height")?.value ? document.getElementById("item-height").value.replace(/cm$/,"") + "cm" : "",
+        weight: document.getElementById("item-weight")?.value ? document.getElementById("item-weight").value.replace(/kg$/,"") + "kg" : ""
+      },
       notes: ""
     };
     itemsData.push(newItem);
