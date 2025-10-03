@@ -298,7 +298,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     const demoItem = randomDemoItem(barcode);
     showItemModal(demoItem, function(newItem) {
-      // Already handled in showItemModal
+      // Save to inventory and persist
+      const inventory = getInventory();
+      inventory.push(newItem);
+      saveInventory(inventory);
+      alert("Item added to inventory!");
     });
   }
 
@@ -313,7 +317,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const scannedBarcode = randomFrom(demoBarcodes);
     const demoItem = randomDemoItem(scannedBarcode);
     showItemModal(demoItem, function(newItem) {
-      // Already handled in showItemModal
+      const inventory = getInventory();
+      inventory.push(newItem);
+      saveInventory(inventory);
+      alert("Item added to inventory (from camera scan)!");
     });
   };
 });
