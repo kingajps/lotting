@@ -203,9 +203,13 @@ function getOnSiteCompanies() {
 
 // === Modal Logic ===
 function removeZoneModal() {
+  // Only remove from document.body; never from a section/footer!
   const modal = document.getElementById("zone-modal-backdrop");
-  if (modal) modal.parentNode.removeChild(modal);
+  if (modal && modal.parentNode === document.body) {
+    modal.parentNode.removeChild(modal);
+  }
 }
+
 function showOnSiteCompanyListModal() {
   removeZoneModal();
   const companies = getOnSiteCompanies();
@@ -227,6 +231,7 @@ function showOnSiteCompanyListModal() {
       </div>
     </div>
   `;
+  // MODAL FIX: Append to document.body ONLY!
   document.body.appendChild(backdrop);
   document.getElementById("zone-modal-close-btn").onclick = removeZoneModal;
   if (companies.length > 0) {
@@ -269,6 +274,7 @@ function showOnSiteCompanyDetailModal(companyObj) {
       </table>
     </div>
   `;
+  // MODAL FIX: Append to document.body ONLY!
   document.body.appendChild(backdrop);
   document.getElementById("zone-modal-close-btn").onclick = removeZoneModal;
 }
