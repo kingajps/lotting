@@ -91,6 +91,16 @@
         </div>
         <div class="inventory-modal-row">
           <div class="inventory-modal-col">
+            <label>Model</label>
+            <input type="text" id="item-model" autocomplete="off" />
+          </div>
+          <div class="inventory-modal-col">
+            <label>Year</label>
+            <input type="number" id="item-year" min="1900" max="2100" />
+          </div>
+        </div>
+        <div class="inventory-modal-row">
+          <div class="inventory-modal-col">
             <label>Category *</label>
             <select required id="item-category">
               <option value="">Select Category</option>
@@ -99,23 +109,50 @@
           <div class="inventory-modal-col">
             <label>Condition *</label>
             <select required id="item-condition">
-              <option>Good</option>
-              <option>Like New</option>
-              <option>Fair</option>
-              <option>Poor</option>
+              <option value="">Select Condition</option>
             </select>
           </div>
         </div>
         <div class="inventory-modal-row">
           <div class="inventory-modal-col">
-            <label>Estimated Value (£) *</label>
-            <input type="number" min="0" required id="item-value" value="0" />
+            <label>Status *</label>
+            <select required id="item-status">
+              <option value="">Select Status</option>
+            </select>
           </div>
           <div class="inventory-modal-col">
             <label>Case *</label>
             <select required id="item-case">
               <option value="">Select Case</option>
             </select>
+          </div>
+        </div>
+        <div class="inventory-modal-row">
+          <div class="inventory-modal-col">
+            <label>Estimated Value (£) *</label>
+            <input type="text" min="0" required id="item-value" value="0" />
+          </div>
+          <div class="inventory-modal-col">
+            <label>Value (string)</label>
+            <input type="text" id="item-value-str" readonly />
+          </div>
+        </div>
+        <div class="inventory-modal-row">
+          <div class="inventory-modal-col">
+            <label>Length</label>
+            <input type="text" id="item-length" placeholder="e.g. 20cm"/>
+          </div>
+          <div class="inventory-modal-col">
+            <label>Width</label>
+            <input type="text" id="item-width" placeholder="e.g. 10cm"/>
+          </div>
+          <div class="inventory-modal-col">
+            <label>Height</label>
+            <input type="text" id="item-height" placeholder="e.g. 5cm"/>
+          </div>
+          <div class="inventory-modal-col">
+            <label>Weight</label>
+            <input type="text" id="item-weight" placeholder="e.g. 1.0kg"/>
           </div>
         </div>
         <div class="inventory-modal-row">
@@ -129,6 +166,20 @@
         <div class="inventory-modal-row">
           <label>Description *</label>
           <textarea required id="item-desc" rows="2"></textarea>
+        </div>
+        <div class="inventory-modal-row">
+          <div class="inventory-modal-col">
+            <label>Logged By</label>
+            <input type="text" id="item-loggedby" readonly />
+          </div>
+          <div class="inventory-modal-col">
+            <label>Logged At</label>
+            <input type="text" id="item-loggedat" readonly />
+          </div>
+        </div>
+        <div class="inventory-modal-row">
+          <label>Notes</label>
+          <textarea id="item-notes" rows="2"></textarea>
         </div>
         <div class="inventory-modal-actions">
           <button type="submit" class="primary-btn inventory-modal-add-btn"><span style="font-size:1.2em;vertical-align:middle;margin-right:7px;">🗃️</span> Add Item</button>
