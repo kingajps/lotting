@@ -376,17 +376,17 @@ function openInventoryModal() {
     }
   });
 
-// Prefill loggedBy and loggedAt fields with current user and date/time
-const loggedByField = document.getElementById("item-loggedby");
-if (loggedByField) {
-  loggedByField.value = sessionStorage.getItem("aw_logged_in_username") || "kingajps";
-}
-const loggedAtField = document.getElementById("item-loggedat");
-if (loggedAtField) {
-  loggedAtField.value = (new Date()).toLocaleString();
-}
+  // Prefill loggedBy and loggedAt fields with current user and date/time
+  const loggedByField = document.getElementById("item-loggedby");
+  if (loggedByField) {
+    loggedByField.value = sessionStorage.getItem("aw_logged_in_username") || "kingajps";
+  }
+  const loggedAtField = document.getElementById("item-loggedat");
+  if (loggedAtField) {
+    loggedAtField.value = (new Date()).toLocaleString();
+  }
 
-document.getElementById("inventory-modal-backdrop").style.display = "flex";
+  document.getElementById("inventory-modal-backdrop").style.display = "flex";
 }
 
 function closeInventoryModal() {
@@ -804,4 +804,4 @@ document.addEventListener("DOMContentLoaded", function () {
     closeInventoryModal();
     alert("Item added!");
   };
-}); // <--- Closing curly brace added here!
+});
