@@ -1,5 +1,7 @@
 // Barcode Scanner Tab JS (Enhanced with Inventory Modal & LocalStorage Integration, with dropdowns and unit auto-formatting)
 
+const ITEMS_KEY = "inventoryItems"; // <-- Make sure this is the same in inventory tab!
+
 // === Utility Functions ===
 function getCurrentUser() {
   return sessionStorage.getItem("aw_logged_in_username") || "kingajps";
@@ -14,29 +16,12 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 const CATEGORY_LIST = [
-  "Vehicles",
-  "Food & Bev",
-  "Industrial",
-  "Farm Equipment",
-  "Metalworking",
-  "Construction",
-  "Woodworking",
-  "Electronics",
-  "Other"
+  "Vehicles", "Food & Bev", "Industrial", "Farm Equipment", "Metalworking",
+  "Construction", "Woodworking", "Electronics", "Other"
 ];
-const CONDITION_LIST = [
-  "Good",
-  "Like New",
-  "Fair",
-  "Poor"
-];
+const CONDITION_LIST = ["Good", "Like New", "Fair", "Poor"];
 const STATUS_LIST = [
-  "Received",
-  "Catalogued",
-  "Photographed",
-  "Listed",
-  "Sold",
-  "Awaiting Lotting"
+  "Received", "Catalogued", "Photographed", "Listed", "Sold", "Awaiting Lotting"
 ];
 
 // === Case list from cases tab ===
@@ -285,16 +270,15 @@ function showItemModal(itemData, saveCallback) {
       loggedBy: getCurrentUser(),
       loggedAt: getCurrentDateTime()
     };
-    
-// Save to inventory!
-const inventory = getInventory();
-inventory.push(item);
-saveInventory(inventory);
-window.dispatchEvent(new Event("inventory-updated")); // <-- Added: notify inventory tab to refresh
-if (typeof saveCallback === "function") saveCallback(item);
-removeOldModal();
-alert("Item added to inventory!");
-};
+    // Save to inventory!
+    const inventory = getInventory();
+    inventory.push(item);
+    saveInventory(inventory);
+    window.dispatchEvent(new Event("inventory-updated")); // <-- notify inventory tab to refresh
+    if (typeof saveCallback === "function") saveCallback(item);
+    removeOldModal();
+    alert("Item added to inventory!");
+  };
 }
 function removeOldModal() {
   const old = document.querySelector(".inventory-detail-modal");
