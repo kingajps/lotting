@@ -54,18 +54,118 @@ function renderLots(lots) {
       </div>
       <div class="lots-card-desc">${l.description}</div>
       <div class="lots-card-actions">
-        <!-- Add future actions here -->
+        <button class="lots-card-edit-btn" data-index="${idx}" title="Edit">&#9998; Edit</button>
       </div>
     `;
     grid.appendChild(card);
   });
+
+  document.querySelectorAll('.lots-card-edit-btn').forEach(btn => {
+    btn.onclick = function() {
+      const idx = Number(btn.getAttribute('data-index'));
+      openEditLotModal(lotsData[idx], idx);
+    };
+  });
 }
 
-// === Modal Logic, Filter/Search, Listeners: Add similar to cases.js ===
+// === Edit Modal Logic ===
+function openEditLotModal(lotObj, idx) {
+  const modalBackdrop = document.getElementById('lots-modal-backdrop');
+  const modal = document.querySelector('.lots-modal');
+  modal.querySelector('.lots-modal-title').textContent = "Edit Lot";
+  modalBackdrop.style.display = "flex";
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
+
+  // Pre-fill form
+  document.getElementById('lot-number').value = lotObj.number || "";
+  document.getElementById('lot-auction').value = lotObj.auction || "";
+  document.getElementById('lot-status').value = lotObj.status || "";
+  document.getElementById('lot-desc').value = lotObj.description || "";
+  document.getElementById('lot-notes').value = lotObj.notes || "";
+
+  // Remove previous submit
+  const form = document.getElementById("lots-modal-form");
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    // Update existing lot
+    lotsData[idx] = {
+      number: document.getElementById('lot-number').value.trim(),
+      auction: document.getElementById('lot-auction').value.trim(),
+      status: document.getElementById('lot-status').value.trim(),
+      description: document.getElementById('lot-desc').value.trim(),
+      notes: document.getElementById('lot-notes').value.trim()
+    };
+    saveLots();
+    renderLots(lotsData);
+    closeLotsModal();
+    alert("Lot updated!");
+  };
+}
+
+// === Modal Open/Close Logic for Add New Lot ===
+function openLotsModal() {
+  const modalBackdrop = document.getElementById('lots-modal-backdrop');
+  const modal = document.querySelector('.lots-modal');
+  modal.querySelector('.lots-modal-title').textContent = "Add New Lot";
+  modalBackdrop.style.display = "flex";
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
+
+  // Clear form
+  document.getElementById('lot-number').value = "";
+  document.getElementById('lot-auction').value = "";
+  document.getElementById('lot-status').value = "";
+  document.getElementById('lot-desc').value = "";
+  document.getElementById('lot-notes').value = "";
+
+  // Remove previous submit
+  const form = document.getElementById("lots-modal-form");
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    const newLot = {
+      number: document.getElementById('lot-number').value.trim(),
+      auction: document.getElementById('lot-auction').value.trim(),
+      status: document.getElementById('lot-status').value.trim(),
+      description: document.getElementById('lot-desc').value.trim(),
+      notes: document.getElementById('lot-notes').value.trim()
+    };
+    lotsData.push(newLot);
+    saveLots();
+    renderLots(lotsData);
+    closeLotsModal();
+    alert("Lot added!");
+  };
+}
+function closeLotsModal() {
+  document.body.style.overflow = "";
+  document.body.style.marginRight = "";
+  document.getElementById('lots-modal-backdrop').style.display = "none";
+}
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
   loadLots();
   renderLots(lotsData);
-  // Add listeners for modal, filters, etc.
+
+  document.getElementById("lots-new-btn").onclick = openLotsModal;
+  document.getElementById("lots-modal-close-btn").onclick =
+    document.getElementById("lots-modal-cancel-btn").onclick = closeLotsModal;
+
+  // Default modal submit for Add New (will be replaced by Edit when editing)
+  document.getElementById("lots-modal-form").onsubmit = function(e) {
+    e.preventDefault();
+    const newLot = {
+      number: document.getElementById('lot-number').value.trim(),
+      auction: document.getElementById('lot-auction').value.trim(),
+      status: document.getElementById('lot-status').value.trim(),
+      description: document.getElementById('lot-desc').value.trim(),
+      notes: document.getElementById('lot-notes').value.trim()
+    };
+    lotsData.push(newLot);
+    saveLots();
+    renderLots(lotsData);
+    closeLotsModal();
+    alert("Lot added!");
+  };
 });
