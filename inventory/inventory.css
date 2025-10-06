@@ -330,6 +330,8 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
+  max-height: 80vh;      /* <-- Added for scroll */
+  overflow-y: auto;      /* <-- Added for scroll */
 }
 .inventory-modal-header {
   display: flex;
