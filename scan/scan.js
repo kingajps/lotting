@@ -51,13 +51,24 @@ function getCaseList() {
 
 // === Inventory LocalStorage Helper ===
 function getInventory() {
-  try {
-    return JSON.parse(localStorage.getItem("inventory")) || [];
-  } catch {
-    return [];
+  let items = [];
+  let localA = localStorage.getItem(ITEMS_KEY);
+  let localB = localStorage.getItem("inventory");
+  if (localA) {
+    try { items = JSON.parse(localA); }
+    catch { items = []; }
   }
+  if ((!items || items.length === 0) && localB) {
+    try { items = JSON.parse(localB); }
+    catch { items = []; }
+  }
+  if (!items || items.length === 0) {
+    items = [];
+  }
+  return items;
 }
 function saveInventory(arr) {
+  localStorage.setItem(ITEMS_KEY, JSON.stringify(arr));
   localStorage.setItem("inventory", JSON.stringify(arr));
 }
 
@@ -304,7 +315,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const inventory = getInventory();
       inventory.push(newItem);
       saveInventory(inventory);
-      window.dispatchEvent(new Event("inventory-updated")); // <-- Added
+      window.dispatchEvent(new Event("inventory-updated"));
       alert("Item added to inventory!");
     });
   }
@@ -323,7 +334,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const inventory = getInventory();
       inventory.push(newItem);
       saveInventory(inventory);
-      window.dispatchEvent(new Event("inventory-updated")); // <-- Added
+      window.dispatchEvent(new Event("inventory-updated"));
       alert("Item added to inventory (from camera scan)!");
     });
   };
