@@ -271,7 +271,10 @@ body {
 .lots-modal-backdrop {
   position: fixed;
   z-index: 9999;
-  left: 0; top: 0; width: 100vw; height: 100vh;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0,0,0,0.39);
   display: flex;
   align-items: center;
