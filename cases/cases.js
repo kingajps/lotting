@@ -224,7 +224,7 @@ function setupCaseModal() {
       description: document.getElementById("case-desc").value.trim(),
       notes: document.getElementById("case-notes").value.trim(),
       closedCase: document.getElementById('case-closed').checked,
-      caseReviewed: document.querySelector('input[name="case-reviewed"]:checked')?.value || ""
+      caseReviewed: document.querySelector('input[name="case-reviewed"]:checked')?.value || "",
       itemsList: []
     };
     casesData.push(newCase);
