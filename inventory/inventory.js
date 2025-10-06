@@ -806,4 +806,4 @@ document.addEventListener("DOMContentLoaded", function () {
     closeInventoryModal();
     alert("Item added!");
   };
-}); // <--- This closes the DOMContentLoaded function
+});
