@@ -424,6 +424,9 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
+  /* Add these lines: */
+  max-height: 90vh;
+  overflow-y: auto;
 }
 .case-modal-header {
   display: flex;
