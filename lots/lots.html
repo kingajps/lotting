@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lots Manager | Auction Warehouse</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="lots.css" />
+  <script>
+    if (sessionStorage.getItem("aw_logged_in") !== "1") {
+      window.location.href = "../login.html";
+    }
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-row">
+        <span class="logo-icon">
+          <!-- SVG, copy from other tabs -->
+          <svg width="36" height="36" fill="none" viewBox="0 0 36 36">
+            <rect width="36" height="36" rx="12" fill="#2563eb"/>
+            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
+            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
+          </svg>
+        </span>
+        <div>
+          <h1 class="header-title">Auction Warehouse</h1>
+          <span class="app-subtitle">Management System</span>
+        </div>
+      </div>
+    </div>
+  </header>
+  <nav class="nav-tabs" aria-label="Main navigation">
+    <a class="tab-btn" href="/lotting/index.html">Dashboard</a>
+    <a class="tab-btn" href="/lotting/scan/scan.html">Barcode Scanner</a>
+    <a class="tab-btn" href="/lotting/inventory/inventory.html">Inventory</a>
+    <a class="tab-btn" href="/lotting/storage/storage.html">Storage Map</a>
+    <a class="tab-btn" href="/lotting/cases/cases.html">Cases</a>
+    <a class="tab-btn active" href="/lotting/lots/lots.html">Lots</a>
+    <a class="tab-btn" href="/lotting/analytics/analytics.html">Analytics</a>
+  </nav>
+  <main class="main-container">
+    <nav class="breadcrumb">
+      <span>Auction Warehouse</span> / <span>Lots</span>
+    </nav>
+    <section id="tab-lots" class="tab-section active" tabindex="0">
+      <div class="lots-header-row">
+        <div>
+          <h2 class="lots-title">Lots Manager</h2>
+          <div class="lots-desc">Manage and view lots for upcoming auctions</div>
+        </div>
+        <button class="primary-btn lots-new-btn" id="lots-new-btn">+ Add New Lot</button>
+      </div>
+      <div class="lots-filters-card">
+        <input type="text" id="lots-search" class="lots-search-input" placeholder="Search lots, lot numbers, cases..." />
+        <select id="lots-auction-filter" class="lots-filter-select">
+          <option value="">All Auctions</option>
+        </select>
+        <select id="lots-status-filter" class="lots-filter-select">
+          <option value="">All Statuses</option>
+        </select>
+      </div>
+      <div class="lots-results-count" id="lots-results-count"></div>
+      <div class="lots-grid" id="lots-grid"></div>
+      <div class="lots-empty" id="lots-empty" style="display:none;">No lots found for your filters.</div>
+    </section>
+  </main>
+  <!-- Add New Lot Modal -->
+  <div id="lots-modal-backdrop" class="lots-modal-backdrop" style="display:none;">
+    <div class="lots-modal">
+      <div class="lots-modal-header">
+        <span class="lots-modal-title">Add New Lot</span>
+        <button class="lots-modal-close-btn" id="lots-modal-close-btn">&times;</button>
+      </div>
+      <form class="lots-modal-form" id="lots-modal-form">
+        <div class="lots-modal-row">
+          <label>Lot Number *</label>
+          <input type="text" required id="lot-number" autocomplete="off" />
+        </div>
+        <div class="lots-modal-row">
+          <label>Auction *</label>
+          <select required id="lot-auction">
+            <option value="">Select Auction</option>
+          </select>
+        </div>
+        <div class="lots-modal-row">
+          <label>Status *</label>
+          <select required id="lot-status">
+            <option value="">Select Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Ready">Ready</option>
+            <option value="Sold">Sold</option>
+          </select>
+        </div>
+        <div class="lots-modal-row">
+          <label>Description</label>
+          <textarea id="lot-desc" rows="2"></textarea>
+        </div>
+        <div class="lots-modal-row">
+          <label>Notes</label>
+          <textarea id="lot-notes" rows="2"></textarea>
+        </div>
+        <div class="lots-modal-actions">
+          <button type="submit" class="primary-btn lots-modal-add-btn">+ Add Lot</button>
+          <button type="button" class="lots-modal-cancel-btn" id="lots-modal-cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <div class="footer-row">
+      <div class="footer-col">
+        <div class="footer-logo">
+          <svg width="32" height="32" fill="none" viewBox="0 0 36 36">
+            <rect width="36" height="36" rx="12" fill="#2563eb"/>
+            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
+            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="footer-title">Auction Warehouse System</div>
+        <div class="footer-desc">Complete inventory management solution</div>
+        <div class="footer-meta">© 2024 JPS Surveyors Auction Warehouse &middot; Built with React &amp; TypeScript</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Features</div>
+        <ul class="footer-list">
+          <li>Barcode Scanning</li>
+          <li>Inventory Management</li>
+          <li>Storage Mapping</li>
+          <li>Case Tracking</li>
+          <li>Lots Management</li>
+          <li>Analytics Dashboard</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Core Functions</div>
+        <ul class="footer-list">
+          <li>Item cataloguing</li>
+          <li>Warehouse organization</li>
+          <li>Client case management</li>
+          <li>Lots management</li>
+          <li>Performance analytics</li>
+          <li>Mobile-friendly interface</li>
+          <li>Real-time updates</li>
+          <li>Comprehensive reporting</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+  <script src="lots.js"></script>
+</body>
+</html>
