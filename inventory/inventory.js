@@ -810,3 +810,9 @@ document.addEventListener("DOMContentLoaded", function () {
     alert("Item added!");
   };
 });
+
+// Listen for updates from *this tab* (custom event, e.g., from barcode scanner)
+window.addEventListener("inventory-updated", function() {
+  populateFilters();
+  renderItems();
+});
