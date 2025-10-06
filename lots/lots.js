@@ -103,8 +103,8 @@ function openEditLotModal(lotObj, idx) {
   };
 }
 
-// === Modal Open/Close Logic for Add New Lot ===
-function openLotsModal() {
+// === Modal Open/Close Logic for Add New Lot + Inventory Lot Modal (with selected items) ===
+function openLotsModal(selectedItems) {
   const modalBackdrop = document.getElementById('lots-modal-backdrop');
   const modal = document.querySelector('.lots-modal');
   modal.querySelector('.lots-modal-title').textContent = "Add New Lot";
@@ -112,31 +112,56 @@ function openLotsModal() {
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
 
-  // Clear form
+  // Clear form fields
   document.getElementById('lot-number').value = "";
   document.getElementById('lot-auction').value = "";
   document.getElementById('lot-status').value = "";
   document.getElementById('lot-desc').value = "";
   document.getElementById('lot-notes').value = "";
 
+  // If items were passed in, populate #selected-items-list
+  const itemsListDiv = document.getElementById("selected-items-list");
+  if (selectedItems && itemsListDiv) {
+    itemsListDiv.innerHTML = selectedItems.map((item, idx) => `
+      <div style="margin-bottom:6px;">
+        <span>${item.name || 'Unnamed Item'} (${item.barcode || 'no barcode'})</span>
+        <input type="number" min="1" value="1" id="item-qty-${idx}" style="width:50px; margin-left:10px;" required>
+      </div>
+    `).join('');
+    itemsListDiv.style.display = "";
+  } else if (itemsListDiv) {
+    itemsListDiv.innerHTML = "";
+    itemsListDiv.style.display = "none";
+  }
+
   // Remove previous submit
   const form = document.getElementById("lots-modal-form");
   form.onsubmit = function(e) {
     e.preventDefault();
-    const newLot = {
+    let newLot = {
       number: document.getElementById('lot-number').value.trim(),
       auction: document.getElementById('lot-auction').value.trim(),
       status: document.getElementById('lot-status').value.trim(),
       description: document.getElementById('lot-desc').value.trim(),
       notes: document.getElementById('lot-notes').value.trim()
     };
+    // Add item quantities if items were passed in
+    if (selectedItems && Array.isArray(selectedItems)) {
+      newLot.selectedItems = selectedItems.map((item, idx) => ({
+        ...item,
+        quantity: parseInt(document.getElementById(`item-qty-${idx}`).value, 10) || 1
+      }));
+    }
     lotsData.push(newLot);
     saveLots();
     renderLots(lotsData);
     closeLotsModal();
     alert("Lot added!");
+    // Remove from sessionStorage (so modal doesn't reappear on reload)
+    sessionStorage.removeItem("selectedLotItems");
   };
 }
+
 function closeLotsModal() {
   document.body.style.overflow = "";
   document.body.style.marginRight = "";
@@ -148,11 +173,13 @@ document.addEventListener("DOMContentLoaded", function () {
   loadLots();
   renderLots(lotsData);
 
-  document.getElementById("lots-new-btn").onclick = openLotsModal;
+  document.getElementById("lots-new-btn").onclick = function() {
+    openLotsModal();
+  };
   document.getElementById("lots-modal-close-btn").onclick =
     document.getElementById("lots-modal-cancel-btn").onclick = closeLotsModal;
 
-  // Default modal submit for Add New (will be replaced by Edit when editing)
+  // Default modal submit for Add New (will be replaced by Edit or custom lots modal)
   document.getElementById("lots-modal-form").onsubmit = function(e) {
     e.preventDefault();
     const newLot = {
@@ -168,4 +195,12 @@ document.addEventListener("DOMContentLoaded", function () {
     closeLotsModal();
     alert("Lot added!");
   };
+
+  // === LOTS: Show modal with selected inventory items if coming from Inventory tab ===
+  const selected = sessionStorage.getItem("selectedLotItems");
+  if (selected) {
+    const selectedItems = JSON.parse(selected);
+    openLotsModal(selectedItems);
+    // Do not remove sessionStorage here - it is removed after successful lot creation
+  }
 });
