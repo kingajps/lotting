@@ -129,22 +129,25 @@ const mockInventory = [
 // === LocalStorage load/save logic ===
 
 function getInventory() {
-  // Try to load from aw_inventory_data OR fallback to "inventory" key for compatibility with barcode scanner tab
-  let local = localStorage.getItem(ITEMS_KEY);
-  if (!local) local = localStorage.getItem("inventory");
-  if (local) {
-    try {
-      const arr = JSON.parse(local);
-      if (Array.isArray(arr) && arr.length > 0) return arr;
-    } catch {}
-    // fallback to mock if parse fails or empty
+  let items = [];
+  let localA = localStorage.getItem(ITEMS_KEY);
+  let localB = localStorage.getItem("inventory");
+  if (localA) {
+    try { items = JSON.parse(localA); }
+    catch { items = []; }
   }
-  // fallback to mockInventory if exists
-  if (typeof mockInventory !== "undefined") {
-    return JSON.parse(JSON.stringify(mockInventory));
+  if ((!items || items.length === 0) && localB) {
+    try { items = JSON.parse(localB); }
+    catch { items = []; }
   }
-  return [];
+  if (!items || items.length === 0) {
+    items = JSON.parse(JSON.stringify(mockInventory));
+  }
+  // Always sync both keys so both tabs see the same data
+  saveInventory(items);
+  return items;
 }
+
 function saveInventory(arr) {
   localStorage.setItem(ITEMS_KEY, JSON.stringify(arr));
   localStorage.setItem("inventory", JSON.stringify(arr));
