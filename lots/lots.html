@@ -79,9 +79,19 @@
           <input type="text" required id="lot-number" autocomplete="off" />
         </div>
         <div class="lots-modal-row">
-          <label>Auction *</label>
-          <select required id="lot-auction">
-            <option value="">Select Auction</option>
+          <label>Auction Date *</label>
+          <input type="date" required id="auction-date" />
+        </div>
+        <div class="lots-modal-row">
+          <label>Auction Time *</label>
+          <input type="time" required id="auction-time" />
+        </div>
+        <div class="lots-modal-row">
+          <label>Auction Type *</label>
+          <select required id="auction-type">
+            <option value="">Select Type</option>
+            <option value="Timed">Timed Auction</option>
+            <option value="Live">Live Auction</option>
           </select>
         </div>
         <div class="lots-modal-row">
@@ -94,12 +104,36 @@
           </select>
         </div>
         <div class="lots-modal-row">
+          <label>Reserve Price (£)</label>
+          <input type="number" min="0" step="0.01" id="reserve-price" />
+        </div>
+        <div class="lots-modal-row">
+          <label>Starting Bid (£)</label>
+          <input type="number" min="0" step="0.01" id="starting-bid" />
+        </div>
+        <div class="lots-modal-row">
+          <label>
+            <input type="checkbox" id="allow-absentee" />
+            Allow Absentee Bids
+          </label>
+        </div>
+        <div class="lots-modal-row">
+          <label>
+            <input type="checkbox" id="private-lot" />
+            Private Lot (hidden from public)
+          </label>
+        </div>
+        <div class="lots-modal-row">
           <label>Description</label>
           <textarea id="lot-desc" rows="2"></textarea>
         </div>
         <div class="lots-modal-row">
           <label>Notes</label>
           <textarea id="lot-notes" rows="2"></textarea>
+        </div>
+        <div class="lots-modal-row">
+          <label>Selected Items & Quantities:</label>
+          <div id="selected-items-list"></div>
         </div>
         <div class="lots-modal-actions">
           <button type="submit" class="primary-btn lots-modal-add-btn">+ Add Lot</button>
