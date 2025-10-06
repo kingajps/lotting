@@ -1,5 +1,6 @@
 // === Persistent storage key ===
 const ITEMS_KEY = "aw_inventory_data";
+const ITEMS_KEY = "inventoryItems";
 
 // === Allowed dropdown lists ===
 const CATEGORY_LIST = [
@@ -141,13 +142,10 @@ function getInventory() {
     catch { items = []; }
   }
   if (!items || items.length === 0) {
-    items = JSON.parse(JSON.stringify(mockInventory));
+    items = [];
   }
-  // Always sync both keys so both tabs see the same data
-  saveInventory(items);
   return items;
 }
-
 function saveInventory(arr) {
   localStorage.setItem(ITEMS_KEY, JSON.stringify(arr));
   localStorage.setItem("inventory", JSON.stringify(arr));
@@ -368,8 +366,6 @@ function setupListeners() {
   document.getElementById("inventory-case-filter").addEventListener("change", applyFilters);
   document.getElementById("inventory-sort-filter").addEventListener("change", applyFilters);
 }
-
-
 
 // === Modal logic for + Add New Item ===
 function openInventoryModal() {
