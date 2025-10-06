@@ -778,7 +778,7 @@ document.addEventListener("DOMContentLoaded", function () {
       model: document.getElementById("item-model")?.value.trim() || "",
       year: document.getElementById("item-year")?.value.trim() || "",
       desc: document.getElementById("item-desc").value.trim(),
-      details: document.getElementById("item-desc").value.trim(),
+      details: document.getElementById("item-details").value.trim(),
       barcode: "",
       status: document.getElementById("item-status") ? document.getElementById("item-status").value.trim() : "",
       condition: document.getElementById("item-condition").value.trim(),
