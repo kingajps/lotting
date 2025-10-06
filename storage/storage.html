@@ -5,12 +5,12 @@
   <title>Storage Map | Auction Warehouse</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="storage.css" />
-</head>
   <script>
-  if (sessionStorage.getItem("aw_logged_in") !== "1") {
-    window.location.href = "login.html";
-  }
-</script>
+    if (sessionStorage.getItem("aw_logged_in") !== "1") {
+      window.location.href = "login.html";
+    }
+  </script>
+</head>
 <body>
   <!-- Header -->
   <header class="app-header">
@@ -57,6 +57,39 @@
       <div id="zone-groups"></div>
     </section>
   </main>
+  <!-- Van Booking Modal -->
+  <div id="van-modal-backdrop" class="modal-backdrop" style="display:none;">
+    <div class="modal">
+      <h2>Book JPS Van</h2>
+      <form id="van-modal-form">
+        <label>Date:
+          <input type="date" id="van-date" required>
+        </label>
+        <label>Time From:
+          <input type="time" id="van-time-from" required>
+        </label>
+        <label>Time To:
+          <input type="time" id="van-time-to" required>
+        </label>
+        <label>Company/Companies:
+          <textarea id="van-companies" rows="2" required></textarea>
+        </label>
+        <label>Address(es):
+          <textarea id="van-addresses" rows="2" required></textarea>
+        </label>
+        <label>Case(s):
+          <textarea id="van-cases" rows="2"></textarea>
+        </label>
+        <label>Used by:
+          <input type="text" id="van-user" required>
+        </label>
+        <div class="modal-actions">
+          <button type="submit" class="primary-btn">Save</button>
+          <button type="button" id="van-modal-cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <!-- Footer -->
   <footer class="dashboard-footer">
     <div class="footer-row">
