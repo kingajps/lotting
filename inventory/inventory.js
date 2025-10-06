@@ -387,6 +387,7 @@ function openInventoryModal() {
   }
 
   document.getElementById("inventory-modal-backdrop").style.display = "flex";
+  document.getElementById("inventory-modal").scrollTop = 0; // Scroll to top when opened
 }
 
 function closeInventoryModal() {
