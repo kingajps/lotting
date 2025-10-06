@@ -766,7 +766,6 @@ document.addEventListener("DOMContentLoaded", function () {
   populateFilters();
   renderItems();
   setupListeners();
-  });
 
   document.getElementById("inventory-new-btn").onclick = openInventoryModal;
   document.getElementById("inventory-modal-close-btn").onclick =
