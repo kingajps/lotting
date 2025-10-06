@@ -1,6 +1,6 @@
 // Barcode Scanner Tab JS (Enhanced with Inventory Modal & LocalStorage Integration, with dropdowns and unit auto-formatting)
 
-const ITEMS_KEY = "inventoryItems"; // <-- Make sure this is the same in inventory tab!
+const ITEMS_KEY = "aw_inventory_data"; // Match the inventory tab!
 
 // === Utility Functions ===
 function getCurrentUser() {
