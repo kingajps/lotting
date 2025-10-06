@@ -166,6 +166,8 @@ function closeLotsModal() {
   document.body.style.overflow = "";
   document.body.style.marginRight = "";
   document.getElementById('lots-modal-backdrop').style.display = "none";
+  // Always remove selectedLotItems when closing modal (cancel/close)
+  sessionStorage.removeItem("selectedLotItems");
 }
 
 // === Init ===
@@ -196,11 +198,17 @@ document.addEventListener("DOMContentLoaded", function () {
     alert("Lot added!");
   };
 
-  // === LOTS: Show modal with selected inventory items if coming from Inventory tab ===
+  // === LOTS: Show modal ONLY if coming from Inventory tab with selection ===
   const selected = sessionStorage.getItem("selectedLotItems");
-  if (selected) {
-    const selectedItems = JSON.parse(selected);
-    openLotsModal(selectedItems);
-    // Do not remove sessionStorage here - it is removed after successful lot creation
+  if (selected && selected !== "[]" && selected !== "") {
+    try {
+      const selectedItems = JSON.parse(selected);
+      if (Array.isArray(selectedItems) && selectedItems.length > 0) {
+        openLotsModal(selectedItems);
+      }
+    } catch (e) {
+      // If parse fails, clear out invalid sessionStorage value
+      sessionStorage.removeItem("selectedLotItems");
+    }
   }
 });
