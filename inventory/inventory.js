@@ -296,6 +296,7 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("storage", function (event) {
     if (event.key === "inventory" || event.key === ITEMS_KEY) renderItems();
   });
+}); // <--- Don't forget this!
 
 // === Populate Filters ===
 function populateFilters() {
