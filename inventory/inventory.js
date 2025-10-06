@@ -402,7 +402,7 @@ function openInventoryEditModal(itemObj, idx) {
   modalBackdrop.style.display = 'flex';
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
-
+  
   modal.innerHTML = `
     <button class="detail-modal-close-btn" id="inventory-edit-close-btn">&times;</button>
     <div class="detail-modal-title">Edit Item</div>
@@ -568,8 +568,8 @@ modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
     condition: modal.querySelector('#edit-item-condition').value.trim(),
     status: modal.querySelector('#edit-item-status').value.trim(),
     barcode: modal.querySelector('#edit-item-barcode').value.trim(),
+    desc: modal.querySelector('#edit-item-desc').value.trim(),
     details: modal.querySelector('#edit-item-details').value.trim(),
-    desc: modal.querySelector('#edit-item-details').value.trim(),
     estimatedValue: parseFloat(modal.querySelector('#edit-item-value').value) || 0,
     value: modal.querySelector('#edit-item-value-str').value.trim(),
     location: modal.querySelector('#edit-item-location').value.trim(),
