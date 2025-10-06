@@ -713,14 +713,15 @@ function showDetailModal(item) {
     modalBackdrop.style.display = "none";
   };
 
-document.getElementById('inventory-detail-edit-btn').onclick = function () {
-  modalBackdrop.style.display = "none";
-  document.body.style.overflow = "";
-  document.body.style.marginRight = "";
-  const allItems = getInventory();
-  const idx = allItems.findIndex(i => i.name === item.name && i.barcode === item.barcode);
-  openInventoryEditModal(item, idx);
-};
+  document.getElementById('inventory-detail-edit-btn').onclick = function () {
+    modalBackdrop.style.display = "none";
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    const allItems = getInventory();
+    const idx = allItems.findIndex(i => i.name === item.name && i.barcode === item.barcode);
+    openInventoryEditModal(item, idx);
+  };
+}
 
 // Print label handler (NEW, add below the above)
 document.querySelector(".detail-modal-secondary-btn[title='Print Label']").onclick = function () {
@@ -765,6 +766,7 @@ document.addEventListener("DOMContentLoaded", function () {
   populateFilters();
   renderItems();
   setupListeners();
+  });
 
   document.getElementById("inventory-new-btn").onclick = openInventoryModal;
   document.getElementById("inventory-modal-close-btn").onclick =
