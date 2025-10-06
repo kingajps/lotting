@@ -274,14 +274,16 @@ function showItemModal(itemData, saveCallback) {
       loggedBy: getCurrentUser(),
       loggedAt: getCurrentDateTime()
     };
-    // Save to inventory!
-    const inventory = getInventory();
-    inventory.push(item);
-    saveInventory(inventory);
-    if (typeof saveCallback === "function") saveCallback(item);
-    removeOldModal();
-    alert("Item added to inventory!");
-  };
+    
+// Save to inventory!
+const inventory = getInventory();
+inventory.push(item);
+saveInventory(inventory);
+window.dispatchEvent(new Event("inventory-updated")); // <-- Added: notify inventory tab to refresh
+if (typeof saveCallback === "function") saveCallback(item);
+removeOldModal();
+alert("Item added to inventory!");
+};
 }
 function removeOldModal() {
   const old = document.querySelector(".inventory-detail-modal");
@@ -302,6 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const inventory = getInventory();
       inventory.push(newItem);
       saveInventory(inventory);
+      window.dispatchEvent(new Event("inventory-updated")); // <-- Added
       alert("Item added to inventory!");
     });
   }
@@ -320,6 +323,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const inventory = getInventory();
       inventory.push(newItem);
       saveInventory(inventory);
+      window.dispatchEvent(new Event("inventory-updated")); // <-- Added
       alert("Item added to inventory (from camera scan)!");
     });
   };
@@ -327,3 +331,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
 window.addEventListener("hashchange", removeOldModal);
 window.addEventListener("popstate", removeOldModal);
+window.addEventListener("inventory-updated", renderItems);
