@@ -768,9 +768,8 @@ document.addEventListener("DOMContentLoaded", function () {
   setupListeners();
 
   document.getElementById("inventory-new-btn").onclick = openInventoryModal;
-  document.getElementById("inventory-modal-close-btn").onclick =
-    document.getElementById("inventory-modal-cancel-btn").onclick = closeInventoryModal;
-
+  document.getElementById("inventory-modal-close-btn").onclick = closeInventoryModal;
+  document.getElementById("inventory-modal-cancel-btn").onclick = closeInventoryModal;
   document.getElementById("inventory-modal-form").onsubmit = function(e) {
     e.preventDefault();
     const newItem = {
