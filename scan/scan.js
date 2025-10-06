@@ -293,9 +293,11 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Please enter a barcode.");
       return;
     }
+    const demoItem = randomDemoItem(barcode); // <-- You forgot this line!
     showItemModal(demoItem, function(newItem) {
-  alert("Item added to inventory!");
-});
+      alert("Item added to inventory!");
+    });
+  } // <-- This bracket was missing
 
   document.getElementById("barcode-lookup-btn").onclick = handleManualBarcodeEntry;
   document.getElementById("barcode-manual-input").addEventListener("keydown", function(e) {
@@ -308,8 +310,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const scannedBarcode = randomFrom(demoBarcodes);
     const demoItem = randomDemoItem(scannedBarcode);
     showItemModal(demoItem, function(newItem) {
-  alert("Item added to inventory!");
-});
+      alert("Item added to inventory!");
+    });
+  }; // <-- This bracket was missing
 
-window.addEventListener("hashchange", removeOldModal);
-window.addEventListener("popstate", removeOldModal);
+  window.addEventListener("hashchange", removeOldModal);
+  window.addEventListener("popstate", removeOldModal);
+}); // <-- This bracket was missing
