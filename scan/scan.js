@@ -331,4 +331,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
 window.addEventListener("hashchange", removeOldModal);
 window.addEventListener("popstate", removeOldModal);
-window.addEventListener("inventory-updated", renderItems);
