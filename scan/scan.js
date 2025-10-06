@@ -293,16 +293,9 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Please enter a barcode.");
       return;
     }
-    const demoItem = randomDemoItem(barcode);
     showItemModal(demoItem, function(newItem) {
-      // Save to inventory and persist
-      const inventory = getInventory();
-      inventory.push(newItem);
-      saveInventory(inventory);
-      window.dispatchEvent(new Event("inventory-updated"));
-      alert("Item added to inventory!");
-    });
-  }
+  alert("Item added to inventory!");
+});
 
   document.getElementById("barcode-lookup-btn").onclick = handleManualBarcodeEntry;
   document.getElementById("barcode-manual-input").addEventListener("keydown", function(e) {
@@ -315,13 +308,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const scannedBarcode = randomFrom(demoBarcodes);
     const demoItem = randomDemoItem(scannedBarcode);
     showItemModal(demoItem, function(newItem) {
-      const inventory = getInventory();
-      inventory.push(newItem);
-      saveInventory(inventory);
-      window.dispatchEvent(new Event("inventory-updated"));
-      alert("Item added to inventory (from camera scan)!");
-    });
-  };
+  alert("Item added to inventory!");
 });
 
 window.addEventListener("hashchange", removeOldModal);
