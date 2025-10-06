@@ -153,6 +153,9 @@ function saveInventory(arr) {
   localStorage.setItem("inventory", JSON.stringify(arr));
 }
 
+// === Multi-select State ===
+let selectedItems = []; // store array of item IDs (or fallback index if no id)
+
 // === Listen for external inventory changes (e.g., from barcode tab) ===
 window.addEventListener("storage", function(event) {
   if (event.key === ITEMS_KEY || event.key === "inventory") {
@@ -170,14 +173,22 @@ function renderItems(filteredItems = null) {
   if (items.length === 0) {
     document.getElementById("inventory-empty").style.display = "";
     document.getElementById("inventory-results-count").textContent = `Showing 0 of ${allItems.length} items`;
+    updateNewLotBtn();
     return;
   }
   document.getElementById("inventory-empty").style.display = "none";
   document.getElementById("inventory-results-count").textContent = `Showing ${items.length} of ${allItems.length} items`;
   items.forEach((i, idx) => {
+    // Ensure unique ID
+    if (!i.id) {
+      i.id = "inv-" + (i.barcode || idx + "-" + Date.now());
+      saveInventory(allItems);
+    }
+
     const card = document.createElement("div");
     card.className = "inventory-card";
     card.innerHTML = `
+      <input type="checkbox" class="inventory-select-checkbox" data-id="${i.id}" style="position:absolute;left:10px;top:10px;z-index:2;">
       <div class="inventory-card-header">
         <span class="inventory-card-icon">🗃️</span>
       </div>
@@ -205,6 +216,20 @@ function renderItems(filteredItems = null) {
       </div>
     `;
     grid.appendChild(card);
+  });
+
+  // Attach select-checkbox listeners
+  document.querySelectorAll('.inventory-select-checkbox').forEach(checkbox => {
+    const id = checkbox.getAttribute("data-id");
+    checkbox.checked = selectedItems.includes(id);
+    checkbox.onchange = function() {
+      if (checkbox.checked) {
+        if (!selectedItems.includes(id)) selectedItems.push(id);
+      } else {
+        selectedItems = selectedItems.filter(selId => selId !== id);
+      }
+      updateNewLotBtn();
+    };
   });
 
   // Attach view button listeners
@@ -237,7 +262,40 @@ function renderItems(filteredItems = null) {
       }
     };
   });
+
+  updateNewLotBtn();
 }
+
+// === New Lot button logic ===
+const newLotBtn = document.getElementById("inventory-new-lot-btn");
+function updateNewLotBtn() {
+  if (!newLotBtn) return;
+  newLotBtn.disabled = selectedItems.length === 0;
+}
+
+// === On "+ New Lot" Click: Store selection and redirect ===
+if (newLotBtn) {
+  newLotBtn.addEventListener("click", function () {
+    if (selectedItems.length === 0) return;
+    const allItems = getInventory();
+    const selectedInventory = allItems.filter(item => selectedItems.includes(item.id));
+    sessionStorage.setItem("selectedLotItems", JSON.stringify(selectedInventory));
+    // Redirect to lots tab
+    window.location.href = "/lotting/lots/lots.html";
+  });
+}
+
+// === Initialization ===
+document.addEventListener("DOMContentLoaded", function () {
+  renderItems();
+
+  // Listen for custom inventory updates (from barcode tab etc.)
+  window.addEventListener("inventory-updated", renderItems);
+
+  // Listen for storage changes from other tabs
+  window.addEventListener("storage", function (event) {
+    if (event.key === "inventory" || event.key === ITEMS_KEY) renderItems();
+  });
 
 // === Populate Filters ===
 function populateFilters() {
@@ -309,6 +367,8 @@ function setupListeners() {
   document.getElementById("inventory-case-filter").addEventListener("change", applyFilters);
   document.getElementById("inventory-sort-filter").addEventListener("change", applyFilters);
 }
+
+
 
 // === Modal logic for + Add New Item ===
 function openInventoryModal() {
