@@ -700,7 +700,7 @@ function showDetailModal(item) {
     <div class="detail-modal-barcode">${item.barcode || ""}</div>
     <div class="detail-modal-actions">
       <button class="primary-btn" title="Edit Item" id="inventory-detail-edit-btn">Edit Item</button>
-      <button class="detail-modal-secondary-btn" title="Print Label">Print Label</button>
+      <button class="detail-modal-secondary-btn" title="Print Label" id="detail-modal-print-btn">Print Label</button>
       <button class="detail-modal-secondary-btn" id="detail-modal-close-btn2" title="Close">Close</button>
     </div>
   `;
@@ -721,12 +721,13 @@ function showDetailModal(item) {
     const idx = allItems.findIndex(i => i.name === item.name && i.barcode === item.barcode);
     openInventoryEditModal(item, idx);
   };
-}
 
-// Print label handler (NEW, add below the above)
-document.querySelector(".detail-modal-secondary-btn[title='Print Label']").onclick = function () {
-  generateItemLabelPDF(item);
-};
+  // Print label handler (must be inside this function!)
+  document.getElementById('detail-modal-print-btn').onclick = function () {
+    generateItemLabelPDF(item);
+  };
+} // <--- This bracket was missing!
+
 
 function generateItemLabelPDF(item) {
   // Generate a random string for the QR code (demo)
