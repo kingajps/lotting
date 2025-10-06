@@ -10,8 +10,6 @@
       window.location.href = "login.html";
     }
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
   <!-- Header -->
@@ -52,7 +50,10 @@
           <h2 class="inventory-title">Inventory Manager</h2>
           <div class="inventory-desc">Manage and track all items in your warehouse</div>
         </div>
-        <button class="primary-btn inventory-new-btn" id="inventory-new-btn">+ Add New Item</button>
+        <div class="inventory-header-actions">
+          <button class="primary-btn" id="inventory-new-btn">+ Add New Item</button>
+          <button class="primary-btn" id="inventory-new-lot-btn" disabled>+ New Lot</button>
+        </div>
       </div>
       <div class="inventory-filters-card">
         <input type="text" id="inventory-search" class="inventory-search-input" placeholder="Search items, barcodes, brands..." />
@@ -70,7 +71,14 @@
         </div>
       </div>
       <div class="inventory-results-count" id="inventory-results-count"></div>
-      <div class="inventory-grid" id="inventory-grid"></div>
+      <div class="inventory-grid" id="inventory-grid">
+        <!-- Dynamically rendered with JS. Each card will include:
+          <div class="inventory-card">
+            <input type="checkbox" class="inventory-select-checkbox" data-index="ITEM_INDEX">
+            <!-- ...rest of item fields... -->
+          </div>
+        -->
+      </div>
       <div class="inventory-empty" id="inventory-empty" style="display:none;">No items found for your filters.</div>
     </section>
   </main>
