@@ -586,15 +586,17 @@ modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
     notes: modal.querySelector('#edit-item-notes').value.trim()
   };
 
-  // Save the updated inventory back to storage
-  saveInventory(allItems);
+    // Save the updated inventory back to storage
+    saveInventory(allItems);
 
-  alert("Item updated!");
-  document.body.style.overflow = "";
-  document.body.style.marginRight = "";
-  modalBackdrop.style.display = "none";
-  renderItems();
-};
+    alert("Item updated!");
+    document.body.style.overflow = "";
+    document.body.style.marginRight = "";
+    modalBackdrop.style.display = "none";
+    renderItems();
+  };
+
+} // <--- This is the missing bracket! Now your function is closed properly.
   
 // === Item Details Modal Logic ===
 function showDetailModal(item) {
