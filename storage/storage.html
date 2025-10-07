@@ -57,43 +57,59 @@
       <div id="zone-groups"></div>
     </section>
   </main>
-  <!-- Van Booking Calendar Modal (with Month Navigation and Booking Fields) -->
-  <div id="van-modal-backdrop" class="zone-modal-backdrop" style="display:none;">
-    <div class="zone-modal" style="max-width:520px;">
-      <div class="zone-modal-header">
-        JPS Van Booking Calendar
-        <button type="button" class="zone-modal-close-btn" id="van-modal-cancel-btn">&times;</button>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <button id="van-prev-month-btn" type="button">&lt; Prev</button>
-        <span id="van-calendar-month-label" style="font-weight:bold;"></span>
-        <button id="van-next-month-btn" type="button">Next &gt;</button>
-      </div>
-      <div id="van-calendar-container"></div>
-      <form id="van-booking-form" style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
-        <input type="hidden" id="van-booking-date" />
-        <label>Who is booking:
-          <input type="text" id="van-user" required />
-        </label>
-        <label>From (date & time):
-          <input type="datetime-local" id="van-from" required />
-        </label>
-        <label>To (date & time):
-          <input type="datetime-local" id="van-to" required />
-        </label>
-        <label>Company/Companies:
-          <textarea id="van-companies" rows="2" required></textarea>
-        </label>
-        <label>Address(es):
-          <textarea id="van-addresses" rows="2" required></textarea>
-        </label>
-        <label>Case(s):
-          <textarea id="van-cases" rows="2"></textarea>
-        </label>
-        <button type="submit" class="primary-btn" id="van-book-btn" disabled>Book Van</button>
-      </form>
+<!-- Van Booking Calendar Modal (with Month Navigation and Booking Fields) -->
+<div id="van-modal-backdrop" class="zone-modal-backdrop" style="display:none;">
+  <div class="zone-modal" style="max-width:540px;">
+    <div class="zone-modal-header">
+      JPS Van Booking Calendar
+      <button type="button" class="zone-modal-close-btn" id="van-modal-cancel-btn">&times;</button>
     </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <button id="van-prev-month-btn" type="button">&lt; Prev</button>
+      <span id="van-calendar-month-label" style="font-weight:bold;"></span>
+      <button id="van-next-month-btn" type="button">Next &gt;</button>
+    </div>
+    <div id="van-calendar-container"></div>
+
+    <form id="van-booking-form" style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
+      <input type="hidden" id="van-booking-date" />
+      <input type="hidden" id="van-booking-end-date" />
+      <label>Who is booking:
+        <input type="text" id="van-user" required />
+      </label>
+      <label>
+        <input type="checkbox" id="van-one-day" checked />
+        Book for one day only
+      </label>
+      <div id="van-date-range-row" style="display: none;">
+        <label>To (date): <input type="date" id="van-to-date" /></label>
+      </div>
+      <label>From (time): <input type="time" id="van-from-time" required /></label>
+      <label id="van-to-time-label">To (time): <input type="time" id="van-to-time" required /></label>
+      <label>Company/Companies:
+        <textarea id="van-companies" rows="2" required></textarea>
+      </label>
+      <label>Address(es):
+        <textarea id="van-addresses" rows="2" required></textarea>
+      </label>
+      <label>Case(s):
+        <textarea id="van-cases" rows="2"></textarea>
+      </label>
+      <button type="submit" class="primary-btn" id="van-book-btn" disabled>Book Van</button>
+    </form>
   </div>
+</div>
+
+<!-- Booking Info Modal -->
+<div id="van-booking-info-backdrop" class="zone-modal-backdrop" style="display:none;">
+  <div class="zone-modal" style="max-width:440px;">
+    <div class="zone-modal-header">
+      JPS Van Booking Info
+      <button type="button" class="zone-modal-close-btn" id="van-booking-info-close-btn">&times;</button>
+    </div>
+    <div id="van-booking-info-content" style="padding:10px 0;"></div>
+  </div>
+</div>
 
   <!-- Footer -->
   <footer class="dashboard-footer">
