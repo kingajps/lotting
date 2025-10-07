@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Finances | Auction Warehouse</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="finances.css" />
+  <script>
+    if (sessionStorage.getItem("aw_logged_in") !== "1") {
+      window.location.href = "../login.html";
+    }
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-row">
+        <span class="logo-icon">
+          <svg width="36" height="36" fill="none" viewBox="0 0 36 36">
+            <rect width="36" height="36" rx="12" fill="#2563eb"/>
+            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
+            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
+          </svg>
+        </span>
+        <div>
+          <h1 class="header-title">Auction Warehouse</h1>
+          <span class="app-subtitle">Management System</span>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Main nav -->
+  <nav class="nav-tabs" aria-label="Main navigation">
+    <a class="tab-btn" href="/lotting/index.html">Dashboard</a>
+    <a class="tab-btn" href="/lotting/scan/scan.html">Barcode Scanner</a>
+    <a class="tab-btn" href="/lotting/inventory/inventory.html">Inventory</a>
+    <a class="tab-btn" href="/lotting/storage/storage.html">Storage Map</a>
+    <a class="tab-btn" href="/lotting/cases/cases.html">Cases</a>
+    <a class="tab-btn" href="/lotting/lots/lots.html">Lots</a>
+    <a class="tab-btn active" href="/lotting/finances/finances.html">Finances</a>
+    <a class="tab-btn" href="/lotting/analytics/analytics.html">Analytics</a>
+  </nav>
+
+  <main class="main-container">
+    <nav class="breadcrumb">
+      <span>Auction Warehouse</span> / <span>Finances</span>
+    </nav>
+
+    <!-- Finance sub-tabs -->
+    <div class="finance-tabs" role="tablist" aria-label="Finances sub navigation">
+      <button class="finance-tab-btn active" role="tab" aria-selected="true" data-tab="invoices">Invoices</button>
+      <button class="finance-tab-btn" role="tab" aria-selected="false" data-tab="settlements">Settlements</button>
+      <button class="finance-tab-btn" role="tab" aria-selected="false" data-tab="shipping">Shipping</button>
+      <button class="finance-tab-btn" role="tab" aria-selected="false" data-tab="invoice-payments">Invoice Payments</button>
+      <button class="finance-tab-btn" role="tab" aria-selected="false" data-tab="settlement-payments">Settlement Payments</button>
+    </div>
+
+    <!-- Invoices -->
+    <section id="tab-invoices" class="finance-tab-section active" tabindex="0">
+      <div class="finance-header-row">
+        <div>
+          <h2 class="finance-title">Invoices</h2>
+          <div class="finance-desc">Reports generated in the Cases tab</div>
+        </div>
+        <div class="finance-actions">
+          <input type="text" id="invoice-search" class="finance-search-input" placeholder="Search invoices, clients, case..." />
+        </div>
+      </div>
+      <div class="finance-card">
+        <div class="finance-results-count" id="invoices-results-count"></div>
+        <div class="table-scroll">
+          <table class="finance-table" id="invoices-table" aria-label="Invoices table">
+            <thead>
+              <tr>
+                <th>Invoice No</th>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Case</th>
+                <th>Total</th>
+                <th style="width:220px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invoices-tbody"></tbody>
+          </table>
+        </div>
+        <div class="finance-empty" id="invoices-empty" style="display:none;">No invoices found.</div>
+      </div>
+    </section>
+
+    <!-- Settlements -->
+    <section id="tab-settlements" class="finance-tab-section" tabindex="0">
+      <div class="finance-header-row">
+        <div>
+          <h2 class="finance-title">Settlements</h2>
+          <div class="finance-desc">Consignor settlements (coming soon)</div>
+        </div>
+      </div>
+      <div class="finance-card">
+        <div class="finance-results-count" id="settlements-results-count"></div>
+        <div class="finance-empty">No settlements yet.</div>
+      </div>
+    </section>
+
+    <!-- Shipping -->
+    <section id="tab-shipping" class="finance-tab-section" tabindex="0">
+      <div class="finance-header-row">
+        <div>
+          <h2 class="finance-title">Shipping</h2>
+          <div class="finance-desc">Shipping quotes and charges (coming soon)</div>
+        </div>
+      </div>
+      <div class="finance-card">
+        <div class="finance-results-count" id="shipping-results-count"></div>
+        <div class="finance-empty">No shipping records yet.</div>
+      </div>
+    </section>
+
+    <!-- Invoice Payments -->
+    <section id="tab-invoice-payments" class="finance-tab-section" tabindex="0">
+      <div class="finance-header-row">
+        <div>
+          <h2 class="finance-title">Invoice Payments</h2>
+          <div class="finance-desc">Payments received against invoices</div>
+        </div>
+      </div>
+      <div class="finance-card">
+        <div class="finance-results-count" id="invpay-results-count"></div>
+        <div class="finance-empty">No payments recorded yet.</div>
+      </div>
+    </section>
+
+    <!-- Settlement Payments -->
+    <section id="tab-settlement-payments" class="finance-tab-section" tabindex="0">
+      <div class="finance-header-row">
+        <div>
+          <h2 class="finance-title">Settlement Payments</h2>
+          <div class="finance-desc">Payments out to consignors</div>
+        </div>
+      </div>
+      <div class="finance-card">
+        <div class="finance-results-count" id="setlpay-results-count"></div>
+        <div class="finance-empty">No payments recorded yet.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <div class="footer-row">
+      <div class="footer-col">
+        <div class="footer-logo">
+          <svg width="32" height="32" fill="none" viewBox="0 0 36 36">
+            <rect width="36" height="36" rx="12" fill="#2563eb"/>
+            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
+            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="footer-title">Auction Warehouse System</div>
+        <div class="footer-desc">Complete inventory management solution</div>
+        <div class="footer-meta">© 2025 JPS Surveyors Auction Warehouse</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Features</div>
+        <ul class="footer-list">
+          <li>Barcode Scanning</li>
+          <li>Inventory Management</li>
+          <li>Storage Mapping</li>
+          <li>Case Tracking</li>
+          <li>Lots Management</li>
+          <li>Analytics Dashboard</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Core Functions</div>
+        <ul class="footer-list">
+          <li>Item cataloguing</li>
+          <li>Warehouse organization</li>
+          <li>Client case management</li>
+          <li>Performance analytics</li>
+          <li>Mobile-friendly interface</li>
+          <li>Real-time updates</li>
+          <li>Comprehensive reporting</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- jsPDF in case you want to re-generate PDFs from here too -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+  <script src="finances.js"></script>
+</body>
+</html>
