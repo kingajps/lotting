@@ -369,24 +369,27 @@ function renderZones(zones, editable = false) {
 // --- Calendar Modal State ---
 let vanCalMonth = null; // 0-11
 let vanCalYear = null;
+let vanSelectedDate = null;
 
 function openVanCalendarModal() {
-  // Set to current month/year when opening
   const today = new Date();
   vanCalYear = today.getFullYear();
   vanCalMonth = today.getMonth();
+  vanSelectedDate = null;
   document.getElementById("van-modal-backdrop").style.display = "flex";
   renderVanCalendar();
+  // Prefill user field with logged in user if available
+  document.getElementById("van-user").value = sessionStorage.getItem("aw_logged_in_username") || "";
+  // Clear form and disable button
+  document.getElementById("van-booking-form").reset();
+  document.getElementById("van-book-btn").disabled = true;
 }
 
 function closeVanCalendarModal() {
   document.getElementById("van-modal-backdrop").style.display = "none";
 }
 
-// Attach close handler
 document.getElementById("van-modal-cancel-btn").onclick = closeVanCalendarModal;
-
-// Month navigation
 document.getElementById("van-prev-month-btn").onclick = function() {
   if (vanCalMonth === 0) {
     vanCalMonth = 11;
@@ -394,7 +397,10 @@ document.getElementById("van-prev-month-btn").onclick = function() {
   } else {
     vanCalMonth--;
   }
+  vanSelectedDate = null;
   renderVanCalendar();
+  document.getElementById("van-booking-form").reset();
+  document.getElementById("van-book-btn").disabled = true;
 };
 document.getElementById("van-next-month-btn").onclick = function() {
   if (vanCalMonth === 11) {
@@ -403,7 +409,10 @@ document.getElementById("van-next-month-btn").onclick = function() {
   } else {
     vanCalMonth++;
   }
+  vanSelectedDate = null;
   renderVanCalendar();
+  document.getElementById("van-booking-form").reset();
+  document.getElementById("van-book-btn").disabled = true;
 };
 
 function renderVanCalendar() {
@@ -422,7 +431,6 @@ function renderVanCalendar() {
   const bookedDaysSet = new Set(
     bookings
       .flatMap(b => {
-        // If booking has endDate, mark all days in range
         if (b.endDate) {
           const days = [];
           let d = new Date(b.date);
@@ -448,26 +456,54 @@ function renderVanCalendar() {
   for(let d=1; d<=lastDay.getDate(); d++) {
     const dateStr = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
     const isBooked = bookedDaysSet.has(dateStr);
-    html += `<td style="background:${isBooked ? "#ffcccc":"#eaffef"};cursor:${isBooked?"not-allowed":"pointer"};" 
-      ${isBooked ? "" : `onclick="bookVan('${dateStr}')"`}>
+    const isSelected = vanSelectedDate === dateStr;
+    html += `<td style="background:${isBooked ? "#ffcccc" : isSelected ? "#93e4c1" : "#eaffef"};cursor:${isBooked?"not-allowed":"pointer"};border:${isSelected?"2px solid #2563eb":"1px solid #e3eaf2"};" 
+      ${isBooked ? "" : `onclick="window.selectVanBookingDate('${dateStr}')"`}>
       ${d}${isBooked ? "<br><span style='color:#c00;font-size:0.9em;'>Booked</span>":""}
     </td>`;
     if((firstDay.getDay() + d)%7 === 0) html += "</tr><tr>";
   }
   html += "</tr></table>";
-  html += `<div style="margin-top:15px;color:#888;">Click any free (green) date to book the van.</div>`;
+  html += `<div style="margin-top:15px;color:#888;">Click any free (green) date to select it for booking. Then complete the fields below.</div>`;
   container.innerHTML = html;
 }
 
-// Book the van on a free day (supports future range logic)
-window.bookVan = function(dateStr) {
-  // For booking a range, you could prompt for an end date here.
-  if (!confirm(`Book JPS Van for ${dateStr}?`)) return;
+window.selectVanBookingDate = function(dateStr) {
+  vanSelectedDate = dateStr;
+  document.getElementById("van-booking-date").value = dateStr;
+  renderVanCalendar();
+  document.getElementById("van-book-btn").disabled = false;
+};
+
+// --- Booking form logic ---
+document.getElementById("van-booking-form").onsubmit = function(e) {
+  e.preventDefault();
+  if (!vanSelectedDate) {
+    alert("Please select a date from the calendar.");
+    return;
+  }
+  const from = document.getElementById("van-from").value;
+  const to = document.getElementById("van-to").value;
+  const user = document.getElementById("van-user").value.trim();
+  const companies = document.getElementById("van-companies").value.trim();
+  const addresses = document.getElementById("van-addresses").value.trim();
+  const cases = document.getElementById("van-cases").value.trim();
+
+  // Optional: Check for overlap with existing bookings here
+
   let bookings = JSON.parse(localStorage.getItem("vanBookings") || "[]");
-  bookings.push({date: dateStr, user: sessionStorage.getItem("aw_logged_in_username") || ""});
+  bookings.push({
+    date: vanSelectedDate,
+    from: from,
+    to: to,
+    user: user,
+    companies: companies,
+    addresses: addresses,
+    cases: cases
+  });
   localStorage.setItem("vanBookings", JSON.stringify(bookings));
   alert("Van booked!");
-  renderVanCalendar();
+  closeVanCalendarModal();
 };
 
 // Expose for HTML inline handlers
