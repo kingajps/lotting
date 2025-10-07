@@ -90,10 +90,13 @@ function openLotsModal(selectedItems = []) {
   const modalBackdrop = document.getElementById('lots-modal-backdrop');
   const modal = document.querySelector('.lots-modal');
   modal.querySelector('.lots-modal-title').textContent = "Add New Lot";
+
+  // Compute scrollbar width BEFORE hiding overflow to prevent layout shift
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+
   modalBackdrop.style.display = "flex";
   document.body.style.overflow = "hidden";
-  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0
-    ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
 
   // Clear form fields
   document.getElementById('lot-number').value = "";
@@ -219,9 +222,13 @@ function openEditLotModal(idx) {
   const modalBackdrop = document.getElementById('lots-modal-backdrop');
   const modal = document.querySelector('.lots-modal');
   modal.querySelector('.lots-modal-title').textContent = "Edit Lot";
+
+  // Compute scrollbar width BEFORE hiding overflow to prevent layout shift
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+
   modalBackdrop.style.display = "flex";
   document.body.style.overflow = "hidden";
-  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
 
   // Pre-fill form fields
   document.getElementById('lot-number').value = lotObj.number || "";
