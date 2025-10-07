@@ -164,6 +164,68 @@ window.addEventListener("storage", function(event) {
   }
 });
 
+// === Helper to convert file to data URL ===
+function fileToDataURL(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function filesToDataURLs(files) {
+  const imgs = [];
+  for (const f of files) {
+    if (!f.type || !f.type.startsWith("image/")) continue;
+    try {
+      imgs.push(await fileToDataURL(f));
+    } catch (e) {
+      console.error("Failed to read image", e);
+    }
+  }
+  return imgs;
+}
+
+function renderPhotoThumbs(container, photos, onRemove) {
+  container.innerHTML = "";
+  photos.forEach((src, idx) => {
+    const wrap = document.createElement("div");
+    wrap.style.position = "relative";
+    wrap.style.width = "80px";
+    wrap.style.height = "80px";
+    wrap.style.borderRadius = "6px";
+    wrap.style.overflow = "hidden";
+    wrap.style.border = "1px solid #ddd";
+    wrap.style.marginRight = "8px";
+    wrap.style.marginBottom = "8px";
+    wrap.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = "Photo";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+    const del = document.createElement("button");
+    del.type = "button";
+    del.textContent = "×";
+    del.title = "Remove";
+    del.style.position = "absolute";
+    del.style.top = "2px";
+    del.style.right = "2px";
+    del.style.width = "20px";
+    del.style.height = "20px";
+    del.style.border = "none";
+    del.style.borderRadius = "50%";
+    del.style.color = "#fff";
+    del.style.background = "rgba(0,0,0,0.6)";
+    del.style.cursor = "pointer";
+    del.onclick = () => onRemove(idx);
+    wrap.appendChild(img);
+    wrap.appendChild(del);
+    container.appendChild(wrap);
+  });
+}
+
 // === Render Items Grid ===
 function renderItems(filteredItems = null) {
   const allItems = getInventory();
@@ -185,28 +247,33 @@ function renderItems(filteredItems = null) {
       saveInventory(allItems);
     }
 
+    const hasImage = Array.isArray(i.photos) && i.photos.length > 0;
+    const headerInner = hasImage
+      ? `<img src="${i.photos[0]}" alt="${i.name || "Item"} photo" style="display:block;width:100%;height:160px;object-fit:cover;border-radius:14px 14px 0 0;">`
+      : `<span class="inventory-card-icon">🗃️</span>`;
+
     const card = document.createElement("div");
     card.className = "inventory-card";
     card.innerHTML = `
       <input type="checkbox" class="inventory-select-checkbox" data-id="${i.id}" style="position:absolute;left:10px;top:10px;z-index:2;">
-      <div class="inventory-card-header">
-        <span class="inventory-card-icon">🗃️</span>
+      <div class="inventory-card-header" style="${hasImage ? "padding:0;height:160px;overflow:hidden;" : ""}">
+        ${headerInner}
       </div>
       <div class="inventory-card-main">
-        <div class="inventory-card-title">${i.name}</div>
-        <div class="inventory-card-desc">${i.model || i.desc}</div>
-        <div class="inventory-card-barcode">${i.barcode}</div>
+        <div class="inventory-card-title">${i.name || ""}</div>
+        <div class="inventory-card-desc">${i.model || i.desc || ""}</div>
+        <div class="inventory-card-barcode">${i.barcode || ""}</div>
         <div class="inventory-card-row">
-          <span class="inventory-card-status ${i.status?.toLowerCase()}">${i.status}</span>
-          <span class="inventory-card-condition">${i.condition}</span>
+          <span class="inventory-card-status ${i.status ? i.status.toLowerCase() : ""}">${i.status || ""}</span>
+          <span class="inventory-card-condition">${i.condition || ""}</span>
         </div>
         <div class="inventory-card-row">
-          <span class="inventory-card-value">${i.value}</span>
-          <span class="inventory-card-category">${i.category}</span>
+          <span class="inventory-card-value">${i.value || ""}</span>
+          <span class="inventory-card-category">${i.category || ""}</span>
         </div>
         <div class="inventory-card-row">
-          <span class="inventory-card-location">📍 ${i.location}</span>
-          <span class="inventory-card-case">#${i.case}</span>
+          <span class="inventory-card-location">📍 ${i.location || ""}</span>
+          <span class="inventory-card-case">${i.case ? "#" + i.case : ""}</span>
         </div>
       </div>
       <div class="inventory-card-actions">
@@ -285,19 +352,6 @@ if (newLotBtn) {
   });
 }
 
-// === Initialization ===
-document.addEventListener("DOMContentLoaded", function () {
-  renderItems();
-
-  // Listen for custom inventory updates (from barcode tab etc.)
-  window.addEventListener("inventory-updated", renderItems);
-
-  // Listen for storage changes from other tabs
-  window.addEventListener("storage", function (event) {
-    if (event.key === "inventory" || event.key === ITEMS_KEY) renderItems();
-  });
-}); // <--- Don't forget this!
-
 // === Populate Filters ===
 function populateFilters() {
   const allItems = getInventory();
@@ -369,8 +423,6 @@ function setupListeners() {
   document.getElementById("inventory-sort-filter").addEventListener("change", applyFilters);
 }
 
-
-
 // === Modal logic for + Add New Item ===
 function openInventoryModal() {
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -388,7 +440,6 @@ function openInventoryModal() {
 
   let statusSel = document.getElementById("item-status");
   if (!statusSel) {
-    // Add status dropdown if not present (for compatibility)
     const row = document.querySelector("#inventory-modal-form .inventory-modal-row:last-of-type");
     statusSel = document.createElement("select");
     statusSel.id = "item-status";
@@ -447,8 +498,43 @@ function openInventoryModal() {
     loggedAtField.value = (new Date()).toLocaleString();
   }
 
+  // Photos: wire up add + preview for this open modal
+  window._newItemPhotos = [];
+  const addBtn = document.getElementById('item-add-photos-btn');
+  const fileInput = document.getElementById('item-photo-input');
+  const preview = document.getElementById('item-photo-preview');
+  if (preview) {
+    // make preview a flex wrap
+    preview.style.display = "flex";
+    preview.style.flexWrap = "wrap";
+    preview.style.gap = "0";
+  }
+
+  function redraw() {
+    renderPhotoThumbs(preview, window._newItemPhotos, (idx) => {
+      window._newItemPhotos.splice(idx, 1);
+      redraw();
+    });
+  }
+
+  if (addBtn && fileInput && preview) {
+    addBtn.onclick = () => fileInput.click();
+    fileInput.onchange = async (event) => {
+      const files = Array.from(event.target.files || []);
+      if (!files.length) return;
+      const imgs = await filesToDataURLs(files);
+      window._newItemPhotos.push(...imgs);
+      redraw();
+      fileInput.value = "";
+    };
+    // reset state
+    window._newItemPhotos = [];
+    preview.innerHTML = "";
+  }
+
   document.getElementById("inventory-modal-backdrop").style.display = "flex";
-  document.getElementById("inventory-modal").scrollTop = 0; // Scroll to top when opened
+  const modalEl = document.querySelector(".inventory-modal");
+  if (modalEl) modalEl.scrollTop = 0;
 }
 
 function closeInventoryModal() {
@@ -521,6 +607,7 @@ function openInventoryEditModal(itemObj, idx) {
       </div>
       <div class="detail-modal-section-title">Description</div>
       <textarea id="edit-item-details" rows="2" style="width:100%;">${itemObj.details||itemObj.desc||''}</textarea>
+
       <div class="detail-modal-section-title">Value</div>
       <div class="detail-modal-row">
         <div>
@@ -532,6 +619,7 @@ function openInventoryEditModal(itemObj, idx) {
           <input type="text" id="edit-item-value-str" value="${itemObj.value||''}" style="width:90px;">
         </div>
       </div>
+
       <div class="detail-modal-section-title">Location & Case</div>
       <div class="detail-modal-row">
         <div>
@@ -548,6 +636,7 @@ function openInventoryEditModal(itemObj, idx) {
           </select>
         </div>
       </div>
+
       <div class="detail-modal-section-title">Tracking Information</div>
       <div class="detail-modal-row">
         <div>
@@ -559,6 +648,7 @@ function openInventoryEditModal(itemObj, idx) {
           <input type="text" id="edit-item-loggedat" value="${itemObj.loggedAt||''}" style="width:150px;">
         </div>
       </div>
+
       <div class="detail-modal-section-title">Dimensions</div>
       <div class="detail-modal-dims-row">
         <div>
@@ -578,8 +668,17 @@ function openInventoryEditModal(itemObj, idx) {
           <input type="text" id="edit-item-weight" value="${itemObj.dims?.weight||''}" style="width:60px;">
         </div>
       </div>
+
       <div class="detail-modal-section-title">Notes</div>
       <textarea id="edit-item-notes" rows="2" style="width:100%;">${itemObj.notes||''}</textarea>
+
+      <div class="detail-modal-section-title">Photos</div>
+      <div class="detail-modal-row" style="align-items:center; gap:10px;">
+        <button type="button" id="edit-item-add-photos-btn" class="detail-modal-secondary-btn">Add Photos</button>
+        <input type="file" id="edit-item-photo-input" accept="image/*" multiple capture="environment" style="display:none;">
+      </div>
+      <div id="edit-item-photo-preview" style="display:flex;flex-wrap:wrap;gap:0;"></div>
+
       <div class="detail-modal-actions" style="margin-top:18px;">
         <button class="primary-btn" type="submit">Save</button>
         <button class="detail-modal-secondary-btn" type="button" id="inventory-edit-close-btn2">Cancel</button>
@@ -614,39 +713,68 @@ function openInventoryEditModal(itemObj, idx) {
     }
   });
 
-modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
-  e.preventDefault();
+  // Photos: maintain an editable list
+  let editPhotos = Array.isArray(itemObj.photos) ? [...itemObj.photos] : [];
+  const editAddBtn = modal.querySelector('#edit-item-add-photos-btn');
+  const editFileInput = modal.querySelector('#edit-item-photo-input');
+  const editPreview = modal.querySelector('#edit-item-photo-preview');
 
-  // Get the latest inventory from storage
-  let allItems = getInventory();
+  function redrawEdit() {
+    renderPhotoThumbs(editPreview, editPhotos, (idx) => {
+      editPhotos.splice(idx, 1);
+      redrawEdit();
+    });
+  }
 
-  // Update the item at idx
-  allItems[idx] = {
-    name: modal.querySelector('#edit-item-name').value.trim(),
-    brand: modal.querySelector('#edit-item-brand').value.trim(),
-    model: modal.querySelector('#edit-item-model').value.trim(),
-    year: modal.querySelector('#edit-item-year').value.trim(),
-    category: modal.querySelector('#edit-item-category').value.trim(),
-    condition: modal.querySelector('#edit-item-condition').value.trim(),
-    status: modal.querySelector('#edit-item-status').value.trim(),
-    barcode: modal.querySelector('#edit-item-barcode').value.trim(),
-    desc: modal.querySelector('#edit-item-desc').value.trim(),
-    details: modal.querySelector('#edit-item-details').value.trim(),
-    estimatedValue: parseFloat(modal.querySelector('#edit-item-value').value) || 0,
-    value: modal.querySelector('#edit-item-value-str').value.trim(),
-    location: modal.querySelector('#edit-item-location').value.trim(),
-    unit: modal.querySelector('#edit-item-unit').value.trim(),
-    case: modal.querySelector('#edit-item-case').value.trim(),
-    loggedBy: modal.querySelector('#edit-item-loggedby').value.trim(),
-    loggedAt: modal.querySelector('#edit-item-loggedat').value.trim(),
-    dims: {
-      length: modal.querySelector('#edit-item-length').value.trim(),
-      width: modal.querySelector('#edit-item-width').value.trim(),
-      height: modal.querySelector('#edit-item-height').value.trim(),
-      weight: modal.querySelector('#edit-item-weight').value.trim()
-    },
-    notes: modal.querySelector('#edit-item-notes').value.trim()
-  };
+  if (editAddBtn && editFileInput && editPreview) {
+    editAddBtn.onclick = () => editFileInput.click();
+    editFileInput.onchange = async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      const imgs = await filesToDataURLs(files);
+      editPhotos.push(...imgs);
+      redrawEdit();
+      editFileInput.value = "";
+    };
+    redrawEdit(); // show any existing photos
+  }
+
+  modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
+    e.preventDefault();
+
+    // Get the latest inventory from storage
+    let allItems = getInventory();
+
+    // Preserve existing id if present
+    const existing = allItems[idx] || {};
+    allItems[idx] = {
+      id: itemObj.id || existing.id || undefined,
+      name: modal.querySelector('#edit-item-name').value.trim(),
+      brand: modal.querySelector('#edit-item-brand').value.trim(),
+      model: modal.querySelector('#edit-item-model').value.trim(),
+      year: modal.querySelector('#edit-item-year').value.trim(),
+      category: modal.querySelector('#edit-item-category').value.trim(),
+      condition: modal.querySelector('#edit-item-condition').value.trim(),
+      status: modal.querySelector('#edit-item-status').value.trim(),
+      barcode: modal.querySelector('#edit-item-barcode').value.trim(),
+      desc: itemObj.desc || "", // keep original short desc if you use it elsewhere
+      details: modal.querySelector('#edit-item-details').value.trim(),
+      estimatedValue: parseFloat(modal.querySelector('#edit-item-value').value) || 0,
+      value: modal.querySelector('#edit-item-value-str').value.trim(),
+      location: modal.querySelector('#edit-item-location').value.trim(),
+      unit: modal.querySelector('#edit-item-unit').value.trim(),
+      case: modal.querySelector('#edit-item-case').value.trim(),
+      loggedBy: modal.querySelector('#edit-item-loggedby').value.trim(),
+      loggedAt: modal.querySelector('#edit-item-loggedat').value.trim(),
+      dims: {
+        length: modal.querySelector('#edit-item-length').value.trim(),
+        width: modal.querySelector('#edit-item-width').value.trim(),
+        height: modal.querySelector('#edit-item-height').value.trim(),
+        weight: modal.querySelector('#edit-item-weight').value.trim()
+      },
+      notes: modal.querySelector('#edit-item-notes').value.trim(),
+      photos: editPhotos
+    };
 
     // Save the updated inventory back to storage
     saveInventory(allItems);
@@ -657,8 +785,7 @@ modal.querySelector('#inventory-edit-form').onsubmit = function(e) {
     modalBackdrop.style.display = "none";
     renderItems();
   };
-
-} // <--- This is the missing bracket! Now your function is closed properly.
+}
   
 // === Item Details Modal Logic ===
 function showDetailModal(item) {
@@ -668,9 +795,17 @@ function showDetailModal(item) {
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
 
+  const photosHtml = Array.isArray(item.photos) && item.photos.length
+    ? `<div class="detail-modal-section-title">Photos</div>
+       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:10px;">
+         ${item.photos.map(src => `<img src="${src}" alt="Item photo" style="width:100%;height:110px;object-fit:cover;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.12);">`).join("")}
+       </div>`
+    : "";
+
   modal.innerHTML = `
     <button class="detail-modal-close-btn" id="detail-modal-close-btn">&times;</button>
     <div class="detail-modal-title">Item Details</div>
+    ${photosHtml}
     <div class="detail-modal-section-title">Basic Information</div>
     <div class="detail-modal-row">
       <div>
@@ -782,16 +917,14 @@ function showDetailModal(item) {
     document.body.style.overflow = "";
     document.body.style.marginRight = "";
     const allItems = getInventory();
-    const idx = allItems.findIndex(i => i.name === item.name && i.barcode === item.barcode);
-    openInventoryEditModal(item, idx);
+    const idx = allItems.findIndex(i => i.name === item.name && i.barcode === item.barcode && i.loggedAt === item.loggedAt);
+    openInventoryEditModal(item, idx >= 0 ? idx : 0);
   };
 
-  // Print label handler (must be inside this function!)
   document.getElementById('detail-modal-print-btn').onclick = function () {
     generateItemLabelPDF(item);
   };
-} // <--- This bracket was missing!
-
+}
 
 function generateItemLabelPDF(item) {
   // Generate a random string for the QR code (demo)
@@ -825,55 +958,73 @@ function generateItemLabelPDF(item) {
   // Download PDF
   doc.save("Label_" + (item.name || "item") + ".pdf");
 }
-  
+
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
   populateFilters();
   renderItems();
   setupListeners();
 
-  document.getElementById("inventory-new-btn").onclick = openInventoryModal;
-  document.getElementById("inventory-modal-close-btn").onclick = closeInventoryModal;
-  document.getElementById("inventory-modal-cancel-btn").onclick = closeInventoryModal;
-  document.getElementById("inventory-modal-form").onsubmit = function(e) {
-    e.preventDefault();
-    const newItem = {
-      name: document.getElementById("item-name").value.trim(),
-      brand: document.getElementById("item-brand").value.trim(),
-      model: document.getElementById("item-model")?.value.trim() || "",
-      year: document.getElementById("item-year")?.value.trim() || "",
-      desc: document.getElementById("item-desc").value.trim(),
-      details: document.getElementById("item-details").value.trim(),
-      barcode: "",
-      status: document.getElementById("item-status") ? document.getElementById("item-status").value.trim() : "",
-      condition: document.getElementById("item-condition").value.trim(),
-      value: "£" + (parseFloat(document.getElementById("item-value").value.replace(/^£/, "")) || 0),
-      estimatedValue: parseFloat(document.getElementById("item-value").value.replace(/^£/, "")) || 0,
-      category: document.getElementById("item-category").value.trim(),
-      location: document.getElementById("item-location").value.trim(),
-      unit: "",
-      case: document.getElementById("item-case").value.trim(),
-      loggedBy: document.getElementById("item-loggedby")?.value.trim() || (sessionStorage.getItem("aw_logged_in_username") || "kingajps"),
-      loggedAt: document.getElementById("item-loggedat")?.value.trim() || (new Date()).toLocaleString(),
-      dims: {
-        length: document.getElementById("item-length")?.value ? document.getElementById("item-length").value.replace(/cm$/,"") + "cm" : "",
-        width: document.getElementById("item-width")?.value ? document.getElementById("item-width").value.replace(/cm$/,"") + "cm" : "",
-        height: document.getElementById("item-height")?.value ? document.getElementById("item-height").value.replace(/cm$/,"") + "cm" : "",
-        weight: document.getElementById("item-weight")?.value ? document.getElementById("item-weight").value.replace(/kg$/,"") + "kg" : ""
-      },
-      notes: document.getElementById("item-notes")?.value.trim() || ""
-    };
-    let allItems = getInventory();          // Always get fresh array
-    allItems.push(newItem);                 // Add new item
-    saveInventory(allItems);                // Save back to storage
-    renderItems();                          // Refresh grid
-    closeInventoryModal();
-    alert("Item added!");
-  };
-});
+  // Open/close add modal
+  const newBtn = document.getElementById("inventory-new-btn");
+  const closeBtn = document.getElementById("inventory-modal-close-btn");
+  const cancelBtn = document.getElementById("inventory-modal-cancel-btn");
+  if (newBtn) newBtn.onclick = openInventoryModal;
+  if (closeBtn) closeBtn.onclick = closeInventoryModal;
+  if (cancelBtn) cancelBtn.onclick = closeInventoryModal;
 
-// Listen for updates from *this tab* (custom event, e.g., from barcode scanner)
-window.addEventListener("inventory-updated", function() {
-  populateFilters();
-  renderItems();
+  // Add item submit
+  const form = document.getElementById("inventory-modal-form");
+  if (form) {
+    form.onsubmit = async function(e) {
+      e.preventDefault();
+      const newItem = {
+        name: document.getElementById("item-name").value.trim(),
+        brand: document.getElementById("item-brand").value.trim(),
+        model: document.getElementById("item-model")?.value.trim() || "",
+        year: document.getElementById("item-year")?.value.trim() || "",
+        desc: document.getElementById("item-desc").value.trim(),
+        details: document.getElementById("item-details").value.trim(),
+        barcode: "",
+        status: document.getElementById("item-status") ? document.getElementById("item-status").value.trim() : "",
+        condition: document.getElementById("item-condition").value.trim(),
+        value: "£" + (parseFloat(document.getElementById("item-value").value.replace(/^£/, "")) || 0),
+        estimatedValue: parseFloat(document.getElementById("item-value").value.replace(/^£/, "")) || 0,
+        category: document.getElementById("item-category").value.trim(),
+        location: document.getElementById("item-location").value.trim(),
+        unit: "",
+        case: document.getElementById("item-case").value.trim(),
+        loggedBy: document.getElementById("item-loggedby")?.value.trim() || (sessionStorage.getItem("aw_logged_in_username") || "kingajps"),
+        loggedAt: document.getElementById("item-loggedat")?.value.trim() || (new Date()).toLocaleString(),
+        dims: {
+          length: document.getElementById("item-length")?.value ? document.getElementById("item-length").value.replace(/cm$/,"") + "cm" : "",
+          width: document.getElementById("item-width")?.value ? document.getElementById("item-width").value.replace(/cm$/,"") + "cm" : "",
+          height: document.getElementById("item-height")?.value ? document.getElementById("item-height").value.replace(/cm$/,"") + "cm" : "",
+          weight: document.getElementById("item-weight")?.value ? document.getElementById("item-weight").value.replace(/kg$/,"") + "kg" : ""
+        },
+        notes: document.getElementById("item-notes")?.value.trim() || "",
+        photos: Array.isArray(window._newItemPhotos) ? window._newItemPhotos.slice(0) : []
+      };
+      let allItems = getInventory();
+      allItems.push(newItem);
+      saveInventory(allItems);
+      renderItems();
+      closeInventoryModal();
+      alert("Item added!");
+      // cleanup photos preview
+      window._newItemPhotos = [];
+      const preview = document.getElementById("item-photo-preview");
+      if (preview) preview.innerHTML = "";
+      const fileInput = document.getElementById('item-photo-input');
+      if (fileInput) fileInput.value = "";
+    };
+  }
+
+  // Listen for custom inventory updates (from barcode tab etc.)
+  window.addEventListener("inventory-updated", renderItems);
+
+  // Listen for storage changes from other tabs
+  window.addEventListener("storage", function (event) {
+    if (event.key === "inventory" || event.key === ITEMS_KEY) renderItems();
+  });
 });
