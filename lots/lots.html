@@ -66,7 +66,7 @@
       <div class="lots-empty" id="lots-empty" style="display:none;">No lots found for your filters.</div>
     </section>
   </main>
-  <!-- Add New Lot Modal (only once, outside main, before footer) -->
+  <!-- Add New Lot Modal (Add/Edit) -->
   <div id="lots-modal-backdrop" class="lots-modal-backdrop" style="display:none;">
     <div class="lots-modal">
       <div class="lots-modal-header">
@@ -77,6 +77,10 @@
         <div class="lots-modal-row">
           <label>Lot Number *</label>
           <input type="text" required id="lot-number" autocomplete="off" />
+        </div>
+        <div class="lots-modal-row">
+          <label>Title</label>
+          <input type="text" id="lot-title" autocomplete="off" />
         </div>
         <div class="lots-modal-row">
           <label>Auction *</label>
@@ -108,23 +112,21 @@
           </select>
         </div>
         <div class="lots-modal-row">
+          <label>Hammer Target (£)</label>
+          <input type="number" min="0" step="0.01" id="hammer-target" />
+        </div>
+        <div class="lots-modal-row">
           <label>Reserve Price (£)</label>
           <input type="number" min="0" step="0.01" id="reserve-price" />
         </div>
         <div class="lots-modal-row">
-          <label>Starting Bid (£)</label>
-          <input type="number" min="0" step="0.01" id="starting-bid" />
-        </div>
-        <div class="lots-modal-row">
           <label>
-            <input type="checkbox" id="allow-absentee" />
-            Allow Absentee Bids
+            <input type="checkbox" id="listed-toggle" />
+            Listed
           </label>
-        </div>
-        <div class="lots-modal-row">
           <label>
-            <input type="checkbox" id="private-lot" />
-            Private Lot (hidden from public)
+            <input type="checkbox" id="published-toggle" />
+            Published
           </label>
         </div>
         <div class="lots-modal-row">
@@ -132,8 +134,24 @@
           <textarea id="lot-desc" rows="2"></textarea>
         </div>
         <div class="lots-modal-row">
-          <label>Notes</label>
-          <textarea id="lot-notes" rows="2"></textarea>
+          <label>Important Information</label>
+          <textarea id="important-info" rows="2"></textarea>
+        </div>
+        <div class="lots-modal-row">
+          <label>Payment Information</label>
+          <textarea id="payment-info" rows="2"></textarea>
+        </div>
+        <div class="lots-modal-row">
+          <label>Collection Information</label>
+          <textarea id="collection-info" rows="2"></textarea>
+        </div>
+        <div class="lots-modal-row">
+          <label>Auction Location</label>
+          <input type="text" id="auction-location" />
+        </div>
+        <div class="lots-modal-row">
+          <label>Contact Information</label>
+          <input type="text" id="contact-info" />
         </div>
         <div class="lots-modal-row">
           <label>Select Items to add:</label>
@@ -144,12 +162,18 @@
           <div id="selected-items-list"></div>
         </div>
         <div class="lots-modal-actions">
-          <button type="submit" class="primary-btn lots-modal-add-btn">+ Add Lot</button>
+          <button type="submit" class="primary-btn lots-modal-add-btn">+ Save Lot</button>
           <button type="button" class="lots-modal-cancel-btn" id="lots-modal-cancel-btn">Cancel</button>
         </div>
       </form>
     </div>
   </div>
+
+  <!-- Lot Details Modal (View) -->
+  <div id="lots-detail-modal-backdrop" class="lots-detail-modal-backdrop" style="display:none;">
+    <div class="lots-detail-modal" id="lots-detail-modal"></div>
+  </div>
+
   <!-- Footer -->
   <footer class="dashboard-footer">
     <div class="footer-row">
@@ -163,7 +187,7 @@
         </div>
         <div class="footer-title">Auction Warehouse System</div>
         <div class="footer-desc">Complete inventory management solution</div>
-        <div class="footer-meta">© 2025 JPS Surveyors Auction Warehouse</div>
+        <div class="footer-meta">© 2024 JPS Surveyors Auction Warehouse &middot; Built with React &amp; TypeScript</div>
       </div>
       <div class="footer-col">
         <div class="footer-heading">Features</div>
@@ -171,9 +195,8 @@
           <li>Barcode Scanning</li>
           <li>Inventory Management</li>
           <li>Storage Mapping</li>
-          <li>Van Booking System</li>
           <li>Case Tracking</li>
-          <li>Lot Management</li>
+          <li>Lots Management</li>
           <li>Analytics Dashboard</li>
         </ul>
       </div>
@@ -183,6 +206,7 @@
           <li>Item cataloguing</li>
           <li>Warehouse organization</li>
           <li>Client case management</li>
+          <li>Lots management</li>
           <li>Performance analytics</li>
           <li>Mobile-friendly interface</li>
           <li>Real-time updates</li>
