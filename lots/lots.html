@@ -1,188 +1,276 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Lots Manager | Auction Warehouse</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="lots.css" />
-  <script>
-    if (sessionStorage.getItem("aw_logged_in") !== "1") {
-      window.location.href = "../login.html";
+// === Persistent storage key ===
+const LOTS_KEY = "aw_lots_data";
+
+// === Mock Data for Lots ===
+const mockLots = [
+  {
+    number: "LOT-001",
+    auction: "February Auction",
+    auctionDate: "2025-02-15",
+    auctionTime: "12:00",
+    auctionType: "Timed",
+    status: "Pending",
+    reservePrice: "0",
+    startingBid: "0",
+    allowAbsentee: false,
+    privateLot: false,
+    description: "Antique vase in good condition.",
+    notes: "Needs authentication.",
+    selectedItems: []
+  }
+];
+
+// === LocalStorage load/save logic ===
+function loadLots() {
+  let lots = [];
+  const local = localStorage.getItem(LOTS_KEY);
+  if (local) {
+    try { lots = JSON.parse(local); }
+    catch { lots = JSON.parse(JSON.stringify(mockLots)); }
+  } else {
+    lots = JSON.parse(JSON.stringify(mockLots));
+  }
+  return lots;
+}
+function saveLots(lots) {
+  localStorage.setItem(LOTS_KEY, JSON.stringify(lots));
+}
+
+// === Render Lots Grid ===
+function renderLots(lots) {
+  const grid = document.getElementById("lots-grid");
+  grid.innerHTML = "";
+  if (!lots || lots.length === 0) {
+    document.getElementById("lots-empty").style.display = "";
+    document.getElementById("lots-results-count").textContent = `Showing 0 of 0 lots`;
+    return;
+  }
+  document.getElementById("lots-empty").style.display = "none";
+  document.getElementById("lots-results-count").textContent = `Showing ${lots.length} of ${lots.length} lots`;
+  lots.forEach((l, idx) => {
+    const card = document.createElement("div");
+    card.className = "lots-card";
+    card.innerHTML = `
+      <div class="lots-card-title-row">
+        <div class="lots-card-title">${l.number}</div>
+        <span class="lots-card-status-badge ${l.status ? l.status.toLowerCase() : ''}">${l.status || ""}</span>
+      </div>
+      <div class="lots-card-meta">
+        <div class="lots-card-meta-row">
+          <span class="lots-card-meta-label">Auction:</span>
+          <span class="lots-card-meta-val bold">${l.auction || ""}</span>
+        </div>
+        <div class="lots-card-meta-row">
+          <span class="lots-card-meta-label">Date:</span>
+          <span class="lots-card-meta-val">${l.auctionDate || ""} ${l.auctionTime || ""}</span>
+        </div>
+        <div class="lots-card-meta-row">
+          <span class="lots-card-meta-label">Type:</span>
+          <span class="lots-card-meta-val">${l.auctionType || ""}</span>
+        </div>
+      </div>
+      <div class="lots-card-desc">${l.description || ""}</div>
+      <div class="lots-card-actions">
+        <button class="lots-card-edit-btn" data-index="${idx}" title="Edit">&#9998; Edit</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  document.querySelectorAll('.lots-card-edit-btn').forEach(btn => {
+    btn.onclick = function() {
+      const idx = Number(btn.getAttribute('data-index'));
+      openEditLotModal(idx);
+    };
+  });
+}
+
+// === Modal Open/Close Logic for Add New Lot + Inventory Lot Modal (with selected items) ===
+function openLotsModal(selectedItems) {
+  const modalBackdrop = document.getElementById('lots-modal-backdrop');
+  const modal = document.querySelector('.lots-modal');
+  modal.querySelector('.lots-modal-title').textContent = "Add New Lot";
+  modalBackdrop.style.display = "flex";
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
+
+  // Clear form fields
+  document.getElementById('lot-number').value = "";
+  document.getElementById('lot-auction').value = "";
+  document.getElementById('auction-date').value = "";
+  document.getElementById('auction-time').value = "";
+  document.getElementById('auction-type').value = "";
+  document.getElementById('lot-status').value = "";
+  document.getElementById('reserve-price').value = "";
+  document.getElementById('starting-bid').value = "";
+  document.getElementById('allow-absentee').checked = false;
+  document.getElementById('private-lot').checked = false;
+  document.getElementById('lot-desc').value = "";
+  document.getElementById('lot-notes').value = "";
+
+  // Populate selected items with quantity fields
+  const itemsListDiv = document.getElementById("selected-items-list");
+  if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
+    itemsListDiv.innerHTML = selectedItems.map((item, idx) => `
+      <div style="margin-bottom:6px;">
+        <span>${item.name || 'Unnamed Item'} (${item.barcode || 'no barcode'})</span>
+        <input type="number" min="1" value="1" id="item-qty-${idx}" style="width:50px; margin-left:10px;" required>
+      </div>
+    `).join('');
+    itemsListDiv.style.display = "";
+  } else {
+    itemsListDiv.innerHTML = "";
+    itemsListDiv.style.display = "none";
+  }
+
+  // Remove previous submit
+  const form = document.getElementById("lots-modal-form");
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    let lots = loadLots();
+
+    let newLot = {
+      number: document.getElementById('lot-number').value.trim(),
+      auction: document.getElementById('lot-auction').value.trim(),
+      auctionDate: document.getElementById('auction-date').value.trim(),
+      auctionTime: document.getElementById('auction-time').value.trim(),
+      auctionType: document.getElementById('auction-type').value.trim(),
+      status: document.getElementById('lot-status').value.trim(),
+      reservePrice: document.getElementById('reserve-price').value,
+      startingBid: document.getElementById('starting-bid').value,
+      allowAbsentee: document.getElementById('allow-absentee').checked,
+      privateLot: document.getElementById('private-lot').checked,
+      description: document.getElementById('lot-desc').value.trim(),
+      notes: document.getElementById('lot-notes').value.trim(),
+      selectedItems: []
+    };
+
+    if (selectedItems && Array.isArray(selectedItems)) {
+      newLot.selectedItems = selectedItems.map((item, idx) => ({
+        ...item,
+        quantity: parseInt(document.getElementById(`item-qty-${idx}`).value, 10) || 1
+      }));
     }
-  </script>
-</head>
-<body>
-  <!-- Header -->
-  <header class="app-header">
-    <div class="header-content">
-      <div class="logo-row">
-        <span class="logo-icon">
-          <!-- SVG, copy from other tabs -->
-          <svg width="36" height="36" fill="none" viewBox="0 0 36 36">
-            <rect width="36" height="36" rx="12" fill="#2563eb"/>
-            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
-            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
-          </svg>
-        </span>
-        <div>
-          <h1 class="header-title">Auction Warehouse</h1>
-          <span class="app-subtitle">Management System</span>
-        </div>
+
+    lots.push(newLot);
+    saveLots(lots);
+    renderLots(lots);
+    closeLotsModal();
+    alert("Lot added!");
+    sessionStorage.removeItem("selectedLotItems");
+  };
+}
+
+function closeLotsModal() {
+  document.body.style.overflow = "";
+  document.body.style.marginRight = "";
+  document.getElementById('lots-modal-backdrop').style.display = "none";
+  sessionStorage.removeItem("selectedLotItems");
+}
+
+// === Edit Modal Logic (for completeness, edit in-place and save all lots) ===
+function openEditLotModal(idx) {
+  let lots = loadLots();
+  const lotObj = lots[idx];
+  if (!lotObj) return;
+  const modalBackdrop = document.getElementById('lots-modal-backdrop');
+  const modal = document.querySelector('.lots-modal');
+  modal.querySelector('.lots-modal-title').textContent = "Edit Lot";
+  modalBackdrop.style.display = "flex";
+  document.body.style.overflow = "hidden";
+  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
+
+  // Pre-fill form fields
+  document.getElementById('lot-number').value = lotObj.number || "";
+  document.getElementById('lot-auction').value = lotObj.auction || "";
+  document.getElementById('auction-date').value = lotObj.auctionDate || "";
+  document.getElementById('auction-time').value = lotObj.auctionTime || "";
+  document.getElementById('auction-type').value = lotObj.auctionType || "";
+  document.getElementById('lot-status').value = lotObj.status || "";
+  document.getElementById('reserve-price').value = lotObj.reservePrice || "";
+  document.getElementById('starting-bid').value = lotObj.startingBid || "";
+  document.getElementById('allow-absentee').checked = !!lotObj.allowAbsentee;
+  document.getElementById('private-lot').checked = !!lotObj.privateLot;
+  document.getElementById('lot-desc').value = lotObj.description || "";
+  document.getElementById('lot-notes').value = lotObj.notes || "";
+
+  // Prepopulate selected items & quantities if present
+  const itemsListDiv = document.getElementById("selected-items-list");
+  if (lotObj.selectedItems && lotObj.selectedItems.length > 0) {
+    itemsListDiv.innerHTML = lotObj.selectedItems.map((item, idx) => `
+      <div style="margin-bottom:6px;">
+        <span>${item.name || 'Unnamed Item'} (${item.barcode || 'no barcode'})</span>
+        <input type="number" min="1" value="${item.quantity || 1}" id="item-qty-${idx}" style="width:50px; margin-left:10px;" required>
       </div>
-    </div>
-  </header>
-  <nav class="nav-tabs" aria-label="Main navigation">
-    <a class="tab-btn" href="/lotting/index.html">Dashboard</a>
-    <a class="tab-btn" href="/lotting/scan/scan.html">Barcode Scanner</a>
-    <a class="tab-btn" href="/lotting/inventory/inventory.html">Inventory</a>
-    <a class="tab-btn" href="/lotting/storage/storage.html">Storage Map</a>
-    <a class="tab-btn" href="/lotting/cases/cases.html">Cases</a>
-    <a class="tab-btn active" href="/lotting/lots/lots.html">Lots</a>
-    <a class="tab-btn" href="/lotting/analytics/analytics.html">Analytics</a>
-  </nav>
-  <main class="main-container">
-    <nav class="breadcrumb">
-      <span>Auction Warehouse</span> / <span>Lots</span>
-    </nav>
-    <section id="tab-lots" class="tab-section active" tabindex="0">
-      <div class="lots-header-row">
-        <div>
-          <h2 class="lots-title">Lots Manager</h2>
-          <div class="lots-desc">Manage and view lots for upcoming auctions</div>
-        </div>
-        <button class="primary-btn lots-new-btn" id="lots-new-btn">+ Add New Lot</button>
-      </div>
-      <div class="lots-filters-card">
-        <input type="text" id="lots-search" class="lots-search-input" placeholder="Search lots, lot numbers, cases..." />
-        <select id="lots-auction-filter" class="lots-filter-select">
-          <option value="">All Auctions</option>
-        </select>
-        <select id="lots-status-filter" class="lots-filter-select">
-          <option value="">All Statuses</option>
-        </select>
-      </div>
-      <div class="lots-results-count" id="lots-results-count"></div>
-      <div class="lots-grid" id="lots-grid"></div>
-      <div class="lots-empty" id="lots-empty" style="display:none;">No lots found for your filters.</div>
-    </section>
-  </main>
-  <!-- Add New Lot Modal -->
-  <div id="lots-modal-backdrop" class="lots-modal-backdrop" style="display:none;">
-    <div class="lots-modal">
-      <div class="lots-modal-header">
-        <span class="lots-modal-title">Add New Lot</span>
-        <button class="lots-modal-close-btn" id="lots-modal-close-btn">&times;</button>
-      </div>
-      <form class="lots-modal-form" id="lots-modal-form">
-        <div class="lots-modal-row">
-          <label>Lot Number *</label>
-          <input type="text" required id="lot-number" autocomplete="off" />
-        </div>
-        <div class="lots-modal-row">
-          <label>Auction Date *</label>
-          <input type="date" required id="auction-date" />
-        </div>
-        <div class="lots-modal-row">
-          <label>Auction Time *</label>
-          <input type="time" required id="auction-time" />
-        </div>
-        <div class="lots-modal-row">
-          <label>Auction Type *</label>
-          <select required id="auction-type">
-            <option value="">Select Type</option>
-            <option value="Timed">Timed Auction</option>
-            <option value="Live">Live Auction</option>
-          </select>
-        </div>
-        <div class="lots-modal-row">
-          <label>Status *</label>
-          <select required id="lot-status">
-            <option value="">Select Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Ready">Ready</option>
-            <option value="Sold">Sold</option>
-          </select>
-        </div>
-        <div class="lots-modal-row">
-          <label>Reserve Price (£)</label>
-          <input type="number" min="0" step="0.01" id="reserve-price" />
-        </div>
-        <div class="lots-modal-row">
-          <label>Starting Bid (£)</label>
-          <input type="number" min="0" step="0.01" id="starting-bid" />
-        </div>
-        <div class="lots-modal-row">
-          <label>
-            <input type="checkbox" id="allow-absentee" />
-            Allow Absentee Bids
-          </label>
-        </div>
-        <div class="lots-modal-row">
-          <label>
-            <input type="checkbox" id="private-lot" />
-            Private Lot (hidden from public)
-          </label>
-        </div>
-        <div class="lots-modal-row">
-          <label>Description</label>
-          <textarea id="lot-desc" rows="2"></textarea>
-        </div>
-        <div class="lots-modal-row">
-          <label>Notes</label>
-          <textarea id="lot-notes" rows="2"></textarea>
-        </div>
-        <div class="lots-modal-row">
-          <label>Selected Items & Quantities:</label>
-          <div id="selected-items-list"></div>
-        </div>
-        <div class="lots-modal-actions">
-          <button type="submit" class="primary-btn lots-modal-add-btn">+ Add Lot</button>
-          <button type="button" class="lots-modal-cancel-btn" id="lots-modal-cancel-btn">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <!-- Footer -->
-  <footer class="dashboard-footer">
-    <div class="footer-row">
-      <div class="footer-col">
-        <div class="footer-logo">
-          <svg width="32" height="32" fill="none" viewBox="0 0 36 36">
-            <rect width="36" height="36" rx="12" fill="#2563eb"/>
-            <path d="M18 10l8 4.5v7c0 .83-.47 1.59-1.19 1.92l-6.81 3.08-6.81-3.08A2.08 2.08 0 0 1 10 21.5v-7L18 10Z" fill="#fff"/>
-            <path d="M18 10v13.5" stroke="#2563eb" stroke-width="2"/>
-          </svg>
-        </div>
-        <div class="footer-title">Auction Warehouse System</div>
-        <div class="footer-desc">Complete inventory management solution</div>
-        <div class="footer-meta">© 2024 JPS Surveyors Auction Warehouse &middot; Built with React &amp; TypeScript</div>
-      </div>
-      <div class="footer-col">
-        <div class="footer-heading">Features</div>
-        <ul class="footer-list">
-          <li>Barcode Scanning</li>
-          <li>Inventory Management</li>
-          <li>Storage Mapping</li>
-          <li>Case Tracking</li>
-          <li>Lots Management</li>
-          <li>Analytics Dashboard</li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-heading">Core Functions</div>
-        <ul class="footer-list">
-          <li>Item cataloguing</li>
-          <li>Warehouse organization</li>
-          <li>Client case management</li>
-          <li>Lots management</li>
-          <li>Performance analytics</li>
-          <li>Mobile-friendly interface</li>
-          <li>Real-time updates</li>
-          <li>Comprehensive reporting</li>
-        </ul>
-      </div>
-    </div>
-  </footer>
-  <script src="lots.js"></script>
-</body>
-</html>
+    `).join('');
+    itemsListDiv.style.display = "";
+  } else {
+    itemsListDiv.innerHTML = "";
+    itemsListDiv.style.display = "none";
+  }
+
+  // Remove previous submit
+  const form = document.getElementById("lots-modal-form");
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    let lots = loadLots();
+
+    lots[idx] = {
+      number: document.getElementById('lot-number').value.trim(),
+      auction: document.getElementById('lot-auction').value.trim(),
+      auctionDate: document.getElementById('auction-date').value.trim(),
+      auctionTime: document.getElementById('auction-time').value.trim(),
+      auctionType: document.getElementById('auction-type').value.trim(),
+      status: document.getElementById('lot-status').value.trim(),
+      reservePrice: document.getElementById('reserve-price').value,
+      startingBid: document.getElementById('starting-bid').value,
+      allowAbsentee: document.getElementById('allow-absentee').checked,
+      privateLot: document.getElementById('private-lot').checked,
+      description: document.getElementById('lot-desc').value.trim(),
+      notes: document.getElementById('lot-notes').value.trim(),
+      selectedItems: []
+    };
+
+    if (lotObj.selectedItems && Array.isArray(lotObj.selectedItems)) {
+      lots[idx].selectedItems = lotObj.selectedItems.map((item, iidx) => ({
+        ...item,
+        quantity: parseInt(document.getElementById(`item-qty-${iidx}`).value, 10) || 1
+      }));
+    }
+
+    saveLots(lots);
+    renderLots(lots);
+    closeLotsModal();
+    alert("Lot updated!");
+  };
+}
+
+// === Init ===
+document.addEventListener("DOMContentLoaded", function () {
+  const lots = loadLots();
+  renderLots(lots);
+
+  document.getElementById("lots-new-btn").onclick = function() {
+    openLotsModal();
+  };
+  document.getElementById("lots-modal-close-btn").onclick =
+    document.getElementById("lots-modal-cancel-btn").onclick = closeLotsModal;
+
+  // Default modal submit for Add New (called by openLotsModal, not needed here)
+  document.getElementById("lots-modal-form").onsubmit = function(e) {
+    e.preventDefault();
+  };
+
+  // Show modal if coming from Inventory tab with selection
+  const selected = sessionStorage.getItem("selectedLotItems");
+  if (selected && selected !== "[]" && selected !== "") {
+    try {
+      const selectedItems = JSON.parse(selected);
+      if (Array.isArray(selectedItems) && selectedItems.length > 0) {
+        openLotsModal(selectedItems);
+      }
+    } catch (e) {
+      sessionStorage.removeItem("selectedLotItems");
+    }
+  }
+});
