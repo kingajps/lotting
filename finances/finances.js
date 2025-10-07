@@ -110,7 +110,7 @@ function computeInvoiceDerived(invRecord) {
   inv.type = inv.type || "Auction";
   inv.sale = inv.sale || (inv.caseId ? inv.caseId.replace(/\D/g,"").slice(-1) : "");
   inv.buyer = inv.client || "";
-  inv.buyerVat = inv.buyerVat ?? 0;
+  inv.buyerid = inv.buyerid || "";
   inv.itemsCount = Array.isArray(inv.items) ? inv.items.length : 0;
   inv.raised = inv.date || "";
   inv.shipping = inv.shipping || "N/A";
