@@ -78,6 +78,18 @@
           <label>Lot Number *</label>
           <input type="text" required id="lot-number" autocomplete="off" />
         </div>
+        <!-- ADDED: Auction Name/Select -->
+        <div class="lots-modal-row">
+          <label>Auction *</label>
+          <select required id="lot-auction">
+            <option value="">Select Auction</option>
+            <option value="October Auction">October Auction</option>
+            <option value="November Auction">November Auction</option>
+            <option value="December Auction">December Auction</option>
+            <option value="February Auction">February Auction</option>
+            <!-- Add more as needed -->
+          </select>
+        </div>
         <div class="lots-modal-row">
           <label>Auction Date *</label>
           <input type="date" required id="auction-date" />
