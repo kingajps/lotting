@@ -86,13 +86,14 @@ function renderLots(lots) {
 }
 
 // === Modal Open/Close Logic for Add New Lot + Inventory Lot Modal (with selected items) ===
-function openLotsModal(selectedItems) {
+function openLotsModal(selectedItems = []) {
   const modalBackdrop = document.getElementById('lots-modal-backdrop');
   const modal = document.querySelector('.lots-modal');
   modal.querySelector('.lots-modal-title').textContent = "Add New Lot";
   modalBackdrop.style.display = "flex";
   document.body.style.overflow = "hidden";
-  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
+  document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0
+    ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
 
   // Clear form fields
   document.getElementById('lot-number').value = "";
@@ -108,26 +109,46 @@ function openLotsModal(selectedItems) {
   document.getElementById('lot-desc').value = "";
   document.getElementById('lot-notes').value = "";
 
-  // Populate selected items with quantity fields
-  const itemsListDiv = document.getElementById("selected-items-list");
-  if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
-    itemsListDiv.innerHTML = selectedItems.map((item, idx) => `
-      <div style="margin-bottom:6px;">
-        <span>${item.name || 'Unnamed Item'} (${item.barcode || 'no barcode'})</span>
-        <input type="number" min="1" value="1" id="item-qty-${idx}" style="width:50px; margin-left:10px;" required>
-      </div>
-    `).join('');
-    itemsListDiv.style.display = "";
-  } else {
-    itemsListDiv.innerHTML = "";
-    itemsListDiv.style.display = "none";
-  }
+  // --- NEW: Populate available items select ---
+  const availableItems = getUnlottedInventoryItems();
+  const select = document.getElementById('available-items-select');
+  select.innerHTML = "";
+  availableItems.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.barcode;
+    option.textContent = `${item.name} (${item.barcode})`;
+    select.appendChild(option);
+  });
+
+  // When selection changes, update selected items list
+  select.onchange = function() {
+    const selectedBarcodes = Array.from(select.selectedOptions).map(opt => opt.value);
+    const selectedObjs = availableItems.filter(item => selectedBarcodes.includes(item.barcode));
+    renderSelectedItemsList(selectedObjs);
+  };
+
+  // Render with initial selectedItems if any (e.g. from inventory tab)
+  renderSelectedItemsList(selectedItems);
 
   // Remove previous submit
   const form = document.getElementById("lots-modal-form");
   form.onsubmit = function(e) {
     e.preventDefault();
     let lots = loadLots();
+
+    // Get all selected items and their quantities
+    const selectedBarcodes = Array.from(select.selectedOptions).map(opt => opt.value);
+    const allSelectedObjs = availableItems.filter(item => selectedBarcodes.includes(item.barcode));
+    // Also add any items passed in from inventory tab that may not be in availableItems (for edit mode)
+    let finalSelected = allSelectedObjs;
+    if (selectedItems && selectedItems.length > 0) {
+      const extra = selectedItems.filter(si => !finalSelected.some(ai => ai.barcode === si.barcode));
+      finalSelected = finalSelected.concat(extra);
+    }
+    const lotItemsWithQty = finalSelected.map((item, idx) => ({
+      ...item,
+      quantity: parseInt(document.getElementById(`item-qty-${idx}`).value, 10) || 1
+    }));
 
     let newLot = {
       number: document.getElementById('lot-number').value.trim(),
@@ -142,15 +163,8 @@ function openLotsModal(selectedItems) {
       privateLot: document.getElementById('private-lot').checked,
       description: document.getElementById('lot-desc').value.trim(),
       notes: document.getElementById('lot-notes').value.trim(),
-      selectedItems: []
+      selectedItems: lotItemsWithQty
     };
-
-    if (selectedItems && Array.isArray(selectedItems)) {
-      newLot.selectedItems = selectedItems.map((item, idx) => ({
-        ...item,
-        quantity: parseInt(document.getElementById(`item-qty-${idx}`).value, 10) || 1
-      }));
-    }
 
     lots.push(newLot);
     saveLots(lots);
@@ -161,11 +175,40 @@ function openLotsModal(selectedItems) {
   };
 }
 
+function renderSelectedItemsList(selectedObjs) {
+  const itemsListDiv = document.getElementById("selected-items-list");
+  if (selectedObjs && selectedObjs.length > 0) {
+    itemsListDiv.innerHTML = selectedObjs.map((item, idx) => `
+      <div style="margin-bottom:6px;">
+        <span>${item.name || 'Unnamed Item'} (${item.barcode || 'no barcode'})</span>
+        <input type="number" min="1" value="${item.quantity || 1}" id="item-qty-${idx}" style="width:50px; margin-left:10px;" required>
+      </div>
+    `).join('');
+    itemsListDiv.style.display = "";
+  } else {
+    itemsListDiv.innerHTML = "<span style='color:#888'>No items selected for this lot.</span>";
+    itemsListDiv.style.display = "";
+  }
+}
+
 function closeLotsModal() {
   document.body.style.overflow = "";
   document.body.style.marginRight = "";
   document.getElementById('lots-modal-backdrop').style.display = "none";
   sessionStorage.removeItem("selectedLotItems");
+}
+
+function getUnlottedInventoryItems() {
+  // Load all items from inventory
+  const inventory = JSON.parse(localStorage.getItem("aw_inventory_data") || "[]");
+  // Get all item barcodes/IDs already in any lot
+  const lots = loadLots();
+  const lottedBarcodes = new Set();
+  lots.forEach(lot => {
+    (lot.selectedItems || []).forEach(item => lottedBarcodes.add(item.barcode));
+  });
+  // Return only items whose barcode is not in a lot
+  return inventory.filter(item => !lottedBarcodes.has(item.barcode));
 }
 
 // === Edit Modal Logic (for completeness, edit in-place and save all lots) ===
