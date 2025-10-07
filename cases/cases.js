@@ -828,6 +828,26 @@ function recordInvoiceFromCase({ invoiceNo, date, caseObj, grandTotal, subtotal,
   }
 }
 
+  // Persist invoice for Finances > Invoices
+  try {
+    recordInvoiceFromCase({
+      invoiceNo,
+      date: dateStr,
+      caseObj,
+      grandTotal,
+      subtotal,
+      vatAmount: vatAmt,
+      taxAmount: otherTaxAmt,
+      items,           // [{name, qty, estimate, reserve}]
+      miscCharges      // [{title, description, amount}]
+    });
+  } catch (e) {
+    console.warn("Unable to record invoice:", e);
+  }
+
+  doc.save(`Invoice_${invoiceNo}.pdf`);
+}
+
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
   loadCases();
