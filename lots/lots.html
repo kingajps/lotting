@@ -78,17 +78,21 @@
           <label>Lot Number *</label>
           <input type="text" required id="lot-number" autocomplete="off" />
         </div>
-        <!-- ADDED: Auction Name/Select -->
+  <!-- Add New Lot Modal -->
+  <div id="lots-modal-backdrop" class="lots-modal-backdrop" style="display:none;">
+    <div class="lots-modal">
+      <div class="lots-modal-header">
+        <span class="lots-modal-title">Add New Lot</span>
+        <button class="lots-modal-close-btn" id="lots-modal-close-btn">&times;</button>
+      </div>
+      <form class="lots-modal-form" id="lots-modal-form">
+        <div class="lots-modal-row">
+          <label>Lot Number *</label>
+          <input type="text" required id="lot-number" autocomplete="off" />
+        </div>
         <div class="lots-modal-row">
           <label>Auction *</label>
-          <select required id="lot-auction">
-            <option value="">Select Auction</option>
-            <option value="October Auction">October Auction</option>
-            <option value="November Auction">November Auction</option>
-            <option value="December Auction">December Auction</option>
-            <option value="February Auction">February Auction</option>
-            <!-- Add more as needed -->
-          </select>
+          <input type="text" required id="lot-auction" autocomplete="off" />
         </div>
         <div class="lots-modal-row">
           <label>Auction Date *</label>
@@ -142,6 +146,10 @@
         <div class="lots-modal-row">
           <label>Notes</label>
           <textarea id="lot-notes" rows="2"></textarea>
+        </div>
+        <div class="lots-modal-row">
+          <label>Select Items to add:</label>
+          <select id="available-items-select" multiple style="width:100%; min-height:80px;"></select>
         </div>
         <div class="lots-modal-row">
           <label>Selected Items & Quantities:</label>
