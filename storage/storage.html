@@ -57,65 +57,23 @@
       <div id="zone-groups"></div>
     </section>
   </main>
-  <!-- In Transit Zone Example -->
-  <div class="zone in-transit-zone">
-    <!-- Other in-transit items -->
 
-    <!-- JPS Van area: MAKE THIS WHOLE AREA CLICKABLE -->
-    <div id="jps-van-element" class="jps-van-area" style="cursor:pointer; display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 8px; background: #f3f6fc; box-shadow: 0 2px 6px #2563eb22; margin-bottom: 12px;">
-      <!-- Van SVG or Image -->
-      <svg width="48" height="32" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-        <rect x="4" y="14" width="32" height="12" rx="3" fill="#2563eb"/>
-        <rect x="36" y="18" width="8" height="8" rx="2" fill="#60a5fa"/>
-        <rect x="8" y="8" width="18" height="8" rx="2" fill="#93c5fd"/>
-        <circle cx="12" cy="28" r="3" fill="#222"/>
-        <circle cx="36" cy="28" r="3" fill="#222"/>
-        <rect x="24" y="8" width="6" height="8" rx="1.5" fill="#fff"/>
-      </svg>
-      <div style="display:flex; flex-direction:column;">
-        <div style="font-size:1.15em; font-weight:700; color:#2563eb;">JPS Van</div>
-        <div style="font-size:0.98em; color:#444;">In Transit Zone</div>
-      </div>
-    </div>
-
-    <!-- Other in-transit items -->
-  </div>
-  <!-- Van Booking Modal -->
+  <!-- Van Booking Calendar Modal (with Month Navigation) -->
   <div id="van-modal-backdrop" class="zone-modal-backdrop" style="display:none;">
-    <div class="zone-modal" style="max-width:450px;">
+    <div class="zone-modal" style="max-width:520px;">
       <div class="zone-modal-header">
-        Book JPS Van
+        JPS Van Booking Calendar
         <button type="button" class="zone-modal-close-btn" id="van-modal-cancel-btn">&times;</button>
       </div>
-      <form id="van-modal-form">
-        <label>Date:
-          <input type="date" id="van-date" required>
-        </label>
-        <label>Time From:
-          <input type="time" id="van-time-from" required>
-        </label>
-        <label>Time To:
-          <input type="time" id="van-time-to" required>
-        </label>
-        <label>Company/Companies:
-          <textarea id="van-companies" rows="2" required></textarea>
-        </label>
-        <label>Address(es):
-          <textarea id="van-addresses" rows="2" required></textarea>
-        </label>
-        <label>Case(s):
-          <textarea id="van-cases" rows="2"></textarea>
-        </label>
-        <label>Used by:
-          <input type="text" id="van-user" required>
-        </label>
-        <div class="modal-actions" style="margin-top:22px; display:flex; gap:14px;">
-          <button type="submit" class="primary-btn">Save</button>
-          <button type="button" id="van-modal-cancel-btn-2">Cancel</button>
-        </div>
-      </form>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <button id="van-prev-month-btn">&lt; Prev</button>
+        <span id="van-calendar-month-label" style="font-weight:bold;"></span>
+        <button id="van-next-month-btn">Next &gt;</button>
+      </div>
+      <div id="van-calendar-container"></div>
     </div>
   </div>
+
   <!-- Footer -->
   <footer class="dashboard-footer">
     <div class="footer-row">
