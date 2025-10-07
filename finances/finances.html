@@ -77,18 +77,18 @@
       <div class="toolbar">
         <div class="left">
           <div class="dropdown">
-            <button class="btn" id="inv-actions-btn">Actions ▾</button>
+            <button class="btn" id="inv-actions-btn" type="button">Actions ▾</button>
             <div class="menu" id="inv-actions-menu" hidden>
-              <button data-action="export">Export CSV</button>
-              <button data-action="reset">Reset Filters</button>
+              <button data-action="export" type="button">Export CSV</button>
+              <button data-action="reset" type="button">Reset Filters</button>
             </div>
           </div>
           <span class="selected-info" id="inv-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn icon" id="inv-download" title="Download"><span>⬇️</span></button>
-          <button class="btn light" id="inv-reset">Reset</button>
-          <button class="btn primary" id="inv-search">Search</button>
+          <button class="btn icon" id="inv-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn light" id="inv-reset" type="button">Reset</button>
+          <button class="btn primary" id="inv-search" type="button">Search</button>
         </div>
       </div>
 
@@ -165,17 +165,18 @@
       <div class="toolbar">
         <div class="left">
           <div class="dropdown">
-            <button class="btn" id="set-actions-btn">Actions ▾</button>
+            <button class="btn" id="set-actions-btn" type="button">Actions ▾</button>
             <div class="menu" id="set-actions-menu" hidden>
-              <button data-action="export">Export CSV</button>
-              <button data-action="reset">Reset Filters</button>
+              <button data-action="export" type="button">Export CSV</button>
+              <button data-action="reset" type="button">Reset Filters</button>
             </div>
           </div>
           <span class="selected-info" id="set-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn light" id="set-reset">Reset</button>
-          <button class="btn primary" id="set-search">Search</button>
+          <button class="btn icon" id="set-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn light" id="set-reset" type="button">Reset</button>
+          <button class="btn primary" id="set-search" type="button">Search</button>
         </div>
       </div>
 
@@ -227,13 +228,14 @@
     <section id="tab-shipping" class="finance-tab-section" tabindex="0">
       <div class="toolbar">
         <div class="left">
-          <button class="btn success" id="ship-mark">Mark as Dispatched</button>
-          <button class="btn" id="ship-unmark">Unmark as Dispatched</button>
+          <button class="btn success" id="ship-mark" type="button">Mark as Dispatched</button>
+          <button class="btn" id="ship-unmark" type="button">Unmark as Dispatched</button>
           <span class="selected-info" id="ship-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn light" id="ship-reset">Reset</button>
-          <button class="btn primary" id="ship-search">Search</button>
+          <button class="btn icon" id="ship-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn light" id="ship-reset" type="button">Reset</button>
+          <button class="btn primary" id="ship-search" type="button">Search</button>
         </div>
       </div>
 
@@ -295,17 +297,18 @@
       <div class="toolbar">
         <div class="left">
           <div class="dropdown">
-            <button class="btn" id="invpay-actions-btn">Actions ▾</button>
+            <button class="btn" id="invpay-actions-btn" type="button">Actions ▾</button>
             <div class="menu" id="invpay-actions-menu" hidden>
-              <button data-action="export">Export CSV</button>
-              <button data-action="reset">Reset Filters</button>
+              <button data-action="export" type="button">Export CSV</button>
+              <button data-action="reset" type="button">Reset Filters</button>
             </div>
           </div>
           <span class="selected-info" id="invpay-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn light" id="invpay-reset">Reset</button>
-          <button class="btn primary" id="invpay-search">Search</button>
+          <button class="btn icon" id="invpay-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn light" id="invpay-reset" type="button">Reset</button>
+          <button class="btn primary" id="invpay-search" type="button">Search</button>
         </div>
       </div>
 
@@ -370,17 +373,18 @@
       <div class="toolbar">
         <div class="left">
           <div class="dropdown">
-            <button class="btn" id="setlpay-actions-btn">Actions ▾</button>
+            <button class="btn" id="setlpay-actions-btn" type="button">Actions ▾</button>
             <div class="menu" id="setlpay-actions-menu" hidden>
-              <button data-action="export">Export CSV</button>
-              <button data-action="reset">Reset Filters</button>
+              <button data-action="export" type="button">Export CSV</button>
+              <button data-action="reset" type="button">Reset Filters</button>
             </div>
           </div>
           <span class="selected-info" id="setlpay-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn light" id="setlpay-reset">Reset</button>
-          <button class="btn primary" id="setlpay-search">Search</button>
+          <button class="btn icon" id="setlpay-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn light" id="setlpay-reset" type="button">Reset</button>
+          <button class="btn primary" id="setlpay-search" type="button">Search</button>
         </div>
       </div>
 
@@ -431,6 +435,15 @@
     </section>
   </main>
 
+  <!-- PDF Preview Modal -->
+  <div id="pdf-preview-backdrop" class="fin-preview-backdrop" style="display:none;">
+    <div class="fin-preview-modal">
+      <button id="fin-preview-close" class="fin-preview-close" type="button">&times;</button>
+      <div class="fin-preview-title" id="fin-preview-title"></div>
+      <iframe id="fin-preview-frame" title="PDF preview" style="width:100%; height:80vh; border:0;"></iframe>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="dashboard-footer">
     <div class="footer-row">
@@ -472,9 +485,10 @@
     </div>
   </footer>
 
-  <!-- Optional: jsPDF if you also want View/Download from here -->
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <script src="finances.js"></script>
 </body>
