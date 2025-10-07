@@ -57,8 +57,7 @@
       <div id="zone-groups"></div>
     </section>
   </main>
-
-  <!-- Van Booking Calendar Modal (with Month Navigation) -->
+  <!-- Van Booking Calendar Modal (with Month Navigation and Booking Fields) -->
   <div id="van-modal-backdrop" class="zone-modal-backdrop" style="display:none;">
     <div class="zone-modal" style="max-width:520px;">
       <div class="zone-modal-header">
@@ -66,11 +65,33 @@
         <button type="button" class="zone-modal-close-btn" id="van-modal-cancel-btn">&times;</button>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <button id="van-prev-month-btn">&lt; Prev</button>
+        <button id="van-prev-month-btn" type="button">&lt; Prev</button>
         <span id="van-calendar-month-label" style="font-weight:bold;"></span>
-        <button id="van-next-month-btn">Next &gt;</button>
+        <button id="van-next-month-btn" type="button">Next &gt;</button>
       </div>
       <div id="van-calendar-container"></div>
+      <form id="van-booking-form" style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
+        <input type="hidden" id="van-booking-date" />
+        <label>Who is booking:
+          <input type="text" id="van-user" required />
+        </label>
+        <label>From (date & time):
+          <input type="datetime-local" id="van-from" required />
+        </label>
+        <label>To (date & time):
+          <input type="datetime-local" id="van-to" required />
+        </label>
+        <label>Company/Companies:
+          <textarea id="van-companies" rows="2" required></textarea>
+        </label>
+        <label>Address(es):
+          <textarea id="van-addresses" rows="2" required></textarea>
+        </label>
+        <label>Case(s):
+          <textarea id="van-cases" rows="2"></textarea>
+        </label>
+        <button type="submit" class="primary-btn" id="van-book-btn" disabled>Book Van</button>
+      </form>
     </div>
   </div>
 
