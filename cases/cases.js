@@ -16,18 +16,8 @@ const mockCases = [
     description: "Complete household contents including furniture, electronics, and collectibles from a 50-year family home in Surrey",
     notes: "High-value antiques included, requires careful handling",
     itemsList: [
-      {
-        name: "Oak Dining Table",
-        meta: "Furniture • Good",
-        value: "£420",
-        status: "Catalogued"
-      },
-      {
-        name: "Oak Dining Chairs (Set of 6)",
-        meta: "Furniture • Good",
-        value: "£230",
-        status: "Catalogued"
-      }
+      { name: "Oak Dining Table", meta: "Furniture • Good", value: "£420", status: "Catalogued" },
+      { name: "Oak Dining Chairs (Set of 6)", meta: "Furniture • Good", value: "£230", status: "Catalogued" }
     ]
   },
   {
@@ -43,12 +33,7 @@ const mockCases = [
     description: "Office furniture and IT equipment clearance for Green Ltd.",
     notes: "",
     itemsList: [
-      {
-        name: "Dell Laptop",
-        meta: "Electronics • Like New",
-        value: "£320",
-        status: "Photographed"
-      }
+      { name: "Dell Laptop", meta: "Electronics • Like New", value: "£320", status: "Photographed" }
     ]
   }
 ];
@@ -217,7 +202,7 @@ function setupCaseModal() {
       client: document.getElementById("case-client-name").value.trim(),
       contact: document.getElementById("case-client-contact").value.trim(),
       clientAddress: document.getElementById('client-address').value.trim(),
-      received: "", // You may want to add this field to your form
+      received: "",
       auction: document.getElementById("case-auction-date").value.trim(),
       items: 0,
       value: "",
@@ -237,14 +222,12 @@ function setupCaseModal() {
 
 // === Case Edit Modal Logic ===
 function openCaseEditModal(caseObj, idx) {
-  // Open a custom edit modal over the case modal backdrop
   const modalBackdrop = document.getElementById('case-detail-modal-backdrop');
   let modal = document.getElementById('case-detail-modal');
   modalBackdrop.style.display = 'flex';
   document.body.style.overflow = "hidden";
   document.body.style.marginRight = (window.innerWidth - document.documentElement.clientWidth) > 0 ? `${window.innerWidth - document.documentElement.clientWidth}px` : "";
 
-  // Render editable form for all fields including items
   modal.innerHTML = `
     <button class="case-detail-close-btn" id="case-detail-edit-close-btn">&times;</button>
     <div class="case-detail-title">Edit Case</div>
@@ -352,7 +335,6 @@ function openCaseEditModal(caseObj, idx) {
   // Add item handler
   modal.querySelector('#edit-item-add-btn').onclick = function() {
     const itemsDiv = modal.querySelector('#edit-case-items-list');
-    const idx = itemsDiv.children.length;
     const div = document.createElement('div');
     div.className = "case-detail-item-row";
     div.innerHTML = `
@@ -370,7 +352,6 @@ function openCaseEditModal(caseObj, idx) {
     updateItemsSummary();
   };
 
-  // Live update items count and avg per item in summary
   function updateItemsSummary() {
     const itemsDiv = modal.querySelector('#edit-case-items-list');
     const itemCount = itemsDiv.querySelectorAll('.case-detail-item-row').length;
@@ -380,11 +361,9 @@ function openCaseEditModal(caseObj, idx) {
       "£" + getAvgPerItem(value, itemCount);
   }
 
-  // On value or items change, update summary
   modal.querySelector('#edit-case-value').oninput = updateItemsSummary;
   modal.querySelector('#edit-case-items-list').oninput = updateItemsSummary;
 
-  // Close modal logic
   modal.querySelector('#case-detail-edit-close-btn').onclick =
   modal.querySelector('#case-detail-edit-close-btn2').onclick = function () {
     document.body.style.overflow = "";
@@ -392,10 +371,8 @@ function openCaseEditModal(caseObj, idx) {
     modalBackdrop.style.display = "none";
   };
 
-  // Form submission logic
   modal.querySelector('#case-detail-edit-form').onsubmit = function(e) {
     e.preventDefault();
-    // Validate and update case
     const newCaseNumber = modal.querySelector('#edit-case-id').value.trim();
     if (!newCaseNumber) return alert("Case Number required");
     const newTitle = modal.querySelector('#edit-case-title').value.trim();
@@ -404,7 +381,6 @@ function openCaseEditModal(caseObj, idx) {
     if (!newClient) return alert("Client Name required");
     const newValue = modal.querySelector('#edit-case-value').value.trim();
 
-    // Collect items
     const itemsDiv = modal.querySelector('#edit-case-items-list');
     const itemsList = [];
     itemsDiv.querySelectorAll('.case-detail-item-row').forEach(row => {
@@ -415,7 +391,6 @@ function openCaseEditModal(caseObj, idx) {
       if (name) itemsList.push({ name, meta, value, status });
     });
 
-    // Update in casesData
     casesData[idx] = {
       id: newCaseNumber,
       title: newTitle,
@@ -439,7 +414,7 @@ function openCaseEditModal(caseObj, idx) {
   };
 }
 
-// Helpers for date
+// Helpers for date and numbers
 function toISODate(str) {
   if (!str) return "";
   if (str.includes("-")) return str;
@@ -462,6 +437,42 @@ function getAvgPerItem(value, count) {
   value = value ? Number(String(value).replace(/[^\d.]/g,'')) : 0;
   count = parseInt(count) || 0;
   return count ? Math.round(value/count) : 0;
+}
+function num(val) {
+  return Number(String(val ?? "").replace(/[^\d.]/g, "")) || 0;
+}
+function fmtCurrency(n) {
+  const sym = localStorage.getItem("aw_currency_symbol") || "£";
+  return sym + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function getImageFormat(dataUrl) {
+  if (!dataUrl || typeof dataUrl !== "string") return "PNG";
+  if (dataUrl.startsWith("data:image/jpeg") || dataUrl.startsWith("data:image/jpg")) return "JPEG";
+  if (dataUrl.startsWith("data:image/webp")) return "WEBP";
+  return "PNG";
+}
+function nextInvoiceNumber() {
+  const prefix = localStorage.getItem("aw_invoice_prefix") || "INV";
+  const key = "aw_invoice_seq";
+  const last = parseInt(localStorage.getItem(key) || "0", 10) || 0;
+  const next = last + 1;
+  localStorage.setItem(key, String(next));
+  const datePart = new Date().toISOString().slice(0,7).replace("-","");
+  return `${prefix}-${datePart}-${String(next).padStart(4,"0")}`;
+}
+function getCompanyProfile() {
+  return {
+    name: localStorage.getItem("aw_company_name") || "JPS Chartered Surveyors",
+    address: localStorage.getItem("aw_company_address") || "1 Example Street, Manchester M1 2AB, United Kingdom",
+    email: localStorage.getItem("aw_company_email") || "info@jpssurveyors.co.uk",
+    logo: localStorage.getItem("aw_company_logo") || sessionStorage.getItem("aw_company_logo") || null,
+    vatRate: (() => {
+      const v = Number(localStorage.getItem("aw_vat_rate")); return isNaN(v) ? 0.2 : v;
+    })(),
+    otherTaxRate: (() => {
+      const v = Number(localStorage.getItem("aw_other_tax_rate")); return isNaN(v) ? 0.0 : v;
+    })()
+  };
 }
 
 // === Case Details Modal Logic (read-only view) ===
@@ -570,7 +581,7 @@ function showCaseDetailModal(caseObj) {
           <div class="case-detail-quick-actions">
             <button class="case-detail-quick-btn edit" title="Edit Case" id="case-detail-edit-btn-2">Edit Case</button>
             <button class="case-detail-quick-btn lot" title="Create Lots">Create Lots</button>
-            <button class="case-detail-quick-btn report" title="Generate Report">Generate Report</button>
+            <button class="case-detail-quick-btn report" title="Generate Report" id="case-detail-generate-report-btn">Generate Report</button>
             <button class="case-detail-quick-btn print" title="Print Labels">Print Labels</button>
           </div>
         </div>
@@ -579,7 +590,6 @@ function showCaseDetailModal(caseObj) {
   `;
   modalBackdrop.style.display = "flex";
 
-  // Close modal logic
   document.getElementById('case-detail-close-btn').onclick =
   document.getElementById('case-detail-close-btn2').onclick = function () {
     document.body.style.overflow = "";
@@ -587,7 +597,6 @@ function showCaseDetailModal(caseObj) {
     modalBackdrop.style.display = "none";
   };
 
-  // Edit modal logic (main and sidebar button)
   document.getElementById('case-detail-edit-btn').onclick =
   document.getElementById('case-detail-edit-btn-2').onclick = function () {
     modalBackdrop.style.display = "none";
@@ -596,6 +605,193 @@ function showCaseDetailModal(caseObj) {
     const idx = casesData.findIndex(c => c.id === caseObj.id);
     openCaseEditModal(caseObj, idx);
   };
+
+  // NEW: Generate Report
+  const genBtn = document.getElementById('case-detail-generate-report-btn');
+  if (genBtn) {
+    genBtn.onclick = function () {
+      generateCaseReportPDF(caseObj);
+    };
+  }
+}
+
+// === PDF Report Generation ===
+function generateCaseReportPDF(caseObj) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+  const company = getCompanyProfile();
+  const currency = localStorage.getItem("aw_currency_symbol") || "£";
+  const invoiceNo = nextInvoiceNumber();
+  const today = new Date();
+  const dateStr = today.toLocaleDateString();
+
+  // Header area
+  const leftX = 14;
+  const rightX = 120;
+  let y = 14;
+
+  // Logo or Company Name
+  if (company.logo) {
+    try {
+      const fmt = getImageFormat(company.logo);
+      doc.addImage(company.logo, fmt, leftX, y, 80, 20); // scale as needed
+      y += 24;
+    } catch (e) {
+      doc.setFontSize(20);
+      doc.setFont(undefined, "bold");
+      doc.text(company.name, leftX, y + 8);
+      y += 16;
+    }
+  } else {
+    doc.setFontSize(20);
+    doc.setFont(undefined, "bold");
+    doc.text(company.name, leftX, y + 8);
+    y += 16;
+  }
+
+  // Company address/email block (top-right)
+  doc.setFontSize(10);
+  doc.setFont(undefined, "normal");
+  const companyBlock = `${company.address}\n${company.email}`;
+  splitAndText(doc, companyBlock, rightX, 18, 80, 5);
+
+  // Client block
+  const clientY = y + 6;
+  doc.setFontSize(12);
+  doc.setFont(undefined, "bold");
+  doc.text("Bill To:", leftX, clientY);
+  doc.setFont(undefined, "normal");
+  const clientBlock = [
+    caseObj.client || "",
+    caseObj.clientAddress || "",
+    caseObj.contact || ""
+  ].filter(Boolean).join("\n");
+  splitAndText(doc, clientBlock, leftX, clientY + 6, 90, 5);
+
+  // Invoice meta (top-right under address)
+  const metaY = clientY;
+  doc.setFont(undefined, "bold");
+  doc.text("Invoice Details", rightX, metaY);
+  doc.setFont(undefined, "normal");
+  const metaBlock = `Invoice No: ${invoiceNo}\nDate: ${dateStr}\nCase No: ${caseObj.id || ""}`;
+  splitAndText(doc, metaBlock, rightX, metaY + 6, 80, 5);
+
+  // Title (represented company – using case title)
+  let sectionY = Math.max(clientY + 26, metaY + 26);
+  doc.setFontSize(14);
+  doc.setFont(undefined, "bold");
+  doc.text(`Title: ${caseObj.title || ""}`, leftX, sectionY);
+  sectionY += 6;
+
+  // Items table
+  const items = (caseObj.itemsList || []).map(it => {
+    const qty = parseInt(it.quantity || 1, 10) || 1;
+    const estimate = num(it.value);
+    const reserve = (it.reservePrice != null ? num(it.reservePrice) : (it.reserve != null ? num(it.reserve) : null));
+    return {
+      name: it.name || "Item",
+      qty,
+      estimate,
+      reserve
+    };
+  });
+
+  const itemsRows = items.map(r => ([
+    r.name,
+    String(r.qty),
+    fmtCurrency(r.estimate),
+    r.reserve != null ? fmtCurrency(r.reserve) : "—"
+  ]));
+
+  doc.autoTable({
+    startY: sectionY,
+    head: [["Item", "Qty", "Estimate", "Reserve"]],
+    body: itemsRows,
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [37, 99, 235] },
+    columnStyles: {
+      1: { halign: "right" },
+      2: { halign: "right" },
+      3: { halign: "right" }
+    },
+    theme: "grid",
+    margin: { left: leftX, right: 14 }
+  });
+
+  let afterItemsY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 6 : sectionY + 6;
+
+  // Miscellaneous charges (from case or stored) — optional
+  const miscCharges =
+    Array.isArray(caseObj.miscCharges) ? caseObj.miscCharges :
+    JSON.parse(localStorage.getItem(`aw_case_charges_${caseObj.id}`) || "[]");
+
+  if (miscCharges && miscCharges.length) {
+    const chargeRows = miscCharges.map(c => ([
+      c.title || "",
+      c.description || "",
+      fmtCurrency(num(c.amount))
+    ]));
+    doc.setFontSize(12);
+    doc.setFont(undefined, "bold");
+    doc.text("Miscellaneous Charges", leftX, afterItemsY);
+    afterItemsY += 2;
+    doc.autoTable({
+      startY: afterItemsY,
+      head: [["Title", "Description", "Amount"]],
+      body: chargeRows,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [162, 89, 231] },
+      columnStyles: { 2: { halign: "right" } },
+      theme: "grid",
+      margin: { left: leftX, right: 14 }
+    });
+    afterItemsY = doc.lastAutoTable.finalY + 6;
+  }
+
+  // Totals
+  const itemsSubtotal = items.reduce((s, r) => s + (r.qty * (r.estimate || 0)), 0);
+  const chargesSubtotal = (miscCharges || []).reduce((s, c) => s + num(c.amount), 0);
+  const subtotal = itemsSubtotal + chargesSubtotal;
+  const vatAmt = subtotal * (company.vatRate || 0);
+  const otherTaxAmt = subtotal * (company.otherTaxRate || 0);
+  const grandTotal = subtotal + vatAmt + otherTaxAmt;
+
+  // Right-aligned totals box
+  const totalsX = 120;
+  doc.setFontSize(12);
+  doc.setFont(undefined, "bold");
+  doc.text("Totals", totalsX, afterItemsY);
+  doc.setFont(undefined, "normal");
+  const totalsLines = [
+    ["Items Subtotal:", fmtCurrency(itemsSubtotal)],
+    ["Misc Charges:", fmtCurrency(chargesSubtotal)],
+    [`VAT (${Math.round((company.vatRate||0)*100)}%):`, fmtCurrency(vatAmt)],
+    [`Tax (${Math.round((company.otherTaxRate||0)*100)}%):`, fmtCurrency(otherTaxAmt)],
+    ["Grand Total:", fmtCurrency(grandTotal)]
+  ];
+  let ty = afterItemsY + 6;
+  totalsLines.forEach(([label, val]) => {
+    doc.text(label, totalsX, ty);
+    doc.text(val, 200, ty, { align: "right" });
+    ty += 6;
+  });
+
+  // Footer note
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(
+    "Thank you for your business. Please contact us if you have any questions regarding this invoice.",
+    leftX,
+    286
+  );
+
+  doc.save(`Invoice_${invoiceNo}.pdf`);
+}
+
+function splitAndText(doc, text, x, y, maxWidth, lineHeight) {
+  const lines = doc.splitTextToSize(text, maxWidth);
+  lines.forEach((ln, i) => doc.text(ln, x, y + i * (lineHeight || 5)));
 }
 
 // === Init ===
