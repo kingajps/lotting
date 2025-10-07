@@ -294,6 +294,15 @@ function renderZones(zones, editable = false) {
                   </div>`
                 : ""}
             `;
+
+            // === Make JPS Van card clickable for calendar modal (ONLY non-edit mode) ===
+            if (loc.id === "JPS Van") {
+              card.style.cursor = "pointer";
+              card.onclick = function() {
+                openVanCalendarModal();
+              };
+            }
+
           } else if (loc.type === "Shipped") {
             card.innerHTML = `
               <div class="storage-card-header">
@@ -356,6 +365,63 @@ function renderZones(zones, editable = false) {
   });
   document.getElementById("map-locations-count").textContent = `${count} locations`;
 }
+
+function openVanCalendarModal() {
+  document.getElementById("van-modal-backdrop").style.display = "flex";
+  renderVanCalendar();
+}
+
+function closeVanCalendarModal() {
+  document.getElementById("van-modal-backdrop").style.display = "none";
+}
+
+document.getElementById("van-modal-cancel-btn").onclick = closeVanCalendarModal;
+
+function renderVanCalendar() {
+  const bookings = JSON.parse(localStorage.getItem("vanBookings") || "[]");
+  const container = document.getElementById("van-calendar-container");
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  // Build a set of booked dates for the month
+  const bookedDaysSet = new Set(
+    bookings
+      .map(b => b.date)
+      .filter(d => d.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`))
+  );
+
+  let html = `<table style="width:100%;text-align:center;"><tr>`;
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => html += `<th>${d}</th>`);
+  html += "</tr><tr>";
+
+  for(let i=0; i<firstDay.getDay(); i++) html += "<td></td>";
+
+  for(let d=1; d<=lastDay.getDate(); d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const isBooked = bookedDaysSet.has(dateStr);
+    html += `<td style="background:${isBooked ? "#ffcccc":"#eaffef"};cursor:${isBooked?"not-allowed":"pointer"};" 
+      ${isBooked ? "" : `onclick="bookVan('${dateStr}')"`}>
+      ${d}${isBooked ? "<br><span style='color:#c00;font-size:0.9em;'>Booked</span>":""}
+    </td>`;
+    if((firstDay.getDay() + d)%7 === 0) html += "</tr><tr>";
+  }
+  html += "</tr></table>";
+  html += `<div style="margin-top:15px;color:#888;">Click any free (green) date to book the van.</div>`;
+  container.innerHTML = html;
+}
+
+// Book the van on a free day
+window.bookVan = function(dateStr) {
+  if (!confirm(`Book JPS Van for ${dateStr}?`)) return;
+  let bookings = JSON.parse(localStorage.getItem("vanBookings") || "[]");
+  bookings.push({date: dateStr, user: sessionStorage.getItem("aw_logged_in_username") || ""});
+  localStorage.setItem("vanBookings", JSON.stringify(bookings));
+  alert("Van booked!");
+  renderVanCalendar();
+};
 
 // Expose for HTML inline handlers
 window.handleZoneEdit = function(e, zoneIdx, locIdx, field) {
@@ -466,36 +532,4 @@ document.addEventListener("DOMContentLoaded", function () {
   setupListeners();
   const btn = document.getElementById("edit-storage-map-btn");
   if (btn) btn.onclick = toggleEditMode;
-
-  // === ADD VAN MODAL CODE BELOW HERE ===
-  var vanEl = document.getElementById("jps-van-element");
-  if (vanEl) {
-    vanEl.onclick = function() {
-      document.getElementById("van-user").value = sessionStorage.getItem("aw_logged_in_username") || "";
-      document.getElementById("van-modal-backdrop").style.display = "flex";
-    };
-  }
-
-  // All cancel buttons close the modal
-  document.getElementById("van-modal-cancel-btn").onclick = function() {
-    document.getElementById("van-modal-backdrop").style.display = "none";
-  };
-  document.getElementById("van-modal-cancel-btn-2").onclick = function() {
-    document.getElementById("van-modal-backdrop").style.display = "none";
-  };
-
-  // Clicking outside the modal closes it
-  document.getElementById("van-modal-backdrop").onclick = function(e) {
-    if (e.target.id === "van-modal-backdrop") {
-      document.getElementById("van-modal-backdrop").style.display = "none";
-    }
-  };
-
-  // Your form submission code unchanged
-  document.getElementById("van-modal-form").onsubmit = function(e) {
-    e.preventDefault();
-    // ... booking logic ...
-    document.getElementById("van-modal-backdrop").style.display = "none";
-    alert("Booking saved!");
-  };
 });
