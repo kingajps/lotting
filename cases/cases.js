@@ -794,6 +794,40 @@ function splitAndText(doc, text, x, y, maxWidth, lineHeight) {
   lines.forEach((ln, i) => doc.text(ln, x, y + i * (lineHeight || 5)));
 }
 
+// === Finance recording (Invoices) ===
+const FIN_INVOICES_KEY = "aw_finance_invoices";
+function financeLoadInvoices() {
+  try { return JSON.parse(localStorage.getItem(FIN_INVOICES_KEY)) || []; }
+  catch { return []; }
+}
+function financeSaveInvoices(arr) {
+  localStorage.setItem(FIN_INVOICES_KEY, JSON.stringify(arr));
+}
+function recordInvoiceFromCase({ invoiceNo, date, caseObj, grandTotal, subtotal, vatAmount, taxAmount, items, miscCharges }) {
+  const invoices = financeLoadInvoices();
+  // Avoid duplicates by invoiceNo
+  if (!invoices.some(i => i.invoiceNo === invoiceNo)) {
+    invoices.push({
+      invoiceNo,
+      date,
+      caseId: caseObj.id || "",
+      client: caseObj.client || "",
+      clientAddress: caseObj.clientAddress || "",
+      clientEmail: caseObj.contact || "",
+      subtotal,
+      vatAmount,
+      taxAmount,
+      grandTotal,
+      // Store minimal to regenerate PDF later:
+      items: (items || []).map(r => ({
+        name: r.name, quantity: r.qty, estimate: r.estimate, reserve: r.reserve
+      })),
+      miscCharges: (miscCharges || []).map(c => ({ title: c.title, description: c.description, amount: c.amount }))
+    });
+    financeSaveInvoices(invoices);
+  }
+}
+
 // === Init ===
 document.addEventListener("DOMContentLoaded", function () {
   loadCases();
