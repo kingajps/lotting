@@ -66,6 +66,21 @@ body { font-family:'Segoe UI', Arial, sans-serif; background:#f7f9fc; margin:0; 
 
 .finance-empty { color:#888; font-size:1.02rem; text-align:center; margin:12px 0; }
 
+/* PDF preview modal */
+.fin-preview-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.39);
+  display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+.fin-preview-modal {
+  background: #fff; border-radius: 12px; width: 90vw; max-width: 1000px;
+  box-shadow: 0 6px 32px rgba(0,0,0,.2); padding: 14px 14px 10px; position: relative;
+}
+.fin-preview-close {
+  position: absolute; top: 8px; right: 10px; background: none; border: none; font-size: 2rem; color: #888; cursor: pointer;
+}
+.fin-preview-close:hover { color: #2563eb; }
+.fin-preview-title { font-weight: 700; font-size: 1.05rem; margin: 4px 0 8px; color:#174ca2; }
+
 /* Footer */
 .dashboard-footer { background:#2563eb; color:#fff; padding:32px 0 16px; margin-top:48px; }
 .footer-row { max-width:1280px; margin:0 auto; display:flex; gap:42px; flex-wrap:wrap; align-items:flex-start; justify-content:flex-start; }
