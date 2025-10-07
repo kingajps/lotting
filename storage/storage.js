@@ -65,7 +65,7 @@ const mockZones = [
     group: "In Transit",
     locations: [
       {
-        id: "Transit-Van-1",
+        id: "JPS Van",
         type: "Van",
         icon: "🚚",
         status: "Available",
@@ -366,7 +366,15 @@ function renderZones(zones, editable = false) {
   document.getElementById("map-locations-count").textContent = `${count} locations`;
 }
 
+// --- Calendar Modal State ---
+let vanCalMonth = null; // 0-11
+let vanCalYear = null;
+
 function openVanCalendarModal() {
+  // Set to current month/year when opening
+  const today = new Date();
+  vanCalYear = today.getFullYear();
+  vanCalMonth = today.getMonth();
   document.getElementById("van-modal-backdrop").style.display = "flex";
   renderVanCalendar();
 }
@@ -375,21 +383,59 @@ function closeVanCalendarModal() {
   document.getElementById("van-modal-backdrop").style.display = "none";
 }
 
+// Attach close handler
 document.getElementById("van-modal-cancel-btn").onclick = closeVanCalendarModal;
+
+// Month navigation
+document.getElementById("van-prev-month-btn").onclick = function() {
+  if (vanCalMonth === 0) {
+    vanCalMonth = 11;
+    vanCalYear--;
+  } else {
+    vanCalMonth--;
+  }
+  renderVanCalendar();
+};
+document.getElementById("van-next-month-btn").onclick = function() {
+  if (vanCalMonth === 11) {
+    vanCalMonth = 0;
+    vanCalYear++;
+  } else {
+    vanCalMonth++;
+  }
+  renderVanCalendar();
+};
 
 function renderVanCalendar() {
   const bookings = JSON.parse(localStorage.getItem("vanBookings") || "[]");
   const container = document.getElementById("van-calendar-container");
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
+  const monthLabel = document.getElementById("van-calendar-month-label");
+  const year = vanCalYear, month = vanCalMonth;
+
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  monthLabel.textContent = `${monthNames[month]} ${year}`;
+
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
 
-  // Build a set of booked dates for the month
+  // Booked days for this month (for day-range bookings, expand here)
   const bookedDaysSet = new Set(
     bookings
-      .map(b => b.date)
+      .flatMap(b => {
+        // If booking has endDate, mark all days in range
+        if (b.endDate) {
+          const days = [];
+          let d = new Date(b.date);
+          const end = new Date(b.endDate);
+          while (d <= end) {
+            days.push(d.toISOString().slice(0,10));
+            d.setDate(d.getDate() + 1);
+          }
+          return days;
+        } else {
+          return [b.date];
+        }
+      })
       .filter(d => d.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`))
   );
 
@@ -413,8 +459,9 @@ function renderVanCalendar() {
   container.innerHTML = html;
 }
 
-// Book the van on a free day
+// Book the van on a free day (supports future range logic)
 window.bookVan = function(dateStr) {
+  // For booking a range, you could prompt for an end date here.
   if (!confirm(`Book JPS Van for ${dateStr}?`)) return;
   let bookings = JSON.parse(localStorage.getItem("vanBookings") || "[]");
   bookings.push({date: dateStr, user: sessionStorage.getItem("aw_logged_in_username") || ""});
