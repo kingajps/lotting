@@ -81,9 +81,12 @@
     <!-- Other in-transit items -->
   </div>
   <!-- Van Booking Modal -->
-  <div id="van-modal-backdrop" class="modal-backdrop" style="display:none;">
-    <div class="modal">
-      <h2>Book JPS Van</h2>
+  <div id="van-modal-backdrop" class="zone-modal-backdrop" style="display:none;">
+    <div class="zone-modal" style="max-width:450px;">
+      <div class="zone-modal-header">
+        Book JPS Van
+        <button type="button" class="zone-modal-close-btn" id="van-modal-cancel-btn">&times;</button>
+      </div>
       <form id="van-modal-form">
         <label>Date:
           <input type="date" id="van-date" required>
@@ -106,9 +109,9 @@
         <label>Used by:
           <input type="text" id="van-user" required>
         </label>
-        <div class="modal-actions">
+        <div class="modal-actions" style="margin-top:22px; display:flex; gap:14px;">
           <button type="submit" class="primary-btn">Save</button>
-          <button type="button" id="van-modal-cancel-btn">Cancel</button>
+          <button type="button" id="van-modal-cancel-btn-2">Cancel</button>
         </div>
       </form>
     </div>
