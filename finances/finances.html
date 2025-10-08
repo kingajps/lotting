@@ -86,7 +86,9 @@
           <span class="selected-info" id="inv-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn icon" id="inv-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn icon" id="inv-download" title="Download selected (PDF)" type="button"><span>⬇️</span></button>
+          <button class="btn icon" id="inv-filter-toggle" title="Show/Hide filters" type="button"><span>⚙️</span></button>
+          <button class="btn icon" id="inv-density" title="Density" type="button"><span>▥</span></button>
           <button class="btn light" id="inv-reset" type="button">Reset</button>
           <button class="btn primary" id="inv-search" type="button">Search</button>
         </div>
@@ -121,7 +123,7 @@
                 <th data-sort="type">Type</th>
                 <th data-sort="sale">Sale</th>
                 <th data-sort="buyer">Buyer</th>
-                <th data-sort="buyerid">Buyer ID</th>
+                <th data-sort="buyerVat">Buyer VAT</th>
                 <th data-sort="totals">Total / Paid / Outstanding</th>
                 <th data-sort="items">Items</th>
                 <th data-sort="status">Status</th>
@@ -174,7 +176,7 @@
           <span class="selected-info" id="set-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn icon" id="set-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn icon" id="set-download" title="Download selected (CSV)" type="button"><span>⬇️</span></button>
           <button class="btn light" id="set-reset" type="button">Reset</button>
           <button class="btn primary" id="set-search" type="button">Search</button>
         </div>
@@ -202,8 +204,8 @@
                 <th data-sort="no">No.</th>
                 <th data-sort="type">Type</th>
                 <th data-sort="sale">Sale</th>
-                <th data-sort="Client">Client</th>
-                <th data-sort="ClientVat">Client VAT</th>
+                <th data-sort="vendor">Vendor</th>
+                <th data-sort="vendorVat">Vendor VAT</th>
                 <th data-sort="totals">Total / Paid / Outstanding</th>
                 <th data-sort="items">Items</th>
                 <th data-sort="status">Status</th>
@@ -233,7 +235,7 @@
           <span class="selected-info" id="ship-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn icon" id="ship-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn icon" id="ship-download" title="Download selected (CSV)" type="button"><span>⬇️</span></button>
           <button class="btn light" id="ship-reset" type="button">Reset</button>
           <button class="btn primary" id="ship-search" type="button">Search</button>
         </div>
@@ -264,7 +266,7 @@
                 <th data-sort="type">Type</th>
                 <th data-sort="sale">Sale</th>
                 <th data-sort="buyer">Buyer</th>
-                <th data-sort="buyerVat">Total Cost</th>
+                <th data-sort="buyerVat">Buyer VAT</th>
                 <th data-sort="items">Items</th>
                 <th data-sort="status">Status</th>
                 <th data-sort="raised">Raised</th>
@@ -306,7 +308,7 @@
           <span class="selected-info" id="invpay-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn icon" id="invpay-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn icon" id="invpay-download" title="Download selected (CSV)" type="button"><span>⬇️</span></button>
           <button class="btn light" id="invpay-reset" type="button">Reset</button>
           <button class="btn primary" id="invpay-search" type="button">Search</button>
         </div>
@@ -382,7 +384,7 @@
           <span class="selected-info" id="setlpay-selected-info">Selected 0</span>
         </div>
         <div class="right">
-          <button class="btn icon" id="setlpay-download" title="Download selected" type="button"><span>⬇️</span></button>
+          <button class="btn icon" id="setlpay-download" title="Download selected (CSV)" type="button"><span>⬇️</span></button>
           <button class="btn light" id="setlpay-reset" type="button">Reset</button>
           <button class="btn primary" id="setlpay-search" type="button">Search</button>
         </div>
@@ -412,8 +414,8 @@
                 <th data-sort="settlement">Settlement</th>
                 <th data-sort="settlementType">Settlement Type</th>
                 <th data-sort="sale">Sale</th>
-                <th data-sort="Client">Client</th>
-                <th data-sort="ClientNo">Client No</th>
+                <th data-sort="vendor">Vendor</th>
+                <th data-sort="vendorNo">Vendor No</th>
                 <th data-sort="paymentType">Payment Type</th>
                 <th data-sort="amount">Amount</th>
                 <th data-sort="method">Method</th>
@@ -435,12 +437,14 @@
     </section>
   </main>
 
-  <!-- PDF Preview Modal -->
-  <div id="pdf-preview-backdrop" class="fin-preview-backdrop" style="display:none;">
-    <div class="fin-preview-modal">
-      <button id="fin-preview-close" class="fin-preview-close" type="button">&times;</button>
-      <div class="fin-preview-title" id="fin-preview-title"></div>
-      <iframe id="fin-preview-frame" title="PDF preview" style="width:100%; height:80vh; border:0;"></iframe>
+  <!-- Preview Modal -->
+  <div id="fin-modal-backdrop" class="fin-modal-backdrop" style="display:none;">
+    <div class="fin-modal">
+      <button class="fin-modal-close-btn" id="fin-modal-close-btn" type="button">×</button>
+      <div class="fin-modal-title" id="fin-modal-title">Preview</div>
+      <div class="fin-modal-body" id="fin-modal-body">
+        <!-- PDF iframe injected here -->
+      </div>
     </div>
   </div>
 
@@ -485,10 +489,9 @@
     </div>
   </footer>
 
-  <!-- Libraries -->
+  <!-- jsPDF (for PDFs) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <script src="finances.js"></script>
 </body>
